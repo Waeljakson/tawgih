@@ -1,3 +1,12 @@
+# V1.0.21 — Bubble Test Bridge
+
+- Connected the test build to `guidance_login_test` on Bubble `version-test`.
+- Connected user context to `guidance_bootstrap` with a user-scoped Bearer token.
+- Added an Arabic test-login overlay when no Bubble token exists.
+- Token is stored in `sessionStorage` only; email/password are never written to GitHub files.
+- Configured the `version-test` Data API base so existing persistence code can authenticate as the current user.
+- No Bubble admin token is embedded.
+
 # V1.0.20 — Inner Header Refinement
 
 - Compact creative header for all inner platforms.

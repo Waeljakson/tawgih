@@ -1,5 +1,5 @@
 {
-  "version": "1.0.20",
+  "version": "1.0.21",
   "edition": "Mishkat School Platform",
   "date": "2026-08-08",
   "features": [
@@ -10,11 +10,15 @@
     "No changes required to existing Bubble core tables",
     "Every guidance record opens on its dedicated report before data entry",
     "New record opens form and save returns to the same report",
-    "Record report filters by student/name, academic year, and term"
+    "Record report filters by student/name, academic year, and term",
+    "Bubble version-test login bridge using guidance_login_test",
+    "Authenticated guidance_bootstrap connection with user-scoped Bearer token",
+    "User token kept in browser sessionStorage only; no admin token or password embedded",
+    "Bubble Data API base configured for version-test user-scoped requests"
   ],
-  "school_version": "1.0.19",
-  "updated_at": "2026-08-08",
+  "school_version": "1.0.21",
+  "updated_at": "2026-08-10",
   "name": "Mishkat School Platform",
-  "build": "record-report-first",
-  "label": "School Edition V1.0.19 - Record Report First"
+  "build": "bubble-test-bridge",
+  "label": "School Edition V1.0.21 - Bubble Test Bridge"
 }
