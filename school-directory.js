@@ -34,14 +34,74 @@
   };
   const boolOf = value => value === true || value === 1 || ["true","yes","نعم","1"].includes(String(value).trim().toLowerCase());
   const activeOf = (raw, fallback=true) => {
-    const v = pick(raw,["Active","active","is_active"],undefined);
-    return v === undefined ? fallback : boolOf(v);
+    for(const key of ["Active","active","is_active"]){
+      if(raw?.[key]!==undefined&&raw?.[key]!==null)return boolOf(raw[key]);
+    }
+    return fallback;
   };
   const norm = v => String(v??"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
 
+  const unwrapIncoming=(value)=>{
+    const cfg=global.MISHKAT_BUBBLE_CONFIG||{};
+    if(typeof cfg.normalizeDirectoryPayload==="function")return cfg.normalizeDirectoryPayload(value);
+    return value?.response||value?.data||value||{};
+  };
+  const hasList=(obj,keys)=>keys.some(k=>Array.isArray(obj?.[k])&&obj[k].length);
+  const mergeDirectorySources=(primary={},extra={})=>{
+    const out={...extra,...primary};
+    const hydrateScoped=(p,e)=>{
+      if(!p.length)return e;
+      const map=new Map(e.map(row=>[idOf(row),row]).filter(([id])=>id));
+      return p.map(row=>{
+        const id=idOf(row);const full=id?map.get(id):null;
+        if(!full)return row;
+        return row&&typeof row==="object"?{...full,...row}:full;
+      });
+    };
+    const scopedGroups=[
+      ["schools",["schools","Schools","School"]],
+      ["departments",["departments","Departments","Department"]],
+      ["grades",["grades","Grades"]],
+      ["academicYears",["academicYears","academic_years","academic year","years"]],
+      ["terms",["terms","academicTerms","academic_terms","semesters"]],
+      ["students",["students","Students","schoolStudents","school_students"]]
+    ];
+    for(const [canonical,keys] of scopedGroups){
+      out[canonical]=hydrateScoped(listFrom(primary,keys),listFrom(extra,keys));
+    }
+    const supplementalGroups=[
+      ["classes",["classes","Classes","Class"]],
+      ["jobTitles",["jobTitles","job_titles","Job Titles","Job Title"]],
+      ["usersData",["usersData","users_data","Users Data","employees","staff","schoolEmployees","school_employees"]],
+      ["guidanceActions",["guidanceActions","Guidance_Action"]],
+      ["guidanceWays",["guidanceWays","Guidance_Way"]],
+      ["guidanceReasons",["guidanceReasons","Guidance_Reason"]],
+      ["guidanceSitu",["guidanceSitu","Guidance_Situ"]],
+      ["guidanceFailTypes",["guidanceFailTypes","Guidance_FailType"]],
+      ["guidanceProblemBehav",["guidanceProblemBehav","Guidance_ProblemBehav"]],
+      ["guidanceProblemEdu",["guidanceProblemEdu","Guidance_ProblemEdu"]],
+      ["guidanceSkills",["guidanceSkills","Guidance_Skills"]],
+      ["guidanceStudentNotices",["guidanceStudentNotices","guidance_Studentnotice"]],
+      ["guidanceObserv",["guidanceObserv","Guidance_observ"]]
+    ];
+    for(const [canonical,keys] of supplementalGroups){
+      const p=listFrom(primary,keys),e=listFrom(extra,keys);out[canonical]=p.length?p:e;
+    }
+    const scopedUser=primary.currentUsersData||primary.current_users_data||null;
+    const userId=String(global.MishkatBubbleAuth?.getUserId?.()||"");
+    const userRows=listFrom(out,["usersData","users_data","Users Data","employees","staff"]);
+    const currentFull=userId?userRows.find(row=>idOf(pick(row,["User","user"],""))===userId):null;
+    if(scopedUser||currentFull)out.currentUsersData={...(currentFull||{}),...(scopedUser||{})};
+    out.__mishkatScope=primary.__mishkatScope||extra.__mishkatScope||{};
+    return out;
+  };
+
   function listFrom(src, keys){
-    for(const key of keys){ if(Array.isArray(src?.[key])) return src[key]; }
-    return [];
+    let empty=[];
+    for(const key of keys){
+      if(Array.isArray(src?.[key])){if(src[key].length)return src[key];empty=src[key];}
+    }
+    return empty;
   }
   function createLookup(src){
     const groups = {
@@ -155,10 +215,14 @@
   }
 
   let snapshot=normalize(FALLBACK);
-  async function loadFromDataApi(){
+  async function loadFromDataApi({supplementOnly=false}={}){
     const store=global.MishkatBubbleStore,config=global.MISHKAT_BUBBLE_CONFIG||{};
     if(!store?.remoteEnabled?.() && !config.dataApiBase && !config.objectApiBase)return null;
-    const typeNames=[
+    const typeNames=supplementOnly?[
+      "School","Department","Grades","Class","Job Title","academic year","terms","Users Data","Students",
+      "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
+      "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
+    ]:[
       "School","Department","Grades","Class","Job Title","academic year","terms","Users Data","Students",
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
@@ -171,17 +235,38 @@
   }
   async function load(){
     let incoming=global.MISHKAT_BUBBLE_DATA||null;const config=global.MISHKAT_BUBBLE_CONFIG||{};
+    let bootstrapLoaded=false;
     if(!incoming&&config.directoryEndpoint){
-      try{const response=await fetch(config.directoryEndpoint,{credentials:config.credentials||"include",headers:{"Accept":"application/json",...(config.headers||{})}});if(!response.ok)throw new Error(`HTTP ${response.status}`);const payload=await response.json();incoming=payload?.response||payload?.data||payload;}catch(error){console.warn("Bubble directory endpoint unavailable; trying Data API/local snapshot.",error);}
-    }
-    if(!incoming)incoming=await loadFromDataApi();
+      try{
+        const response=await fetch(config.directoryEndpoint,{credentials:config.credentials||"include",headers:{"Accept":"application/json",...(config.headers||{})},cache:"no-store"});
+        if(!response.ok)throw new Error(`HTTP ${response.status}`);
+        incoming=unwrapIncoming(await response.json());bootstrapLoaded=true;
+      }catch(error){console.warn("Bubble directory endpoint unavailable; trying Data API/local snapshot.",error);}
+    }else if(incoming){incoming=unwrapIncoming(incoming);bootstrapLoaded=Boolean(incoming?.__mishkatScope?.authoritativeStudents);}
+
+    if(incoming){
+      // guidance_bootstrap is authoritative for the current user's schools/departments/grades/students.
+      // Data API only supplements lookup tables and employee directory; it never replaces scoped students.
+      const supplement=await loadFromDataApi({supplementOnly:true}).catch(()=>null);
+      if(supplement)incoming=mergeDirectorySources(incoming,supplement);
+    }else incoming=await loadFromDataApi();
+
     if(!incoming){try{incoming=JSON.parse(localStorage.getItem("mishkat_bubble_directory_snapshot_v1")||"null");}catch(_error){}}
     if(incoming&&Object.keys(incoming).length){
+      incoming=unwrapIncoming(incoming);
       global.MISHKAT_BUBBLE_DATA=incoming;
       try{localStorage.setItem("mishkat_bubble_directory_snapshot_v1",JSON.stringify(incoming));}catch(_error){}
       try{global.MishkatSchoolContext?.build?.();global.MishkatSchoolContext?.applyDocument?.(document);}catch(_error){}
     }
-    snapshot=normalize(incoming||FALLBACK);return snapshot;
+    snapshot=normalize(incoming||FALLBACK);
+    snapshot.connection={
+      authenticated:Boolean(global.MishkatBubbleAuth?.isAuthenticated?.()),
+      bootstrapLoaded,
+      rawStudents:listFrom(incoming||{},["students","Students","schoolStudents","school_students"]).length,
+      normalizedStudents:snapshot.students.length,
+      employees:snapshot.employees.length
+    };
+    return snapshot;
   }
   function currentAcademicYear(){
     const active=snapshot.academicYears.filter(x=>x.isCurrent);

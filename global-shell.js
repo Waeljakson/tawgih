@@ -33,7 +33,7 @@
   function loadScript(src,id){return new Promise(resolve=>{if(global[id])return resolve();const exists=[...document.scripts].find(s=>s.src===src);if(exists){exists.addEventListener('load',resolve,{once:true});return resolve()}const s=document.createElement('script');s.src=src;s.async=false;s.onload=resolve;s.onerror=resolve;document.head.appendChild(s)})}
   function build(){
     if(document.getElementById('mishkatGlobalShell'))return;
-    ensureCss(A('global-shell.css?v=1.0.20'),'mgsGlobalCss');
+    ensureCss(A('global-shell.css?v=1.0.22'),'mgsGlobalCss');
     const pageKey=currentPageKey();
     document.body.classList.add('mishkat-global-shell-loaded');
     document.body.classList.add(pageKey?'mishkat-inner-shell':'mishkat-home-shell');
@@ -101,14 +101,14 @@
   function updateContext(){const c=global.MishkatSchoolContext?.getContext?.()||{};const line=document.getElementById('mgsContextLine');if(line){const bits=[c.schoolName||'مدارس المشكاة الأهلية',c.stageName||c.departmentName,c.counselorName].filter(Boolean);line.textContent=bits.join(' · ')||'مدارس المشكاة الأهلية · جميع الخدمات في مكان واحد'}}
   function syncBadge(){const src=document.getElementById('smartReminderBadge'),dst=document.getElementById('mgsNotifyBadge');if(!dst)return;const n=Number(src?.textContent||0);dst.hidden=!n;dst.textContent=String(Math.min(99,n))}
   async function loadServices(){
-    ensureCss(A('smart-reminders.css?v=1.0.20'),'mgsReminderCss');ensureCss(A('support-widget.css?v=1.0.20'),'mgsSupportCss');
-    await loadScript(A('bubble-schema.js?v=1.0.20'),'MISHKAT_BUBBLE_SCHEMA');
-    await loadScript(A('bubble-config.js?v=1.0.20'),'MISHKAT_BUBBLE_CONFIG');
-    await loadScript(A('school-context.js?v=1.0.20'),'MishkatSchoolContext');
-    await loadScript(A('bubble-persistence.js?v=1.0.20'),'MishkatBubbleStore');
-    await loadScript(A('school-directory.js?v=1.0.20'),'MishkatBubbleDirectory');
-    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.20'),'__guidanceSmartRemindersLoaded');
-    if(!global.__unifiedSupportWidgetLoaded)await loadScript(A('support-widget-rest.js?v=1.0.20'),'__unifiedSupportWidgetLoaded');
+    ensureCss(A('smart-reminders.css?v=1.0.22'),'mgsReminderCss');ensureCss(A('support-widget.css?v=1.0.22'),'mgsSupportCss');
+    await loadScript(A('bubble-schema.js?v=1.0.22'),'MISHKAT_BUBBLE_SCHEMA');
+    await loadScript(A('bubble-config.js?v=1.0.22'),'MISHKAT_BUBBLE_CONFIG');
+    await loadScript(A('school-context.js?v=1.0.22'),'MishkatSchoolContext');
+    await loadScript(A('bubble-persistence.js?v=1.0.22'),'MishkatBubbleStore');
+    await loadScript(A('school-directory.js?v=1.0.22'),'MishkatBubbleDirectory');
+    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.22'),'__guidanceSmartRemindersLoaded');
+    if(!global.__unifiedSupportWidgetLoaded)await loadScript(A('support-widget-rest.js?v=1.0.22'),'__unifiedSupportWidgetLoaded');
     setTimeout(syncBadge,500);setInterval(syncBadge,1200);
   }
   function reorderHome(){if(!/\/index\.html$|\/$/.test(location.pathname))return;const grid=document.getElementById('activePlatformGrid');if(!grid)return;const order=['records','counselor-plan','smart-calendar','messages','analysis','reports','certificates','presentations'];order.forEach((cls,i)=>{const card=grid.querySelector('.'+cls);if(card){grid.appendChild(card);const n=card.querySelector('.platform-number');if(n)n.textContent=String(i+1).padStart(2,'0')}})}

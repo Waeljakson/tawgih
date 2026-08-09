@@ -1,24 +1,23 @@
 {
-  "version": "1.0.21",
+  "version": "1.0.22",
   "edition": "Mishkat School Platform",
   "date": "2026-08-08",
   "features": [
-    "Unified platform gateway header on all primary pages",
-    "Floating guidance chat launcher at bottom-right on all pages",
-    "Group and direct chat using Guidance_Message and Users Data",
-    "Role-scoped school and supervisory statistics",
-    "No changes required to existing Bubble core tables",
-    "Every guidance record opens on its dedicated report before data entry",
-    "New record opens form and save returns to the same report",
-    "Record report filters by student/name, academic year, and term",
-    "Bubble version-test login bridge using guidance_login_test",
-    "Authenticated guidance_bootstrap connection with user-scoped Bearer token",
-    "User token kept in browser sessionStorage only; no admin token or password embedded",
-    "Bubble Data API base configured for version-test user-scoped requests"
+    "Fixed Bubble student dropdowns in digital records",
+    "Current User -> user data -> User Student is authoritative for visible students",
+    "Multi-school/multi-stage assignments no longer hide valid students",
+    "Bubble bootstrap payload normalized into platform directory schema",
+    "Scoped IDs can be safely hydrated from Data API without broadening student access",
+    "Employees and lookup tables supplement from Bubble Data API using the user token",
+    "Terms/lookups without an Active field are no longer incorrectly filtered out",
+    "Student school/department from selected student wins when saving multi-school records",
+    "Stale directory/user-context caches cleared when Bubble user changes",
+    "Cache-busting updated across platform pages",
+    "No Bubble admin token embedded"
   ],
-  "school_version": "1.0.21",
+  "school_version": "1.0.22",
   "updated_at": "2026-08-10",
   "name": "Mishkat School Platform",
-  "build": "bubble-test-bridge",
-  "label": "School Edition V1.0.21 - Bubble Test Bridge"
+  "build": "bubble-records-directory-fix",
+  "label": "School Edition V1.0.22 - Bubble Records Directory Fix"
 }

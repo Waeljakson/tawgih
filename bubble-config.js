@@ -22,6 +22,49 @@
   };
 
   const getToken=()=>storage.get(TOKEN_KEY);
+
+  function normalizeDirectoryPayload(payload){
+    let data=payload?.response??payload?.data??payload??{};
+    if(data?.response && typeof data.response==="object" && !Array.isArray(data.response))data=data.response;
+    if(!data || typeof data!=="object" || Array.isArray(data))data={};
+    const out={...data};
+    const arr=(...keys)=>{for(const key of keys){if(Array.isArray(data?.[key]))return data[key];}return [];};
+    out.schools=arr("schools","Schools","School");
+    out.departments=arr("departments","Departments","Department","Dep list","dep_list");
+    out.grades=arr("grades","Grades");
+    out.students=arr("students","Students","User Student","user_students","schoolStudents","school_students");
+    out.academicYears=arr("academicYears","academic_years","academic year","years");
+    out.terms=arr("terms","academicTerms","academic_terms","semesters");
+    const currentYear=data.current_academic_year||data.currentAcademicYear||data["current academic year"]||null;
+    if(currentYear){
+      const currentId=String(currentYear?._id||currentYear?.id||currentYear?.["unique id"]||currentYear?.["Unique ID"]||"");
+      out.academicYears=out.academicYears.map(y=>{
+        const yid=String(y?._id||y?.id||y?.["unique id"]||y?.["Unique ID"]||"");
+        return currentId&&yid===currentId?{...y,Active:true}:y;
+      });
+      out.currentAcademicYear=currentYear;
+    }
+    // guidance_bootstrap already scopes these lists from Current User -> user data.
+    // Create a synthetic Users Data context so the existing UI can understand multi-school assignment
+    // without requiring Full Name/User ID parameters in the endpoint.
+    if(!out.currentUsersData && !out.current_users_data){
+      out.currentUsersData={
+        "Schools":out.schools,
+        "Dep list":out.departments,
+        "Grades":out.grades,
+        "Students":out.students,
+        "User":storage.get(USER_KEY)||""
+      };
+    }
+    out.__mishkatScope={
+      source:"guidance_bootstrap",
+      authoritativeStudents:true,
+      assignedSchools:true,
+      assignedDepartments:true,
+      assignedGrades:true
+    };
+    return out;
+  }
   const authHeaders={};
   Object.defineProperty(authHeaders,"Authorization",{
     enumerable:true,
@@ -59,13 +102,24 @@
     storage.set(TOKEN_KEY,token);
     storage.set(USER_KEY,findDeep(payload,"user_id")||findDeep(payload,"userId")||"");
     storage.set(EXPIRES_KEY,findDeep(payload,"expires")||"");
+    try{
+      localStorage.removeItem("mishkat_bubble_directory_snapshot_v1");
+      localStorage.removeItem("mishkat_school_user_context_v4");
+      localStorage.removeItem("mishkat_school_user_context_v3");
+      localStorage.removeItem("mishkat_school_user_context_v2");
+    }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:true}}));
     return payload;
   }
 
   function logout(){
     storage.remove(TOKEN_KEY);storage.remove(USER_KEY);storage.remove(EXPIRES_KEY);
-    try{localStorage.removeItem("mishkat_bubble_directory_snapshot_v1")}catch(_e){}
+    try{
+      localStorage.removeItem("mishkat_bubble_directory_snapshot_v1");
+      localStorage.removeItem("mishkat_school_user_context_v4");
+      localStorage.removeItem("mishkat_school_user_context_v3");
+      localStorage.removeItem("mishkat_school_user_context_v2");
+    }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:false}}));
   }
 
@@ -129,6 +183,7 @@
     timeoutMs:12000,
     headers:authHeaders,
     tokenProvider:async()=>getToken(),
+    normalizeDirectoryPayload,
     typeApiNames:{
       "academic year":"academic year","Users Data":"Users Data","Students":"Students","terms":"terms","School":"School","Department":"Department","Grades":"Grades","Class":"Class","Job Title":"Job Title",
       "Guidance_Attandance":"Guidance_Attandance","Guidance_Cases":"Guidance_Cases","Guidance_Collective":"Guidance_Collective","Guidance_Contact":"Guidance_Contact","guidance_Fail":"guidance_Fail","Guidance_FailType":"Guidance_FailType","Guidance_Late":"Guidance_Late","Guidance_Log":"Guidance_Log","Guidance_Mettings":"Guidance_Mettings","Guidance_observ":"Guidance_observ","Guidance_Observation":"Guidance_Observation","Guidance_Periodic":"Guidance_Periodic","Guidance_ProblemBehav":"Guidance_ProblemBehav","Guidance_ProblemEdu":"Guidance_ProblemEdu","Guidance_Project":"Guidance_Project","Guidance_Project_Progress":"Guidance_Project_Progress","Guidance_Reason":"Guidance_Reason","Guidance_Situ":"Guidance_Situ","Guidance_Situation":"Guidance_Situation","Guidance_Skills":"Guidance_Skills","Guidance_Statistics":"Guidance_Statistics","guidance_Studentnotice":"guidance_Studentnotice","Guidance_SubCollective":"Guidance_SubCollective","Guidance_Way":"Guidance_Way","Guidance_Action":"Guidance_Action","Guidance_Behav":"Guidance_Behav","Guidance_Edu":"Guidance_Edu",

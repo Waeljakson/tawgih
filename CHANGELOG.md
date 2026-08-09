@@ -1,3 +1,16 @@
+# V1.0.22 — Bubble Records Directory Fix
+
+- Fixed blank student dropdowns in Digital Records.
+- `guidance_bootstrap.students` is treated as the authoritative Current User student scope; the UI no longer applies a second single-school filter.
+- Added multi-school / multi-department / multi-grade assignment context.
+- Normalized bootstrap aliases: schools, departments, grades, students, academic years, terms, current academic year.
+- Added safe hydration from user-authenticated Data API when Bootstrap returns Bubble IDs instead of full Things, while preserving the original scoped student list.
+- Supplemented employees and guidance lookup tables from Data API without replacing scoped students.
+- Fixed `activeOf()` fallback so Terms and lookup tables that do not have an `Active` field remain visible.
+- Selected student's Bubble School/Department now takes priority when saving a record for multi-school users.
+- Clears previous user's directory/context cache after login/logout to prevent stale cross-user display.
+- Updated shared-script cache versions to V1.0.22.
+
 # V1.0.21 — Bubble Test Bridge
 
 - Connected the test build to `guidance_login_test` on Bubble `version-test`.
