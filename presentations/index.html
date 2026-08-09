@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-platform-name="منصة العروض التقديمية">
+<head>
+  <meta name="app-version" content="12.0.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#5b21b6">
+  <meta name="description" content="مكتبة عروض توجيهية احترافية مصنفة حسب المرحلة والجمهور.">
+  <title>منصة العروض التقديمية | خدمات الموجه الطلابي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v10.1.0-20260806">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../support-widget.css?v10.1.0-20260806">
+  <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+</head>
+<body>
+  <div id="accessGate" class="access-gate">
+    <div class="gate-spinner"></div>
+    <strong>جارٍ التحقق من باقة العروض التقديمية…</strong>
+    <p>سيتم إعادتك إلى بوابة المنصات إذا لم تكن الباقة مفعّلة.</p>
+  </div>
+
+  <div id="appShell" hidden>
+    <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
+      <div class="unified-nav-shell">
+        <a class="portal-home-link" href="../index.html" aria-label="العودة إلى بوابة المنصات">
+          <span class="home-icon">⌂</span>
+          <span><strong>بوابة المنصات</strong><small>العودة إلى الصفحة الرئيسية</small></span>
+        </a>
+        <nav id="platformSwitcher" class="platform-switcher" aria-label="التنقل بين المنصات"></nav>
+        <div id="platformPlanBadge" class="platform-plan-badge"></div>
+      </div>
+    </header>
+
+    <header class="presentation-header">
+      <div class="header-glow glow-a"></div><div class="header-glow glow-b"></div>
+      <div class="header-inner">
+        <div class="school-brand">
+          <div class="school-logo-box"><img id="schoolLogo" hidden alt="شعار المدرسة"><span id="schoolLogoPlaceholder">م</span></div>
+          <div><span>منصة العروض التقديمية</span><h1 id="schoolName">اسم المدرسة</h1><p id="userName">المستخدم</p></div>
+        </div>
+        <div class="header-copy">
+          <span class="eyebrow">عروض توجيهية جاهزة للعرض داخل المنصة</span>
+          <h2>محتوى بصري يناسب <b>المرحلة والجمهور</b></h2>
+          <p>اختر المرحلة ونوع الطلاب، ثم استعرض البرامج الوزارية والنوعية والقيمية بصياغة وتصميم مناسبين.</p>
+        </div>
+        <div class="header-actions">
+          <button id="openAudienceButton" class="light-button" type="button">تغيير الجمهور</button>
+          <button id="openCustomRequestButton" class="accent-button" type="button">طلب برنامج خاص</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-shell">
+      <section class="audience-bar">
+        <div class="audience-title"><span>الجمهور المحدد</span><strong id="audienceSummary">الابتدائية الدنيا — بنين</strong><small>المرحلة قابلة للتغيير، أما نوع الطلاب فيُثبَّت على الحساب ولا يغيّره إلا مدير النظام.</small></div>
+        <div id="stageQuickFilters" class="quick-filter-group" aria-label="المرحلة"></div>
+        <div id="genderQuickFilters" class="quick-filter-group gender-filters" aria-label="نوع الطلاب"></div>
+      </section>
+
+      <section class="catalog-controls">
+        <div class="section-heading"><div><span>مكتبة البرامج</span><h2>اختر تصنيف العرض</h2></div><div class="catalog-count"><strong id="visibleProgramCount">0</strong><small>عرض متاح</small></div></div>
+        <div id="categoryTabs" class="category-tabs"></div>
+        <div class="search-row">
+          <label class="search-box"><span>⌕</span><input id="programSearch" type="search" placeholder="ابحث باسم البرنامج أو الموضوع…"></label>
+          <select id="sortPrograms" aria-label="ترتيب العروض"><option value="recommended">الترتيب المقترح</option><option value="title">حسب الاسم</option><option value="duration">الأقصر مدة</option></select>
+        </div>
+      </section>
+
+      <section id="ministerialIntro" class="ministerial-intro">
+        <div class="intro-icon">◈</div>
+        <div><span>قائمة البرامج الوزارية</span><h3>برامج وخدمات توجيهية أساسية</h3><p>تبدأ المكتبة ببرامج التهيئة الإرشادية، تعزيز السلوك الإيجابي، رفق، الإرشاد وقت الأزمات، الاستخدام الآمن للإنترنت، المجلس الطلابي، الرعاية الطلابية، الاستشارات التربوية، التوجيه المهني، والانضباط المدرسي.</p></div>
+      </section>
+
+      <section>
+        <div id="programGrid" class="program-grid"></div>
+        <div id="emptyPrograms" class="empty-state" hidden><strong>لا توجد عروض مطابقة</strong><p>غيّر المرحلة أو التصنيف أو عبارة البحث.</p></div>
+      </section>
+
+      <section class="custom-program-banner">
+        <div class="custom-visual"><span></span><span></span><span></span><b>+</b></div>
+        <div><span>برنامج خاص بالمدرسة</span><h2>لم تجد الموضوع المناسب؟</h2><p>أرسل احتياجك والمرحلة ونوع الطلاب وعدد الشرائح المطلوب. يتم تحديد السعر حسب نطاق المحتوى والتصميم والمواد المطلوبة، ثم التواصل عبر واتساب.</p></div>
+        <button id="openCustomRequestButtonBottom" class="accent-button large" type="button">طلب تصميم عرض خاص</button>
+      </section>
+
+      <section class="my-requests-section">
+        <div class="section-heading"><div><span>طلباتك الخاصة</span><h2>متابعة طلبات التصميم</h2></div><button id="refreshRequestsButton" class="text-button" type="button">تحديث</button></div>
+        <div id="myRequestsList" class="requests-list"><div class="loading-line">جارٍ تحميل الطلبات…</div></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>منصة العروض التقديمية — منصة مدارس المشكاة الأهلية</span><span>الدعم والتصميم الخاص عبر واتساب: 00966582712620</span></footer>
+  </div>
+
+  <div id="audienceModal" class="modal" hidden>
+    <div class="modal-card audience-modal-card">
+      <div class="modal-head"><div><span>تخصيص المحتوى</span><h2>حدد المرحلة ونوع الطلاب</h2><p>اختر نوع الطلاب بدقة؛ سيتم تثبيته على الحساب، ولن تستطيع تغييره لاحقًا إلا عن طريق مدير النظام.</p></div><button class="close-button" data-close="audienceModal" type="button">×</button></div>
+      <div class="chooser-section"><h3>المرحلة الدراسية</h3><div id="stageChooser" class="choice-grid stage-choice-grid"></div></div>
+      <div class="chooser-section"><h3>نوع الطلاب</h3><div id="genderChooser" class="choice-grid gender-choice-grid"></div></div>
+      <button id="confirmAudienceButton" class="primary-button wide" type="button">عرض البرامج المناسبة</button>
+    </div>
+  </div>
+
+  <div id="viewerModal" class="viewer-modal" hidden>
+    <div class="viewer-topbar">
+      <div class="viewer-title"><span id="viewerCategory">برنامج</span><strong id="viewerProgramTitle">عنوان العرض</strong><small id="viewerAudience">الجمهور</small></div>
+      <div class="viewer-actions"><button id="toggleAutoPlayButton" type="button">تشغيل تلقائي</button><button id="fullScreenButton" type="button">ملء الشاشة</button><button id="closeViewerButton" class="viewer-close" type="button">×</button></div>
+    </div>
+    <div class="viewer-stage-wrap">
+      <button id="previousSlideButton" class="slide-arrow prev" type="button" aria-label="الشريحة السابقة">‹</button>
+      <div id="slideCanvas" class="slide-canvas"></div>
+      <button id="nextSlideButton" class="slide-arrow next" type="button" aria-label="الشريحة التالية">›</button>
+    </div>
+    <div class="viewer-bottom">
+      <div id="slideDots" class="slide-dots"></div>
+      <div class="slide-counter"><span id="currentSlideNumber">1</span><i>/</i><span id="totalSlideNumber">7</span></div>
+      <div class="viewer-note">العرض متاح للمشاهدة داخل المنصة فقط — لا توجد ملفات للتنزيل.</div>
+    </div>
+  </div>
+
+  <div id="customRequestModal" class="modal" hidden>
+    <div class="modal-card custom-request-card">
+      <div class="modal-head"><div><span>تصميم حسب الطلب</span><h2>طلب برنامج وعرض خاص</h2><p>السعر يحدد بعد مراجعة الموضوع وعدد الشرائح ومستوى التخصيص.</p></div><button class="close-button" data-close="customRequestModal" type="button">×</button></div>
+      <div class="form-grid">
+        <label class="span-2"><span>عنوان البرنامج المطلوب</span><input id="customTitle" type="text" placeholder="مثال: برنامج التعامل مع قلق الاختبارات"></label>
+        <label><span>التصنيف الأقرب</span><select id="customCategory"><option value="custom">برنامج خاص</option><option value="ministerial">وزاري</option><option value="qualitative">نوعي</option><option value="values">قيمي</option></select></label>
+        <label><span>عدد الشرائح المتوقع</span><input id="customSlides" type="number" min="15" max="40" value="15"></label>
+        <label><span>المرحلة</span><select id="customStage"></select></label>
+        <label><span>نوع الطلاب — ثابت حسب الحساب</span><select id="customGender" disabled></select></label>
+        <label class="span-2"><span>الهدف من البرنامج</span><textarea id="customObjective" rows="4" placeholder="اشرح المشكلة أو الهدف الذي تريد أن يعالجه العرض…"></textarea></label>
+        <label class="span-2"><span>ملاحظات التصميم والمحتوى</span><textarea id="customNotes" rows="3" placeholder="ألوان، مدة العرض، نشاط مطلوب، موعد التنفيذ…"></textarea></label>
+      </div>
+      <div class="cost-note"><strong>التسعير حسب التكلفة</strong><p>يتم تحديد السعر بعد مراجعة عدد الشرائح، عمق المحتوى، مستوى التصميم، الصور، والموعد المطلوب.</p></div>
+      <a id="customWhatsAppLink" class="whatsapp-button" target="_blank" rel="noopener">التواصل عبر واتساب ببيانات الطلب</a>
+      <label class="confirmation"><input id="customWhatsappConfirmed" type="checkbox"><span>أؤكد أنني تواصلت عبر واتساب بخصوص هذا الطلب.</span></label>
+      <button id="submitCustomRequestButton" class="primary-button wide" type="button" disabled>إرسال طلب التصميم</button>
+      <div id="customRequestStatus" class="status-box" hidden></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="data.js?v10.1.0-20260806"></script>
+  <script src="../bubble-schema.js?v=school-1.0.15"></script>
+  <script src="../bubble-config.js?v=school-1.0.15"></script>
+  <script src="../school-context.js?v=school-1.0.15"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.15"></script>
+  <script src="../school-directory.js?v=school-1.0.15"></script>
+  <script src="app-v12.js"></script>
+  <script src="../support-widget.js?v10.1.0-20260806"></script>
+  <script src="../smart-reminders.js?v=19.0.9"></script>
+  <script src="../global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>

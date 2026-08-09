@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-platform-name="منصة شهادات التقدير">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#173f56">
+  <meta name="app-version" content="18.0.0">
+  <meta name="description" content="منصة إنشاء شهادات تقدير فاخرة من التوجيه الطلابي للطلاب وأولياء الأمور.">
+  <title>شهادات التقدير | التوجيه الطلابي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=18.0.0">
+  <link rel="stylesheet" href="../support-widget.css?v=17.3.1">
+  <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+<style>.mishkat-unified-logo{background:#fff!important;padding:4px!important;border:1px solid rgba(49,95,53,.14)!important}.mishkat-unified-logo img{width:100%;height:100%;object-fit:contain}.unified-platform-bar{border-bottom:2px solid rgba(49,95,53,.25)!important}</style></head>
+<body>
+  <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
+    <div class="unified-platform-inner">
+      <a class="unified-brand" href="../index.html" aria-label="العودة إلى بوابة المنصات">
+        <span class="unified-brand-mark mishkat-unified-logo" aria-hidden="true"><img src="../assets/school-logo.png" alt=""></span>
+        <span class="unified-brand-copy"><strong>منصة مدارس المشكاة الأهلية</strong><small>التنقل بين المنصات</small></span>
+      </a>
+      <nav id="platformSwitcher" class="platform-switcher" aria-label="التنقل بين المنصات"></nav>
+      <div id="platformPlanBadge" class="platform-plan-badge" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <section id="gate" class="gate">
+    <div class="gate-card">
+      <div id="gateSpinner" class="spinner"></div>
+      <div id="gateIcon" class="gate-icon" hidden>★</div>
+      <h1 id="gateTitle">جارٍ فتح هدية الباقة...</h1>
+      <p id="gateMessage">يتم التحقق من الباقة السنوية أو الباقة الشاملة.</p>
+      <div id="gateActions" class="gate-actions" hidden>
+        <button id="retryButton" class="btn primary" type="button">إعادة المحاولة</button>
+        <a class="btn secondary" href="../index.html">العودة إلى البوابة</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="app" hidden>
+    <header class="hero">
+      <div class="hero-shell">
+        <div>
+          <span class="eyebrow">هدية الباقة السنوية والشاملة</span>
+          <h1>شهادات التقدير</h1>
+          <p>أنشئ شهادة فاخرة من التوجيه الطلابي للطالب، مع عبارة تكريم راقية وسطر تهنئة خاص لولي الأمر.</p>
+        </div>
+        <div class="hero-actions">
+          <span id="audienceBadge" class="hero-pill">—</span>
+          <span class="hero-pill gift">★ هدية مفعّلة</span>
+          <a class="hero-link" href="../index.html">العودة للبوابة</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace-shell">
+      <aside class="controls">
+        <section class="control-card">
+          <div class="section-head"><div><span>01</span><h2>نوع الشهادة</h2></div><button id="nextPhraseButton" class="text-button" type="button">عبارة أخرى</button></div>
+          <label>التصنيف
+            <select id="categorySelect" class="field">
+              <option value="excellence">شهادات تفوق</option>
+              <option value="appreciation">شهادات تقدير</option>
+              <option value="congratulations">شهادات تهنئة</option>
+            </select>
+          </label>
+          <label>سبب التكريم<select id="occasionSelect" class="field"></select></label>
+          <label id="programLabel">اسم البرنامج
+            <input id="programInput" class="field" list="programSuggestions" placeholder="مثال: تكريم المتميزين سلوكيًا">
+            <datalist id="programSuggestions"></datalist>
+          </label>
+          <label>عبارة الشهادة<textarea id="bodyInput" class="field" rows="5"></textarea></label>
+          <label>تهنئة ولي الأمر<textarea id="parentMessageInput" class="field" rows="4"></textarea></label>
+        </section>
+
+        <section class="control-card">
+          <div class="section-head"><div><span>02</span><h2>بيانات الطالب</h2></div></div>
+          <label>اسم الطالب<select id="studentNameInput" class="field"><option value="">اختر الطالب من Bubble</option></select></label>
+          <div class="grid-2"><label>الصف <small>تلقائي من بيانات الطالب</small><input id="classInput" class="field" readonly></label><label>الفصل <small>تلقائي من بيانات الطالب</small><input id="sectionInput" class="field" readonly></label></div>
+          <label>تفصيل إضافي اختياري<input id="achievementInput" class="field" placeholder="مثال: الحصول على المركز الأول بمعدل 99%"></label>
+          <label>اسم ولي الأمر <small>اختياري</small><input id="parentNameInput" class="field" placeholder="يترك فارغًا لكتابة ولي الأمر الكريم"></label>
+        </section>
+
+        <section class="control-card">
+          <div class="section-head"><div><span>03</span><h2>هوية المدرسة</h2></div></div>
+          <label>اسم المدرسة <small>تلقائي حسب توزيع المستخدم</small><input id="schoolInput" class="field" readonly></label>
+          <div class="grid-2"><label>الموجه الطلابي <small>تلقائي</small><input id="counselorInput" class="field" readonly></label><label>مدير المدرسة <small>تلقائي من بيانات المدرسة</small><input id="directorInput" class="field" readonly></label></div>
+          <div class="grid-2"><label>التاريخ<input id="dateInput" class="field" type="date"></label><label>العام الدراسي <small>الحالي من Bubble</small><input id="yearInput" class="field" readonly></label></div>
+          <label>شعار المدرسة<input id="logoInput" class="field" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        </section>
+
+        <section class="control-card">
+          <div class="section-head"><div><span>04</span><h2>التصميم</h2></div></div>
+          <label>قالب الشهادة<select id="designSelect" class="field">
+            <option value="royal">الملكي الذهبي</option>
+            <option value="pearl">اللؤلؤي الأزرق</option>
+            <option value="emerald">الزمردي الفاخر</option>
+            <option value="burgundy">العنابي الراقي</option>
+            <option value="midnight">الليلي الذهبي</option>
+            <option value="classic">الأكاديمي الكلاسيكي</option>
+          </select></label>
+          <div class="toggles"><label><input id="showSerialInput" type="checkbox" checked> إظهار رقم الشهادة</label><label><input id="showClassInput" type="checkbox" checked> إظهار الصف والفصل</label></div>
+        </section>
+
+        <section class="control-card batch-card">
+          <div class="section-head"><div><span>05</span><h2>إصدار جماعي</h2></div></div>
+          <p>اختياري — اختر أكثر من طالب من القائمة. لا توجد كتابة يدوية لأسماء الطلاب.</p>
+          <select id="batchInput" class="field" multiple size="8" aria-label="طلاب الإصدار الجماعي"></select>
+          <small>استخدم Ctrl/⌘ لاختيار أكثر من طالب. الصف والفصل يُسحبان تلقائيًا من Bubble.</small>
+        </section>
+
+        <div class="action-stack">
+          <button id="printCurrentButton" class="btn primary" type="button">طباعة / حفظ PDF للشهادة</button>
+          <button id="printBatchButton" class="btn success" type="button">طباعة الشهادات الجماعية</button>
+          <button id="resetButton" class="btn secondary" type="button">شهادة جديدة</button>
+        </div>
+      </aside>
+
+      <section class="preview-area">
+        <div class="preview-toolbar"><div><span>معاينة مباشرة</span><strong id="certificateTypeLabel">شهادة تفوق</strong></div><span id="statusNote">يتم الحفظ تلقائيًا على هذا الجهاز</span></div>
+        <div class="certificate-stage">
+          <div id="certificatePreview" class="certificate design-royal"></div>
+        </div>
+        <div class="tips"><b>ملاحظة:</b> الشهادة مضبوطة للطباعة أفقياً على A4. اختر “حفظ كملف PDF” من نافذة الطباعة للحصول على ملف جاهز للإرسال أو الطباعة.</div>
+      </section>
+    </main>
+  </div>
+
+  <div id="printRoot" class="print-root"></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="../reports/programs.js?v=16.0.0"></script>
+  <script src="../bubble-schema.js?v=school-1.0.15"></script>
+  <script src="../bubble-config.js?v=school-1.0.15"></script>
+  <script src="../school-context.js?v=school-1.0.15"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.15"></script>
+  <script src="../school-directory.js?v=school-1.0.15"></script>
+  <script src="app.js?v=18.1.0"></script>
+  <script src="../support-widget-rest.js?v=17.3.0"></script>
+  <script src="../smart-reminders.js?v=19.0.9"></script>
+  <script src="../global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>

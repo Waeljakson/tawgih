@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="illustration">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0284c7"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+ <linearGradient id="accent" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#22c55e"/><stop offset="1" stop-color="#fde047"/></linearGradient>
+ </defs>
+<rect width="800" height="600" rx="44" fill="#f8fbff"/>
+<circle cx="94" cy="85" r="62" fill="#0284c7" opacity=".12"/><circle cx="700" cy="510" r="120" fill="#7c3aed" opacity=".1"/>
+<path d="M0 485 Q170 410 330 480 T800 440 V600 H0Z" fill="url(#bg)" opacity=".1"/>
+<g><rect x="135" y="95" width="530" height="365" rx="34" fill="#0f172a"/><rect x="165" y="127" width="470" height="288" rx="22" fill="#e0f2fe"/><circle cx="400" cy="270" r="95" fill="url(#bg)" opacity=".9"/><path d="M365 270h70v95h-70z" fill="#fff"/><path d="M380 270v-35a20 20 0 0 1 40 0v35" fill="none" stroke="#fff" stroke-width="18"/><circle cx="400" cy="315" r="9" fill="#0f172a"/><path d="M300 495h200" stroke="#0f172a" stroke-width="28" stroke-linecap="round"/></g>
+</svg>

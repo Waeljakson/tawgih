@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>شات التوجيه الطلابي | مدارس المشكاة الأهلية</title>
+  <link rel="icon" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=1.0.18.1">
+</head>
+<body>
+  <main class="chat-page">
+    <section class="chat-hero">
+      <div>
+        <span class="eyebrow">التواصل الداخلي</span>
+        <h1>شات التوجيه الطلابي</h1>
+        <p>محادثات جماعية بين فريق التوجيه، أو محادثة فردية مع مستخدم محدد من النظام.</p>
+      </div>
+      <div class="hero-context">
+        <span><b id="ctxUser">—</b><small>المستخدم</small></span>
+        <span><b id="ctxSchool">—</b><small>المدرسة</small></span>
+        <span><b id="ctxStage">—</b><small>المرحلة</small></span>
+      </div>
+    </section>
+
+    <section class="chat-shell">
+      <aside class="chat-sidebar">
+        <div class="mode-switch" role="tablist" aria-label="نوع المحادثة">
+          <button id="groupModeBtn" class="mode-btn active" type="button" data-mode="group"><span>👥</span><b>شات جماعي</b><small>فريق التوجيه</small></button>
+          <button id="directModeBtn" class="mode-btn" type="button" data-mode="direct"><span>💬</span><b>شات فردي</b><small>اختيار مستخدم</small></button>
+        </div>
+
+        <div id="groupInfo" class="group-info">
+          <div class="group-avatar">ت</div>
+          <div><b>مجموعة التوجيه الطلابي</b><span>مساحة مشتركة للموجهين والمشرفين</span></div>
+        </div>
+
+        <div id="directPicker" class="direct-picker" hidden>
+          <label for="contactSearch">ابحث عن مستخدم</label>
+          <div class="search-wrap"><span>⌕</span><input id="contactSearch" type="search" placeholder="اكتب اسم المستخدم أو المسمى..."></div>
+          <div id="contactList" class="contact-list"></div>
+        </div>
+
+        <div class="chat-side-note">
+          <b>الهوية تلقائية</b>
+          <p>الاسم والمسمى والمدرسة تأتي من <code>Users Data</code> ولا يتم إدخالها يدويًا.</p>
+        </div>
+      </aside>
+
+      <section class="conversation-panel">
+        <header class="conversation-head">
+          <div class="conversation-title">
+            <div id="conversationAvatar" class="conversation-avatar">ت</div>
+            <div><h2 id="conversationName">مجموعة التوجيه الطلابي</h2><p id="conversationMeta">الشات الجماعي لفريق التوجيه</p></div>
+          </div>
+          <div class="conversation-tools">
+            <span id="connectionState" class="connection-state">جاهز</span>
+            <button id="refreshChatBtn" type="button" title="تحديث المحادثة">↻</button>
+          </div>
+        </header>
+
+        <div id="chatEmpty" class="chat-empty" hidden>
+          <div>💬</div><h3>ابدأ المحادثة</h3><p>لا توجد رسائل هنا حتى الآن.</p>
+        </div>
+        <div id="messageList" class="message-list" aria-live="polite"></div>
+
+        <footer class="composer">
+          <textarea id="messageInput" rows="1" maxlength="3000" placeholder="اكتب رسالتك هنا..."></textarea>
+          <button id="sendMessageBtn" type="button"><span>إرسال</span><b>➤</b></button>
+          <div class="composer-help"><span id="charCount">0 / 3000</span><span>Ctrl + Enter للإرسال</span></div>
+        </footer>
+      </section>
+    </section>
+  </main>
+
+  <script src="../bubble-schema.js?v=1.0.18"></script>
+  <script src="../bubble-config.js?v=1.0.18"></script>
+  <script src="../school-context.js?v=1.0.18"></script>
+  <script src="../bubble-persistence.js?v=1.0.18"></script>
+  <script src="../school-directory.js?v=1.0.18"></script>
+  <script src="app.js?v=1.0.18.1"></script>
+  <script src="../global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>

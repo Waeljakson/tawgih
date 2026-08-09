@@ -1,0 +1,21 @@
+{
+  "currentUser": {
+    "_id": "users-data-id",
+    "Full Name": "اسم الموجه",
+    "Employee Code": 1234,
+    "Active": true,
+    "User": "bubble-user-id",
+    "activity schools": ["school-id"],
+    "Dep": "department-id",
+    "Current Job": "job-title-id"
+  },
+  "Users Data": [],
+  "Students": [],
+  "academic year": [],
+  "terms": [],
+  "Schools": [],
+  "Departments": [],
+  "Grades": [],
+  "Class": [],
+  "Job Title": []
+}

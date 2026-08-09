@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-platform-name="مراسلات الموجه الطلابي">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b6678">
+  <meta name="description" content="مكتبة مراسلات الموجه الطلابي لأولياء الأمور — نسخة مدارس المشكاة الأهلية.">
+  <meta name="app-version" content="17.3.0">
+  <title>مراسلات الموجه الطلابي</title>
+  <style>
+    :root{--bg:#f4f8fa;--card:#fff;--text:#17323b;--muted:#667b83;--primary:#0b6678;--primary2:#0e8297;--line:#dce8ec;--soft:#eaf4f6;--success:#17795d;--warn:#a45c00;--danger:#b33b46;--shadow:0 18px 44px rgba(31,78,91,.10);font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#eef7f9 0,#f8fbfc 300px,var(--bg) 100%);color:var(--text);min-height:100vh}
+    button,input,select,textarea{font:inherit}button,a{touch-action:manipulation}.hidden{display:none!important}
+    .gate{min-height:100vh;display:grid;place-items:center;padding:24px}.gate-card{width:min(620px,100%);background:var(--card);border:1px solid var(--line);border-radius:26px;padding:34px;text-align:center;box-shadow:var(--shadow)}
+    .spinner{width:48px;height:48px;margin:0 auto 18px;border:5px solid #d9e9ed;border-top-color:var(--primary);border-radius:50%;animation:spin .9s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .gate-icon{width:64px;height:64px;border-radius:20px;background:var(--soft);display:grid;place-items:center;margin:0 auto 16px;font-size:30px}.gate h1,.gate h2{margin:8px 0 10px}.gate p{color:var(--muted);line-height:1.9;margin:0 auto 18px;max-width:500px}
+    .gate-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.diagnostic{margin-top:18px;text-align:right;background:#f7fafb;border:1px dashed var(--line);border-radius:14px;padding:12px;white-space:pre-wrap;word-break:break-word;font-size:12px;color:#53666d}
+    .btn{border:0;border-radius:12px;padding:11px 17px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:700}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#085565}.btn-secondary{background:var(--soft);color:var(--primary);border:1px solid #cfe2e7}.btn-danger{background:#fff2f3;color:var(--danger);border:1px solid #f1cfd3}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .app-header{background:linear-gradient(135deg,#075767,#0d8195);color:#fff;padding:26px 24px 58px;position:relative;overflow:hidden}.app-header:after{content:"";position:absolute;inset:auto -10% -80px;width:120%;height:120px;background:var(--bg);border-radius:50% 50% 0 0/55% 55% 0 0}.header-inner{width:min(1240px,100%);margin:auto;display:flex;gap:24px;align-items:center;justify-content:space-between;position:relative;z-index:1}.eyebrow{font-size:13px;opacity:.85}.app-header h1{margin:7px 0 8px;font-size:clamp(26px,4vw,42px)}.app-header p{margin:0;opacity:.9;line-height:1.8}.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700}.header-link{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.38);padding:9px 13px;border-radius:11px}.header-action-button{background:#fff;color:var(--primary);border:1px solid #fff;box-shadow:0 7px 18px rgba(0,0,0,.12);padding:10px 15px}.header-action-button:hover{background:#eaf4f6;color:#075767}
+    main{width:min(1240px,calc(100% - 28px));margin:-25px auto 50px;position:relative;z-index:2}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(40,83,96,.06)}.stat strong{display:block;font-size:25px;color:var(--primary)}.stat span{font-size:13px;color:var(--muted)}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:14px;box-shadow:0 10px 30px rgba(40,83,96,.05)}.panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.panel-title h2{font-size:17px;margin:0}.panel-title small{color:var(--muted)}
+    .filters{display:grid;grid-template-columns:2fr repeat(3,1fr) auto;gap:10px}.field,.select{width:100%;border:1px solid var(--line);background:#fbfdfe;border-radius:12px;padding:11px 12px;outline:none;color:var(--text)}.field:focus,.select:focus{border-color:#75adba;box-shadow:0 0 0 3px rgba(11,102,120,.08)}
+    .personalize{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.view-switches{display:flex;gap:8px;flex-wrap:wrap}.switch{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:999px;padding:8px 13px;cursor:pointer}.switch.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .info-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:12px 2px;color:var(--muted);font-size:13px;flex-wrap:wrap}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.message-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;min-height:290px;box-shadow:0 10px 28px rgba(40,83,96,.05);transition:.18s}.message-card:hover{transform:translateY(-2px);box-shadow:0 15px 34px rgba(40,83,96,.10)}
+    .card-head{display:flex;justify-content:space-between;gap:10px}.card-title{margin:0;font-size:16px;line-height:1.5}.favorite{border:0;background:transparent;font-size:25px;color:#b18b19;cursor:pointer;padding:0 4px}.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.tag{font-size:11px;background:var(--soft);color:#316b77;border-radius:999px;padding:5px 8px}.message-text{white-space:pre-wrap;line-height:1.95;color:#29444d;font-size:14px;background:#f8fbfc;border:1px solid #edf3f5;border-radius:13px;padding:12px;flex:1}.card-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.copy-btn{background:var(--primary);color:#fff}.wa-btn{background:#eaf8f1;color:#167551;border:1px solid #cbe9da}.load-more{display:flex;margin:18px auto 0;min-width:180px}.empty{grid-column:1/-1;background:#fff;border:1px dashed var(--line);border-radius:18px;padding:34px;text-align:center;color:var(--muted)}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#17323b;color:#fff;padding:11px 18px;border-radius:12px;box-shadow:var(--shadow);z-index:50}.audience-chooser{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.audience-chooser button{padding:16px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:800;color:var(--primary)}
+    .annual-note{display:flex;gap:10px;align-items:flex-start;background:#fff8e8;border:1px solid #f0dfb8;color:#765000;border-radius:14px;padding:12px;margin-bottom:14px;line-height:1.7;font-size:13px}.annual-note b{white-space:nowrap}
+    @media(max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .search{grid-column:1/-1}.personalize{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:650px){.header-inner{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}.filters,.personalize{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.gate-card{padding:24px 18px}.app-header{padding-inline:16px}.card-actions{grid-template-columns:1fr}.panel{padding:13px}}
+
+    .unified-platform-bar{position:sticky;top:0;z-index:10020;background:rgba(255,255,255,.97);border-bottom:1px solid rgba(8,72,102,.12);box-shadow:0 10px 32px rgba(7,63,93,.10);backdrop-filter:blur(18px);font-family:Cairo,"Segoe UI",Tahoma,sans-serif}
+    .unified-platform-inner{width:min(1380px,calc(100% - 28px));margin:auto;min-height:78px;display:grid;grid-template-columns:minmax(215px,.85fr) minmax(520px,2.2fr) minmax(205px,.8fr);align-items:center;gap:18px}
+    .unified-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#14364a;min-width:0}.unified-brand-mark{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#0a789d,#07536f);box-shadow:0 10px 24px rgba(8,102,138,.24);flex:0 0 auto}.unified-brand-mark svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.unified-brand-copy{display:grid;gap:1px;min-width:0}.unified-brand-copy strong{font-size:13px;font-weight:900;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.unified-brand-copy small{font-size:10px;font-weight:700;color:#718490;white-space:nowrap}
+    .platform-switcher{display:flex;align-items:stretch;justify-content:center;gap:8px;min-width:0;overflow-x:auto;padding:7px 2px;scrollbar-width:thin;scrollbar-color:#bdd4df transparent}.platform-switcher::-webkit-scrollbar{height:5px}.platform-switcher::-webkit-scrollbar-thumb{background:#bdd4df;border-radius:999px}.platform-tab{min-width:136px;min-height:50px;display:flex;align-items:center;gap:9px;padding:7px 11px;border:1px solid #dbe8ee;border-radius:15px;background:#f8fbfc;color:#21485b;text-decoration:none;transition:.18s ease;white-space:nowrap;box-sizing:border-box}.platform-tab:not(.locked):hover{transform:translateY(-1px);border-color:#9fc6d6;background:#fff;box-shadow:0 9px 22px rgba(7,85,119,.10)}.platform-tab.current{background:linear-gradient(145deg,#0b789c,#09607f);border-color:transparent;color:#fff;box-shadow:0 10px 24px rgba(9,105,140,.23)}.platform-tab.locked{color:#8999a2;background:#f5f7f8;border-style:dashed;cursor:not-allowed;opacity:.82}.platform-tab-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:#e7f2f6;color:#087092;flex:0 0 auto}.platform-tab.current .platform-tab-icon{background:rgba(255,255,255,.17);color:#fff}.platform-tab.locked .platform-tab-icon{background:#e9edef;color:#8b9aa2}.platform-tab-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.platform-tab-copy{display:grid;gap:1px;line-height:1.25;min-width:0}.platform-tab-copy strong{font-size:11px;font-weight:900}.platform-tab-copy small{font-size:9px;font-weight:700;color:#69808c}.platform-tab.current .platform-tab-copy small{color:rgba(255,255,255,.78)}
+    .platform-plan-badge{justify-self:end;display:flex;align-items:center;gap:10px;min-width:0;padding:8px 11px;border:1px solid #d7e8ee;border-radius:15px;background:linear-gradient(180deg,#fff,#f6fafb);box-shadow:0 6px 18px rgba(11,83,113,.07)}.platform-plan-status{width:10px;height:10px;border-radius:50%;background:#29a86b;box-shadow:0 0 0 5px rgba(41,168,107,.11);flex:0 0 auto}.platform-plan-copy{display:grid;gap:1px;min-width:0}.platform-plan-copy span{font-size:9px;font-weight:700;color:#788a94}.platform-plan-copy strong{font-size:11px;font-weight:900;color:#183f52;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}.platform-plan-copy small{font-size:8.5px;font-weight:700;color:#6e828d;white-space:nowrap}
+    @media(max-width:1080px){.unified-platform-inner{grid-template-columns:190px minmax(430px,1fr) 185px;gap:10px}.platform-tab{min-width:125px}.unified-brand-copy small{display:none}.platform-plan-copy strong{max-width:140px}}
+    @media(max-width:820px){.unified-platform-inner{width:min(100% - 18px,760px);grid-template-columns:1fr auto;grid-template-rows:auto auto;min-height:auto;padding:9px 0 8px;gap:8px}.unified-brand{grid-column:1;grid-row:1}.platform-plan-badge{grid-column:2;grid-row:1;padding:7px 9px}.platform-plan-copy span,.platform-plan-copy small{display:none}.platform-plan-copy strong{max-width:120px;font-size:10px}.platform-switcher{grid-column:1/-1;grid-row:2;justify-content:flex-start;padding:5px 0 1px}.platform-tab{min-width:132px;min-height:46px;padding:6px 9px;border-radius:13px}.platform-tab-icon{width:28px;height:28px}.platform-tab-copy strong{font-size:10px}}
+    @media print{.unified-platform-bar{display:none!important}}
+
+  </style>
+<link rel="stylesheet" href="../support-widget.css?v=17.3.0">
+  <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+<style>.mishkat-unified-logo{background:#fff!important;padding:4px!important;border:1px solid rgba(49,95,53,.14)!important}.mishkat-unified-logo img{width:100%;height:100%;object-fit:contain}.unified-platform-bar{border-bottom:2px solid rgba(49,95,53,.25)!important}</style></head>
+<body>
+  <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
+    <div class="unified-platform-inner">
+      <a class="unified-brand" href="../index.html" aria-label="العودة إلى بوابة المنصات">
+        <span class="unified-brand-mark mishkat-unified-logo" aria-hidden="true"><img src="../assets/school-logo.png" alt=""></span>
+        <span class="unified-brand-copy"><strong>منصة مدارس المشكاة الأهلية</strong><small>التنقل بين المنصات</small></span>
+      </a>
+      <nav id="platformSwitcher" class="platform-switcher" aria-label="التنقل بين المنصات"></nav>
+      <div id="platformPlanBadge" class="platform-plan-badge" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <section id="gate" class="gate">
+    <div class="gate-card">
+      <div id="gateSpinner" class="spinner"></div>
+      <div id="gateIcon" class="gate-icon hidden">✉</div>
+      <h2 id="gateTitle">جارٍ فتح منصة المراسلات...</h2>
+      <p id="gateMessage">يتم تجهيز مكتبة الرسائل وبيانات المستخدم.</p>
+      <div id="gateActions" class="gate-actions hidden">
+        <button id="retryButton" class="btn btn-primary" type="button">إعادة المحاولة</button>
+        <a class="btn btn-secondary" href="../index.html">العودة إلى البوابة</a>
+      </div>
+      <div id="audienceChooser" class="hidden">
+        <p>لم يتم تحديد نوع المدرسة في الحساب. اختر مرة واحدة لعرض الصياغات المناسبة.</p>
+        <div class="audience-chooser">
+          <button type="button" data-audience="boys">مدرسة بنين</button>
+          <button type="button" data-audience="girls">مدرسة بنات</button>
+        </div>
+      </div>
+      <div id="diagnostic" class="diagnostic hidden"></div>
+    </div>
+  </section>
+
+  <div id="app" class="hidden">
+    <header class="app-header">
+      <div class="header-inner">
+        <div>
+          <div class="eyebrow">منصة الموجه الطلابي · الإصدار 15.1</div>
+          <h1>مراسلات أولياء الأمور</h1>
+          <p>مكتبة كبيرة من الرسائل المختصرة والراقية، جاهزة للنسخ والإرسال عبر واتساب.</p>
+        </div>
+        <div class="header-actions">
+          <span id="audienceBadge" class="pill">—</span>
+          <span id="schoolTypeAutoBadge" class="pill">النوع تلقائي من التوزيع</span>
+          <span class="pill">مدارس المشكاة الأهلية</span>
+          <a class="header-link" href="../index.html">العودة للبوابة</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="annual-note"><b>نسخة المدرسة</b><span>المراسلات متاحة مباشرة، وتستخدم بيانات الموجه والمدرسة تلقائيًا من حساب المستخدم.</span></div>
+      <section class="stats">
+        <article class="stat"><strong id="totalCount">0</strong><span>رسالة مولّدة</span></article>
+        <article class="stat"><strong id="categoryCount">0</strong><span>تصنيفًا رئيسيًا</span></article>
+        <article class="stat"><strong>4</strong><span>مراحل دراسية</span></article>
+        <article class="stat"><strong id="favoriteCount">0</strong><span>في المفضلة</span></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><h2>البحث والتصفية</h2><small>اختر المرحلة والتصنيف ونوع الصياغة</small></div>
+        <div class="filters">
+          <input id="searchInput" class="field search" type="search" placeholder="ابحث: غياب، تأخر، تفوق، قدرات، تحصيلي...">
+          <select id="stageFilter" class="select"><option value="all">كل المراحل</option><option value="lower_primary">الابتدائية الدنيا</option><option value="upper_primary">الابتدائية العليا</option><option value="middle">المتوسطة</option><option value="secondary">الثانوية</option></select>
+          <select id="categoryFilter" class="select"><option value="all">كل التصنيفات</option></select>
+          <select id="toneFilter" class="select"><option value="all">كل الصياغات</option><option value="gentle">راقية ودية</option><option value="formal">رسمية مختصرة</option></select>
+          <button id="clearFilters" class="btn btn-secondary" type="button">مسح الفلاتر</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><h2>تخصيص الرسالة</h2><small>تُطبق البيانات مباشرة عند النسخ</small></div>
+        <div class="personalize">
+          <select id="studentName" class="field" aria-label="اسم الطالب"><option value="">اختر الطالب من Bubble</option></select>
+          <input id="className" class="field" placeholder="الصف والفصل" readonly aria-readonly="true">
+          <input id="subjectName" class="field" placeholder="المادة — اختياري">
+          <div class="field" style="height:auto;min-height:48px;background:#f4f8fa;display:grid;gap:2px"><small>المدرسة — تلقائي</small><strong data-school-context-display="schoolName">—</strong></div>
+          <div class="field" style="height:auto;min-height:48px;background:#f4f8fa;display:grid;gap:2px"><small>الموجه الطلابي — تلقائي</small><strong data-school-context-display="counselorName">—</strong></div>
+          <input id="schoolName" type="hidden"><input id="counselorName" type="hidden">
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><h2>طريقة العرض</h2><small>المفضلة وآخر الرسائل المستخدمة</small></div>
+        <div class="view-switches">
+          <button class="switch active" data-view="all" type="button">كل الرسائل</button>
+          <button class="switch" data-view="favorites" type="button">المفضلة</button>
+          <button class="switch" data-view="recent" type="button">المستخدمة مؤخرًا</button>
+        </div>
+      </section>
+
+      <div class="info-row"><span id="resultsInfo">—</span><span id="accountInfo">—</span></div>
+      <section id="cards" class="cards"></section>
+      <button id="loadMore" class="btn btn-primary load-more" type="button">عرض المزيد</button>
+    </main>
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script>
+    window.__MESSAGES_READY__ = false;
+    window.__MESSAGES_DIAG__ = ['HTML loaded'];
+    setTimeout(function(){
+      if(window.__MESSAGES_READY__) return;
+      var title=document.getElementById('gateTitle');
+      var msg=document.getElementById('gateMessage');
+      var actions=document.getElementById('gateActions');
+      var spinner=document.getElementById('gateSpinner');
+      var diag=document.getElementById('diagnostic');
+      if(title) title.textContent='تعذر بدء منصة الرسائل';
+      if(msg) msg.textContent='لم يكتمل تشغيل المنصة خلال المهلة المحددة. اضغط إعادة المحاولة أو ارجع إلى البوابة وسجّل الدخول من جديد.';
+      if(actions) actions.classList.remove('hidden');
+      if(spinner) spinner.classList.add('hidden');
+      if(diag){diag.classList.remove('hidden');diag.textContent=(window.__MESSAGES_DIAG__||[]).join('\n');}
+    },12000);
+  </script>
+
+  <script>
+  (function(){
+    'use strict';
+    var VERSION='15.0.2-school';
+    var SCHOOL_EDITION=true;
+    var SUPABASE_URL='https://fpicgtldwfevdvpbxkjf.supabase.co';
+    var SUPABASE_KEY='sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay';
+    var PROJECT_REF='fpicgtldwfevdvpbxkjf';
+    var PAGE_SIZE=48;
+    var state={audience:null,account:null,user:null,session:null,annualAccess:false,entitlements:[],messages:[],filtered:[],shown:0,view:'all',favorites:{},recent:[]};
+
+    function $(id){return document.getElementById(id)}
+    function diag(text){window.__MESSAGES_DIAG__.push(new Date().toLocaleTimeString('ar-SA')+' — '+text)}
+    function ready(){window.__MESSAGES_READY__=true}
+    function safeParse(raw){try{return JSON.parse(raw)}catch(e){return null}}
+    function readJSON(key,fallback){var v=safeParse(localStorage.getItem(key));return v===null?fallback:v}
+    function writeJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){}}
+    function escapeHTML(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]})}
+    function normalizeArabic(value){return String(value||'').toLowerCase().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim()}
+    function timeout(ms,code){return new Promise(function(_,reject){setTimeout(function(){reject(new Error(code))},ms)})}
+    function withTimeout(promise,ms,code){return Promise.race([promise,timeout(ms,code)])}
+    function tokenPayload(token){try{var part=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');while(part.length%4)part+='=';return JSON.parse(decodeURIComponent(escape(atob(part))))}catch(e){return null}}
+    function isExpired(session){var exp=session&&session.expires_at;if(!exp&&session&&session.access_token){var p=tokenPayload(session.access_token);exp=p&&p.exp}return exp?Number(exp)*1000<Date.now()+30000:false}
+
+    function deepFindSession(value,depth){
+      if(depth>6||value==null)return null;
+      if(typeof value==='string'){
+        var text=value;
+        if(text.indexOf('base64-')===0){try{text=decodeURIComponent(escape(atob(text.slice(7).replace(/-/g,'+').replace(/_/g,'/'))))}catch(e){}}
+        var parsed=safeParse(text);return parsed?deepFindSession(parsed,depth+1):null;
+      }
+      if(Array.isArray(value)){for(var i=0;i<value.length;i++){var a=deepFindSession(value[i],depth+1);if(a)return a}return null}
+      if(typeof value==='object'){
+        if(value.access_token&&value.user&&value.user.id)return value;
+        var priority=['currentSession','session','data','value'];
+        for(var j=0;j<priority.length;j++){if(value[priority[j]]){var p=deepFindSession(value[priority[j]],depth+1);if(p)return p}}
+        var keys=Object.keys(value);for(var k=0;k<keys.length;k++){var r=deepFindSession(value[keys[k]],depth+1);if(r)return r}
+      }
+      return null;
+    }
+
+    function findSession(){
+      diag('Searching for saved login session');
+      var stores=[localStorage,sessionStorage];
+      var preferred='sb-'+PROJECT_REF+'-auth-token';
+      for(var s=0;s<stores.length;s++){
+        var store=stores[s];var keys=[];
+        try{for(var i=0;i<store.length;i++){var key=store.key(i);if(key)keys.push(key)}}catch(e){}
+        keys.sort(function(a,b){return (a===preferred?-1:0)-(b===preferred?-1:0)});
+        for(var x=0;x<keys.length;x++){
+          var keyName=keys[x];
+          if(keyName.indexOf('sb-')!==0||keyName.indexOf('auth-token')<0)continue;
+          try{var found=deepFindSession(store.getItem(keyName),0);if(found){diag('Saved session found');return {session:found,key:keyName,store:store}}}catch(e){}
+        }
+      }
+      return null;
+    }
+
+    function api(path,options){
+      options=options||{};
+      var headers={'apikey':SUPABASE_KEY,'Accept':'application/json'};
+      if(options.token)headers.Authorization='Bearer '+options.token;
+      if(options.body!==undefined)headers['Content-Type']='application/json';
+      return withTimeout(fetch(SUPABASE_URL+path,{method:options.method||'GET',headers:headers,body:options.body===undefined?undefined:JSON.stringify(options.body),cache:'no-store'}),8000,'network_timeout').then(function(response){
+        return response.text().then(function(text){
+          var data=text?safeParse(text):null;
+          if(!response.ok){var err=new Error('http_'+response.status);err.status=response.status;err.details=data||text;throw err}
+          return data;
+        });
+      });
+    }
+
+    function refreshSession(found){
+      if(!found||!found.session||!found.session.refresh_token)return Promise.reject(new Error('no_refresh_token'));
+      diag('Refreshing login session');
+      return api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:found.session.refresh_token}}).then(function(next){
+        if(!next||!next.access_token)throw new Error('refresh_failed');
+        try{found.store.setItem(found.key,JSON.stringify(next))}catch(e){}
+        return next;
+      });
+    }
+
+    function verifySession(found){
+      var session=found.session;
+      var flow=isExpired(session)?refreshSession(found):Promise.resolve(session);
+      return flow.then(function(active){
+        return api('/auth/v1/user',{token:active.access_token}).catch(function(error){
+          if(error.status===401&&active.refresh_token){found.session=active;return refreshSession(found).then(function(fresh){return api('/auth/v1/user',{token:fresh.access_token}).then(function(user){return {user:user,session:fresh}})})}
+          throw error;
+        }).then(function(result){
+          if(result&&result.user&&result.session)return result;
+          return {user:result,session:active};
+        });
+      });
+    }
+
+    function verifyAnnualAccess(session,user){
+      diag('Checking annual entitlement');
+      return Promise.all([
+        api('/rest/v1/rpc/premium_has_annual_access',{method:'POST',token:session.access_token,body:{p_user_id:user.id}}),
+        api('/rest/v1/premium_accounts?select=full_name,school_name,is_system_admin,presentation_audience_type&user_id=eq.'+encodeURIComponent(user.id)+'&limit=1',{token:session.access_token}).catch(function(){return []}),
+        api('/rest/v1/premium_entitlements?select=product_code,billing_period,expires_at,is_active&user_id=eq.'+encodeURIComponent(user.id),{token:session.access_token}).catch(function(){return []})
+      ]).then(function(res){
+        return {annual:res[0]===true,account:Array.isArray(res[1])?(res[1][0]||{}):(res[1]||{}),entitlements:Array.isArray(res[2])?res[2]:[]};
+      });
+    }
+
+    function showGate(title,message,kind,details){
+      $('gateSpinner').classList.add('hidden');$('gateIcon').classList.remove('hidden');$('gateIcon').textContent=kind==='locked'?'🔒':'!';$('gateTitle').textContent=title;$('gateMessage').textContent=message;$('gateActions').classList.remove('hidden');
+      if(details){$('diagnostic').classList.remove('hidden');$('diagnostic').textContent=details}
+      ready();
+    }
+
+    function chooseAudience(account){
+      if(SCHOOL_EDITION){var ctx=window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext?window.MishkatSchoolContext.getContext():{};return Promise.resolve(ctx.schoolType==='girls'?'girls':'boys');}
+      var value=account&&account.presentation_audience_type;
+      if(value==='boys'||value==='girls')return Promise.resolve(value);
+      var saved=localStorage.getItem('messages_audience_v15');
+      if(saved==='boys'||saved==='girls')return Promise.resolve(saved);
+      $('gateSpinner').classList.add('hidden');$('gateTitle').textContent='تحديد نوع المدرسة';$('gateMessage').textContent='اختر الصياغة المناسبة للحساب. سيتم حفظ الاختيار على هذا الجهاز.';$('audienceChooser').classList.remove('hidden');
+      return new Promise(function(resolve){
+        var buttons=document.querySelectorAll('[data-audience]');
+        for(var i=0;i<buttons.length;i++)buttons[i].onclick=function(){var audience=this.getAttribute('data-audience');localStorage.setItem('messages_audience_v15',audience);resolve(audience)};
+      });
+    }
+
+    var STAGES={lower_primary:'الابتدائية الدنيا',upper_primary:'الابتدائية العليا',middle:'المتوسطة',secondary:'الثانوية'};
+    var CATEGORY_DEFS=[
+      {id:'excellence',label:'التفوق والتميز',kind:'positive',topics:['التفوق العام','تحقيق المركز الأول','ارتفاع المعدل الدراسي','التميز في مادة محددة','الإجابة المتميزة داخل الصف','الالتزام المستمر بالواجبات','التقدم الملحوظ في القراءة','التميز في الكتابة','المبادرة الإيجابية','الانضباط المثالي','القدرة القيادية','مساعدة الزملاء','التميز في مشروع دراسي','الإبداع في عرض شفهي','المحافظة على مستوى مرتفع']},
+      {id:'success',label:'النجاح والتحفيز',kind:'positive',topics:['النجاح في الفصل الدراسي','اجتياز اختبار صعب','تحقيق هدف دراسي','العودة إلى النجاح بعد تعثر','تحسن نتيجة الاختبار','الاستمرار في التقدم','المثابرة والاجتهاد','تحمل المسؤولية الدراسية','الاستجابة للخطة العلاجية','التقدم في المهارات الأساسية','نجاح المشاركة في برنامج','إنجاز مشروع مطلوب','التحسن في الحضور','التحسن في السلوك','الاستعداد الجيد للاختبار']},
+      {id:'absence',label:'الغياب والانقطاع',kind:'warning',topics:['غياب يوم واحد','غياب يومين متتاليين','غياب أكثر من يومين','الغياب المتكرر خلال الشهر','الغياب دون عذر موضح','الغياب قبل الإجازة','الغياب بعد الإجازة','الغياب يوم الاختبار','الغياب عن حصة محددة','الغياب عن برنامج علاجي','الغياب بعد تنبيه سابق','الانقطاع المفاجئ عن الدراسة','عدم تقديم عذر الغياب','تأثر التحصيل بسبب الغياب','تحسن الانتظام بعد المتابعة']},
+      {id:'lateness',label:'التأخر والانضباط',kind:'warning',topics:['التأخر الصباحي','تكرار التأخر الصباحي','التأخر عن الاصطفاف','التأخر عن الحصة الأولى','التأخر عن الاختبار','الخروج المبكر من المدرسة','عدم الالتزام بوقت الانصراف','التأخر بعد تنبيه سابق','أثر السهر على الحضور','عدم الاستعداد صباحًا','فوات شرح بداية الحصة','التأخر عن برنامج مدرسي','الانضباط في المواعيد','تحسن الحضور المبكر','الحاجة إلى خطة انتظام']},
+      {id:'academic',label:'المستوى والتحصيل',kind:'warning',topics:['انخفاض المستوى الدراسي','ضعف مادة محددة','تراجع الدرجات بصورة ملحوظة','ضعف المشاركة الصفية','عدم إتقان المهارات الأساسية','صعوبة فهم بعض الدروس','الحاجة إلى خطة علاجية','تشتت الانتباه أثناء التعلم','بطء إنجاز المهام','ضعف القراءة','ضعف الكتابة','ضعف العمليات الحسابية','عدم مراجعة الدروس','تراكم الواجبات','تحسن المستوى بعد الخطة']},
+      {id:'homework',label:'الواجبات والمشروعات',kind:'warning',topics:['عدم إنجاز الواجب','تكرار نسيان الواجب','تسليم الواجب ناقصًا','عدم تسليم المشروع','التأخر في تسليم المشروع','عدم إحضار الأدوات','ضعف جودة المشروع','الاعتماد على الآخرين في الواجب','عدم متابعة منصة الواجبات','الحاجة إلى تنظيم وقت الواجب','تميز الواجبات','تحسن الالتزام بالواجب','المحافظة على الكتب','إهمال دفتر المتابعة','الاستعداد للمهمة الأدائية']},
+      {id:'exams',label:'الاختبارات',kind:'awareness',topics:['قرب الاختبارات','الاستعداد المبكر للاختبار','تنظيم جدول المذاكرة','تجنب السهر قبل الاختبار','تهيئة مكان هادئ للمذاكرة','تقليل استخدام الجوال','مراجعة الأخطاء السابقة','التدريب على نماذج الأسئلة','الحضور المبكر يوم الاختبار','إحضار الأدوات المطلوبة','التعامل مع قلق الاختبار','عدم الضغط والمقارنة','ضعف نتيجة اختبار','الاستفادة من نتيجة الاختبار','دعم الطالب بعد الإخفاق']},
+      {id:'behavior',label:'السلوك المدرسي',kind:'warning',topics:['عدم الالتزام بالتعليمات','مقاطعة المعلم أثناء الشرح','إثارة الفوضى داخل الصف','التحدث المستمر أثناء الدرس','استخدام ألفاظ غير مناسبة','العبث بممتلكات المدرسة','مخالفة الزي المدرسي','الخروج من الفصل دون إذن','رفض تنفيذ التوجيه','تكرار مخالفة سلوكية','إحضار أغراض غير مسموحة','عدم المحافظة على الهدوء','تحمل مسؤولية الخطأ','الاعتذار بعد المخالفة','تحسن السلوك بعد المتابعة']},
+      {id:'respect',label:'الاحترام والعلاقات',kind:'awareness',topics:['احترام المعلمين','احترام الزملاء','حسن الاستماع','التعاون داخل المجموعة','تقبل الاختلاف','حل الخلاف بالحوار','الاعتذار عند الخطأ','عدم السخرية من الآخرين','المحافظة على حدود التعامل','اختيار الصحبة الإيجابية','التعامل بلطف','احترام الخصوصية','مساندة الزملاء','تنمية مهارة التواصل','تحسن العلاقة مع الزملاء']},
+      {id:'bullying',label:'التنمر والمشاجرات',kind:'warning',topics:['التنمر اللفظي','التنمر الجسدي','التنمر الإلكتروني','السخرية من زميل','الدخول في مشاجرة','تهديد الآخرين','نشر شائعة عن زميل','استبعاد زميل من المجموعة','التعرض للتنمر','الخوف من الإبلاغ','تكرار الخلافات','الحاجة إلى جلسة إصلاح','تعزيز التسامح','متابعة اتفاق سلوكي','انتهاء المشكلة بعد التدخل']},
+      {id:'digital',label:'التوعية الرقمية',kind:'awareness',topics:['الاستخدام الآمن للإنترنت','حماية البيانات الشخصية','عدم مشاركة كلمات المرور','التصوير دون إذن','نشر الصور دون موافقة','الاستخدام المفرط للألعاب','إدارة وقت الشاشة','التعامل مع الرسائل المجهولة','التحقق من الأخبار والشائعات','المحتوى غير المناسب','التنمر الإلكتروني','احترام حقوق الآخرين رقميًا','عدم فتح الروابط المشبوهة','الإبلاغ عن الإساءة الرقمية','التوازن بين التقنية والدراسة']},
+      {id:'phone',label:'الجوال والتقنية',kind:'warning',topics:['استخدام الجوال أثناء الحصة','إحضار الجوال بالمخالفة للتعليمات','الانشغال بالإشعارات','التصوير داخل المدرسة','تشغيل الألعاب أثناء اليوم الدراسي','عدم تسليم الجهاز عند الطلب','تكرار مخالفة استخدام الجوال','أثر الجوال على النوم','أثر الجوال على التركيز','تنظيم استخدام الجوال في المنزل','وضع الجوال أثناء المذاكرة','الاستفادة التعليمية من التقنية','الاستخدام المسؤول للأجهزة','تحسن الالتزام بضوابط الجوال','الحاجة إلى اتفاق أسري رقمي']},
+      {id:'health',label:'الصحة والعادات',kind:'awareness',topics:['النوم الكافي','تناول وجبة الإفطار','التغذية المتوازنة','شرب الماء','النظافة الشخصية','العناية بصحة الفم','النشاط البدني','العناية بالبصر','تجنب مشروبات الطاقة','الوقاية من العدوى','الراحة عند المرض','الجلوس الصحي أثناء المذاكرة','التعامل مع الصداع المتكرر','تنظيم الوجبات','المحافظة على أدوات النظافة']},
+      {id:'psychology',label:'الصحة النفسية',kind:'awareness',topics:['القلق الملحوظ','التوتر الدراسي','الخجل الزائد','العزلة عن الزملاء','الحزن الملحوظ','انخفاض الدافعية','ضعف الثقة بالنفس','الخوف من المدرسة','صعوبة التكيف','سرعة الانفعال','الضغط بسبب الدرجات','الحاجة إلى دعم نفسي','التعبير عن المشاعر','طلب المساعدة عند الحاجة','تحسن الحالة النفسية']},
+      {id:'motivation',label:'الدافعية والثقة',kind:'awareness',topics:['تحديد هدف دراسي','تعزيز الثقة بالنفس','الاحتفاء بالتقدم الصغير','تجنب المقارنة بالآخرين','تحمل مسؤولية التعلم','تنمية المثابرة','التعامل مع الخطأ كتجربة','تقسيم الهدف إلى خطوات','الاستمرار بعد التعثر','بناء عادة يومية','اكتشاف نقاط القوة','التعبير عن الطموح','طلب التغذية الراجعة','المشاركة دون خوف','تعزيز الاستقلالية']},
+      {id:'family',label:'التوعية الأسرية',kind:'awareness',topics:['الحوار الأسري الهادئ','المتابعة المنزلية المتوازنة','وضع روتين يومي','تعزيز المسؤولية','عدم المقارنة بين الأبناء','التشجيع دون مبالغة','القدوة الحسنة','متابعة الأصدقاء','تنظيم وقت الأسرة','الاستماع لمخاوف الطالب','التواصل مع المدرسة','الاتفاق على قواعد واضحة','تعزيز الاستقلالية','مكافأة الجهد لا النتيجة فقط','متابعة التحسن بصورة دورية']},
+      {id:'safety',label:'السلامة والوقاية',kind:'awareness',topics:['السلامة عند الدخول والخروج','عبور الطريق بأمان','عدم العبث بالأدوات الخطرة','اتباع تعليمات الإخلاء','السلامة داخل الحافلة','الإبلاغ عن المخاطر','المحافظة على الممرات','تجنب التدافع','السلامة في المختبر','الاستخدام الآمن للأجهزة','معرفة جهة التواصل عند الطوارئ','عدم مغادرة المدرسة دون إذن','الوقاية أثناء الطقس المتقلب','السلامة في الرحلات','تعزيز السلوك الوقائي']},
+      {id:'values',label:'القيم والمسؤولية',kind:'awareness',topics:['الصدق','الأمانة','الاحترام','المسؤولية','الانتماء للمدرسة','التعاون','الرحمة','العدل','المحافظة على الممتلكات','احترام الأنظمة','الوفاء بالوعد','تقبل النصيحة','الإحسان للآخرين','المبادرة بالخير','تحمل نتائج القرار']},
+      {id:'activities',label:'الأنشطة والموهبة',kind:'positive',topics:['المشاركة في نشاط مدرسي','التميز في نشاط فني','التميز في نشاط رياضي','المشاركة في مسابقة علمية','العمل التطوعي','المشاركة في الإذاعة','الانضمام إلى ناد طلابي','إطلاق مبادرة مجتمعية','المشاركة في رحلة تعليمية','تكريم المشاركة','اكتشاف موهبة جديدة','الالتزام بتدريبات النشاط','تمثيل المدرسة بصورة مشرفة','التعاون في فريق النشاط','تطوير ملف الموهبة']},
+      {id:'meetings',label:'التواصل والاجتماعات',kind:'meeting',topics:['طلب تواصل هاتفي','دعوة إلى مقابلة','موعد اجتماع ولي الأمر','مناقشة مستوى التحصيل','مناقشة الغياب','مناقشة التأخر','مناقشة السلوك','متابعة توصية سابقة','تحديث بيانات التواصل','توقيع خطة متابعة','إفادة المدرسة بسبب حالة','تنسيق إحالة داخلية','شكر على حضور الاجتماع','تأجيل الموعد','إغلاق المتابعة بعد التحسن']},
+      {id:'gratitude',label:'الشكر والتقدير',kind:'positive',topics:['شكر ولي الأمر على المتابعة','شكر الأسرة على سرعة الاستجابة','تقدير التعاون مع المدرسة','شكر الحضور للاجتماع','تقدير دعم الخطة العلاجية','شكر الالتزام بتوصية','تقدير تحسين الحضور','تقدير تحسين السلوك','شكر المشاركة في نشاط','تقدير التواصل البنّاء','شكر تحديث البيانات','تقدير تهيئة بيئة المذاكرة','شكر دعم الموهبة','تقدير الشراكة المستمرة','رسالة امتنان عامة']},
+      {id:'transition',label:'الانتقال بين المراحل',kind:'awareness',topics:['التهيئة للانتقال إلى مرحلة جديدة','التكيف مع معلمين جدد','تنظيم المواد المتعددة','بناء صداقات جديدة','تحمل مسؤولية أكبر','التعامل مع تغير الجدول','الاستعداد للمرحلة المتوسطة','الاستعداد للمرحلة الثانوية','مراجعة المهارات السابقة','التعرف على أنظمة المدرسة','تقليل القلق من الانتقال','تعزيز الاستقلالية','متابعة الأسابيع الأولى','التواصل عند ظهور صعوبة','نجاح التكيف مع المرحلة']},
+      {id:'special_followup',label:'المتابعة الفردية',kind:'meeting',topics:['متابعة خطة فردية','متابعة حالة صحية','متابعة ظرف أسري','متابعة صعوبة تعلم','متابعة موهبة خاصة','متابعة تكرار الغياب','متابعة انخفاض التحصيل','متابعة مشكلة سلوكية','متابعة قلق الاختبارات','متابعة تكيف الطالب','طلب مستند داعم','تحديث بيانات الحالة','تنسيق دعم أكاديمي','قياس أثر التدخل','إنهاء المتابعة بعد التحسن']},
+      {id:'career',label:'التوجيه المهني والجامعي',kind:'secondary',secondaryOnly:true,topics:['اكتشاف الميول المهنية','اختيار التخصص الجامعي','البحث عن الجامعات','متطلبات القبول','مقارنة التخصصات','الاستعداد للمقابلة الشخصية','إعداد سيرة ذاتية أولية','البحث عن المنح','زيارة معرض جامعي','معرفة المسارات المهنية','التخصصات المستقبلية','اتخاذ القرار المهني','الاستفادة من الخبرات التطوعية','بناء ملف الإنجاز','مراجعة الخطة بعد ظهور النتائج']},
+      {id:'aptitude',label:'اختبار القدرات',kind:'secondary',secondaryOnly:true,topics:['الاستعداد المبكر للقدرات','التسجيل في اختبار القدرات','اختيار موعد مناسب','التدريب على القسم الكمي','التدريب على القسم اللفظي','إجراء اختبار تجريبي','تحليل أخطاء القدرات','إدارة وقت الاختبار','الانتظام في التدريب اليومي','ضعف الالتزام بالخطة','الانقطاع عن برنامج القدرات','قرب موعد اختبار القدرات','انخفاض درجة القدرات','تحسن درجة القدرات','إعادة اختبار القدرات','خطة رفع درجة القدرات','التوازن بين المدرسة والقدرات','تقليل قلق اختبار القدرات','التأكد من مقر الاختبار','التهنئة بدرجة قدرات متميزة']},
+      {id:'achievement_test',label:'الاختبار التحصيلي',kind:'secondary',secondaryOnly:true,topics:['الاستعداد المبكر للتحصيلي','إعداد خطة مراجعة للتحصيلي','مراجعة الرياضيات','مراجعة الفيزياء','مراجعة الكيمياء','مراجعة الأحياء','حل نماذج التحصيلي','تحليل الأخطاء','قياس الإنجاز الأسبوعي','ضعف الالتزام بالمراجعة','التأخر في بدء الاستعداد','الانقطاع عن برنامج التحصيلي','قرب موعد التحصيلي','انخفاض درجة التحصيلي','تحسن درجة التحصيلي','إعادة المحاولة','التوازن بين المدرسة والتحصيلي','تقليل قلق التحصيلي','التأكد من موعد ومقر الاختبار','التهنئة بدرجة تحصيلي متميزة']},
+      {id:'graduation',label:'التخرج وما بعده',kind:'secondary',secondaryOnly:true,topics:['الاستعداد للفصل الأخير','متابعة متطلبات التخرج','إكمال الساعات المطلوبة','تنظيم ملفات القبول','مراجعة نتائج القدرات والتحصيلي','الاستعداد للتقديم الجامعي','حضور برامج التهيئة','إدارة قلق ما بعد التخرج','اختيار بدائل متعددة','متابعة المواعيد المهمة','استكمال الوثائق','حفظ نسخ من الشهادات','بناء خطة صيفية','التهنئة بالتخرج','الاستمرار في التعلم بعد التخرج']}
+    ];
+
+    var CONTEXTS={
+      positive:[['praise','إشادة'],['maintain','استمرار التميز'],['family_thanks','شكر الأسرة'],['motivate','تحفيز إضافي'],['next_goal','هدف قادم']],
+      warning:[['first','تنبيه أول'],['follow','متابعة بعد التواصل'],['impact','توضيح الأثر'],['plan','خطة تحسين'],['improved','تعزيز التحسن']],
+      awareness:[['reminder','توعية مختصرة'],['step','خطوة عملية'],['family','دور الأسرة'],['prevention','وقاية مبكرة'],['follow','متابعة التغيير']],
+      meeting:[['invite','دعوة أولى'],['remind','تذكير بالموعد'],['follow','متابعة الاجتماع'],['thanks','شكر التعاون'],['close','إغلاق المتابعة']],
+      secondary:[['start','بدء الاستعداد'],['follow','متابعة الخطة'],['weakness','معالجة الضعف'],['near','قرب الموعد'],['result','متابعة النتيجة']]
+    };
+
+    function audienceWords(){return state.audience==='girls'?{student:'الطالبة',child:'ابنتكم',schoolType:'طالبات'}:{student:'الطالب',child:'ابنكم',schoolType:'طلاب'}}
+    function stageNote(stage){return {lower_primary:'مع استخدام التشجيع والروتين اليومي المبسط.',upper_primary:'مع تعزيز المسؤولية تدريجيًا والمتابعة المتوازنة.',middle:'مع الحوار الهادئ وخطوات واضحة قابلة للمتابعة.',secondary:'مع إشراك الطالب في الخطة وتعزيز مسؤوليته عن مستقبله.'}[stage]}
+    function contextSentence(kind,context,w){
+      var map={
+        praise:'ونثمّن جهود الأسرة التي أسهمت في هذا التميز.',maintain:'نأمل المحافظة على هذا المستوى وتعزيزه.',family_thanks:'نشكر لكم المتابعة الإيجابية والدعم المستمر.',motivate:'كلمات التشجيع المتوازنة تدعم استمرار الإنجاز.',next_goal:'نوصي بتحديد هدف قريب يحافظ على دافعية '+w.student+'.',
+        first:'هذه متابعة أولية هدفها الدعم المبكر.',follow:'نقدّر تعاونكم السابق ونأمل استمرار المتابعة.',impact:'استمرار الموقف قد يؤثر في التحصيل والانضباط.',plan:'نقترح الاتفاق على خطوات يومية قصيرة ومحددة.',improved:'نثمّن التحسن ونأمل المحافظة عليه.',
+        reminder:'نأمل مناقشة الموضوع بهدوء داخل الأسرة.',step:'ابدؤوا بخطوة عملية بسيطة يمكن متابعتها يوميًا.',family:'دور الأسرة المنتظم يصنع أثرًا واضحًا ومستدامًا.',prevention:'التوجيه المبكر يساعد على الوقاية من تكرار المشكلة.',
+        invite:'نأمل تحديد وقت مناسب للتواصل مع الموجه الطلابي.',remind:'نذكّركم بأهمية التواصل في الموعد المتفق عليه.',thanks:'نشكركم على تعاونكم وسرعة استجابتكم.',close:'تمت ملاحظة التحسن، ونقدّر الشراكة الإيجابية.',
+        start:'البدء المبكر يتيح وقتًا كافيًا للتدريب والتحسن.',weakness:'نوصي بتحديد جوانب الضعف والعمل عليها تدريجيًا.',near:'نأمل التأكد من الموعد والمقر مع النوم الكافي والحضور المبكر.',result:'الدعم الهادئ وتحليل النتيجة يساعدان على التخطيط للمحاولة التالية.'
+      };return map[context]||'نأمل استمرار المتابعة والتعاون مع المدرسة.';
+    }
+
+    function buildMessage(def,topic,context,stage,tone){
+      var w=audienceWords();var student=w.student+' [الاسم]';var base='';
+      if(def.kind==='positive')base='يسرنا إبلاغكم بـ'+topic+' لدى '+student+' في [الصف]، ونبارك لكم هذا الإنجاز.';
+      else if(def.kind==='warning')base='لوحظ '+topic+' لدى '+student+' في [الصف]، ونأمل تعاونكم في المتابعة ومعالجة الأسباب.';
+      else if(def.kind==='awareness')base='نأمل دعم '+student+' في موضوع '+topic+'، لما له من أثر في الاستقرار الدراسي والشخصي.';
+      else if(def.kind==='meeting')base='نأمل تواصلكم مع الموجه الطلابي بشأن '+topic+' لدى '+student+' في [الصف]، لتوحيد المتابعة بين الأسرة والمدرسة.';
+      else if(def.id==='aptitude')base='نأمل دعم '+student+' في '+topic+'، وفق تدريب منتظم يجمع بين الممارسة وتحليل الأخطاء وقياس التحسن.';
+      else if(def.id==='achievement_test')base='نأمل متابعة '+student+' في '+topic+'، وفق خطة مراجعة متدرجة تجمع بين الفهم وحل الأسئلة.';
+      else base='نأمل مساندة '+student+' في '+topic+'، مع وضع خطوات واضحة ومواعيد قابلة للمتابعة.';
+      if(topic.indexOf('مادة')>=0||topic.indexOf('الرياضيات')>=0||topic.indexOf('الفيزياء')>=0||topic.indexOf('الكيمياء')>=0||topic.indexOf('الأحياء')>=0)base=base.replace('، وفق',' في مادة [المادة]، وفق');
+      var tail=contextSentence(def.kind,context,w);
+      if(tone==='formal')return 'ولي أمر '+w.student+' [الاسم] المحترم، '+base+' '+tail;
+      return 'أسرة '+w.student+' [الاسم] الكريمة، '+base+' '+tail+' '+stageNote(stage);
+    }
+
+    function generateMessages(){
+      var out=[];
+      for(var c=0;c<CATEGORY_DEFS.length;c++){
+        var def=CATEGORY_DEFS[c];var contexts=CONTEXTS[def.kind];var stageKeys=def.secondaryOnly?['secondary']:Object.keys(STAGES);
+        for(var t=0;t<def.topics.length;t++)for(var x=0;x<contexts.length;x++)for(var s=0;s<stageKeys.length;s++)for(var toneIndex=0;toneIndex<2;toneIndex++){
+          var tone=toneIndex===0?'gentle':'formal';var stage=stageKeys[s];var context=contexts[x][0];
+          out.push({id:def.id+'-'+t+'-'+context+'-'+stage+'-'+tone,category:def.id,categoryLabel:def.label,topic:def.topics[t],contextLabel:contexts[x][1],stage:stage,tone:tone,text:buildMessage(def,def.topics[t],context,stage,tone)});
+        }
+      }
+      return out;
+    }
+
+    function directorySnapshot(){return (window.MishkatSchoolDirectory||window.MishkatBubbleDirectory)?.getSnapshot?.()||{students:[]};}
+    function selectedStudentRecord(){var id=$('studentName').value;return (directorySnapshot().students||[]).find(function(x){return String(x.id)===String(id)})||null}
+    function selectedStudentName(){var row=selectedStudentRecord();return row?String(row.name||'').trim():''}
+    async function loadStudentDirectory(){
+      try{
+        var dir=window.MishkatSchoolDirectory||window.MishkatBubbleDirectory;if(dir&&dir.load)await dir.load();
+        var rows=(directorySnapshot().students||[]);var current=$('studentName').value;
+        $('studentName').innerHTML='<option value="">اختر الطالب من Bubble</option>'+rows.map(function(st){return '<option value="'+escapeHTML(st.id)+'">'+escapeHTML(st.name)+'</option>'}).join('');
+        if(rows.some(function(st){return String(st.id)===String(current)}))$('studentName').value=current;
+        $('studentName').onchange=function(){var st=selectedStudentRecord();$('className').value=st?[st.grade,st.className].filter(Boolean).join(' / '):'';renderMore(true)};
+      }catch(e){console.warn('Student directory unavailable',e)}
+    }
+    function personalized(text){
+      var w=audienceWords();var name=selectedStudentName();var cls=$('className').value.trim();var subject=$('subjectName').value.trim();var ctx=window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext?window.MishkatSchoolContext.getContext():{};var school=(ctx.schoolName||$('schoolName').value||'').trim();var counselor=(ctx.counselorName||$('counselorName').value||'').trim();
+      var result=text.replace(/\[الاسم\]/g,name||'').replace(/\[الصف\]/g,cls||'الصف').replace(/\[المادة\]/g,subject||'المادة');
+      result=result.replace(new RegExp(w.student+'\\s+في','g'),w.student+' في').replace(/\s{2,}/g,' ').trim();
+      if(school)result+='\n'+school;if(counselor)result+='\nالموجه الطلابي: '+counselor;return result;
+    }
+
+    function saveRecent(id){state.recent=state.recent.filter(function(x){return x!==id});state.recent.unshift(id);state.recent=state.recent.slice(0,40);writeJSON('messages_recent_v15',state.recent)}
+    async function loadBubbleMessageTemplates(){
+      if(!window.MishkatBubbleStore)return;
+      try{
+        var rows=await window.MishkatBubbleStore.listTemplates('Message');if(!rows||!rows.length)return;
+        var ctx=window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext?window.MishkatSchoolContext.getContext():{};
+        var stageMap={'المرحلة الابتدائية':'upper_primary','الابتدائية':'upper_primary','المرحلة المتوسطة':'middle','المتوسطة':'middle','المرحلة الثانوية':'secondary','الثانوية':'secondary'};var stage=stageMap[ctx.stage]||'middle';
+        var gender=ctx.schoolType==='girls'?'girls':'boys';
+        rows.forEach(function(r){var rg=String(r.Gender||'').toLowerCase();if(rg&&rg!==gender&&rg!=='all'&&rg!=='الكل')return;var id='bubble-template-'+(window.MishkatBubbleStore.idOf(r)||Math.random().toString(36).slice(2));if(state.messages.some(function(m){return m.id===id}))return;state.messages.push({id:id,category:'template',categoryLabel:'قالب معتمد',topic:r.Title||'رسالة معتمدة',contextLabel:'قالب Bubble',stage:stage,tone:'formal',text:r.Content||''})});
+        $('totalCount').textContent=state.messages.length.toLocaleString('ar-SA');applyFilters();
+      }catch(e){console.warn('Bubble message templates unavailable',e)}
+    }
+    function toast(message){$('toast').textContent=message;$('toast').classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(function(){$('toast').classList.add('hidden')},2200)}
+    function copyText(text){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();try{document.execCommand('copy');resolve()}catch(e){reject(e)}finally{document.body.removeChild(area)}})}
+
+    function cardHTML(m){
+      var fav=!!state.favorites[m.id];
+      return '<article class="message-card"><div class="card-head"><div><h3 class="card-title">'+escapeHTML(m.topic)+'</h3><div class="tags"><span class="tag">'+escapeHTML(m.categoryLabel)+'</span><span class="tag">'+escapeHTML(STAGES[m.stage])+'</span><span class="tag">'+(m.tone==='gentle'?'راقية ودية':'رسمية')+'</span><span class="tag">'+escapeHTML(m.contextLabel)+'</span></div></div><button class="favorite" data-favorite="'+escapeHTML(m.id)+'" title="إضافة للمفضلة">'+(fav?'★':'☆')+'</button></div><div class="message-text">'+escapeHTML(personalized(m.text))+'</div><div class="card-actions"><button class="btn copy-btn" data-copy="'+escapeHTML(m.id)+'" type="button">نسخ الرسالة</button><button class="btn wa-btn" data-whatsapp="'+escapeHTML(m.id)+'" type="button">فتح واتساب</button></div></article>';
+    }
+
+    function applyFilters(){
+      var query=normalizeArabic($('searchInput').value);var stage=$('stageFilter').value;var category=$('categoryFilter').value;var tone=$('toneFilter').value;var recentMap={};
+      for(var r=0;r<state.recent.length;r++)recentMap[state.recent[r]]=true;
+      state.filtered=state.messages.filter(function(m){
+        if(stage!=='all'&&m.stage!==stage)return false;if(category!=='all'&&m.category!==category)return false;if(tone!=='all'&&m.tone!==tone)return false;
+        if(state.view==='favorites'&&!state.favorites[m.id])return false;if(state.view==='recent'&&!recentMap[m.id])return false;
+        if(query){var hay=normalizeArabic(m.topic+' '+m.categoryLabel+' '+m.contextLabel+' '+m.text);if(hay.indexOf(query)<0)return false}return true;
+      });
+      if(state.view==='recent')state.filtered.sort(function(a,b){return state.recent.indexOf(a.id)-state.recent.indexOf(b.id)});
+      state.shown=0;renderMore(true);
+    }
+
+    function renderMore(reset){
+      if(reset)$('cards').innerHTML='';var batch=state.filtered.slice(state.shown,state.shown+PAGE_SIZE);if(!batch.length&&state.shown===0)$('cards').innerHTML='<div class="empty">لا توجد رسائل مطابقة للفلاتر الحالية.</div>';else $('cards').insertAdjacentHTML('beforeend',batch.map(cardHTML).join(''));
+      state.shown+=batch.length;$('loadMore').classList.toggle('hidden',state.shown>=state.filtered.length);$('resultsInfo').textContent='عرض '+state.shown.toLocaleString('ar-SA')+' من '+state.filtered.length.toLocaleString('ar-SA')+' رسالة';bindCards();
+    }
+
+    function findMessage(id){for(var i=0;i<state.messages.length;i++)if(state.messages[i].id===id)return state.messages[i];return null}
+    function bindCards(){
+      var favorites=document.querySelectorAll('[data-favorite]');for(var i=0;i<favorites.length;i++)favorites[i].onclick=function(){var id=this.getAttribute('data-favorite');if(state.favorites[id])delete state.favorites[id];else state.favorites[id]=true;writeJSON('messages_favorites_v15',state.favorites);$('favoriteCount').textContent=Object.keys(state.favorites).length.toLocaleString('ar-SA');applyFilters()};
+      var copies=document.querySelectorAll('[data-copy]');for(var j=0;j<copies.length;j++)copies[j].onclick=function(){var m=findMessage(this.getAttribute('data-copy'));if(!m)return;var text=personalized(m.text);copyText(text).then(function(){saveRecent(m.id);if(window.MishkatBubbleStore)window.MishkatBubbleStore.logMessage({messageType:m.category,subject:m.topic,messageText:text,studentId:selectedStudentRecord()?.id,parentPhone:selectedStudentRecord()?.guardianPhone,recipientType:'parent',channel:'copy',sent:false,notes:'تم نسخ الرسالة من مكتبة المراسلات'}).catch(function(e){console.warn('Message log fallback',e)});toast('تم نسخ الرسالة')}).catch(function(){toast('تعذر النسخ، حدّد النص يدويًا')})};
+      var whats=document.querySelectorAll('[data-whatsapp]');for(var k=0;k<whats.length;k++)whats[k].onclick=function(){var m=findMessage(this.getAttribute('data-whatsapp'));if(!m)return;var text=personalized(m.text);saveRecent(m.id);if(window.MishkatBubbleStore)window.MishkatBubbleStore.logMessage({messageType:m.category,subject:m.topic,messageText:text,studentId:selectedStudentRecord()?.id,parentPhone:selectedStudentRecord()?.guardianPhone,recipientType:'parent',channel:'WhatsApp',sent:true}).catch(function(e){console.warn('Message log fallback',e)});var ph=String(selectedStudentRecord()?.guardianPhone||'').replace(/\D/g,'');window.open('https://wa.me/'+(ph?ph:'')+'?text='+encodeURIComponent(text),'_blank','noopener')};
+    }
+
+
+
+    var NAV_ROUTES={
+      results_analysis:{label:'تحليل النتائج',href:'../analysis/index.html'},guidance_records:{label:'السجلات الرقمية',href:'../records/index.html'},presentations:{label:'العروض التقديمية',href:'../presentations/index.html'},counselor_plan:{label:'خطة الموجه',href:'../plans/index.html'},achievement_reports:{label:'تقارير الإنجاز',href:'../reports/index.html'},messages_library:{label:'مراسلات ولي الأمر',href:'../messages/index.html'}
+    };
+    var NAV_ICONS={results_analysis:'<svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>',guidance_records:'<svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg>',presentations:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 21l4-5 4 5M8 9h3M8 12h7"/></svg>',counselor_plan:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h3"/><path d="m15 16 1.4 1.4L19 14.8"/></svg>',achievement_reports:'<svg viewBox="0 0 24 24"><path d="M5 3h14v18H5z"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="m15 17 1.5 1.5L20 15"/></svg>',messages_library:'<svg viewBox="0 0 24 24"><path d="M4 5h16v12H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg>'};
+    function navActiveEntitlements(){return (state.entitlements||[]).filter(function(e){return e&&e.is_active!==false&&e.expires_at&&new Date(e.expires_at).getTime()>Date.now()})}
+    function navHasAccess(code){if(SCHOOL_EDITION)return true;if(state.account&&state.account.is_system_admin)return true;if(code==='messages_library')return !!state.annualAccess;var active=navActiveEntitlements();return active.some(function(e){return e.product_code==='all_access'||e.product_code===code})}
+    function renderUnifiedNav(){var bar=$('unifiedPlatformBar'),box=$('platformSwitcher'),badge=$('platformPlanBadge');if(!bar||!box||!badge)return;box.innerHTML=Object.keys(NAV_ROUTES).filter(function(code){return code!=='messages_library'}).map(function(code){var item=NAV_ROUTES[code],icon=NAV_ICONS[code]||'',current=code==='messages_library';if(!navHasAccess(code)&&!current)return '<span class="platform-tab locked"><span class="platform-tab-icon">'+icon+'</span><span class="platform-tab-copy"><strong>'+item.label+'</strong><small>غير مفعّلة</small></span></span>';return '<a class="platform-tab'+(current?' current':'')+'" href="'+item.href+'?from=portal"><span class="platform-tab-icon">'+icon+'</span><span class="platform-tab-copy"><strong>'+item.label+'</strong><small>'+(current?'المنصة الحالية':'انتقال إلى المنصة')+'</small></span></a>'}).join('');var active=navActiveEntitlements();var label=SCHOOL_EDITION?'منصة المدارس':(state.account&&state.account.is_system_admin?'مدير النظام':(active.some(function(e){return e.product_code==='all_access'})?'الباقة الشاملة':(state.annualAccess?'اشتراك سنوي مفعل':'اشتراك مفعل')));badge.innerHTML='<span class="platform-plan-status"></span><span class="platform-plan-copy"><span>الباقة الحالية</span><strong>'+escapeHTML(label)+'</strong><small>التنقل بين الخدمات المفعلة</small></span>';bar.hidden=false}
+
+    function persistAudienceChoice(newAudience){
+      if(newAudience!=='boys'&&newAudience!=='girls')return Promise.reject(new Error('invalid_audience_type'));
+      if(SCHOOL_EDITION){
+        state.audience=newAudience;localStorage.setItem('messages_audience_v15',newAudience);state.messages=generateMessages();
+        $('audienceBadge').textContent=newAudience==='girls'?'صياغات الطالبات':'صياغات الطلاب';applyFilters();
+        toast('تم تغيير الصياغات إلى '+(newAudience==='girls'?'الطالبات':'الطلاب'));return Promise.resolve(state.account||{});
+      }
+      return api('/rest/v1/rpc/premium_set_platform_audience',{method:'POST',token:state.session.access_token,body:{p_audience_type:newAudience}}).then(function(account){
+        state.audience=newAudience;state.account=account||state.account||{};localStorage.setItem('messages_audience_v15',newAudience);state.messages=generateMessages();
+        $('audienceBadge').textContent=newAudience==='girls'?'صياغات الطالبات':'صياغات الطلاب';applyFilters();toast('تم تغيير الصياغات إلى '+(newAudience==='girls'?'الطالبات':'الطلاب'));
+      });
+    }
+
+    function startApp(access){
+      state.account=access.account||{};state.annualAccess=!!access.annual;state.entitlements=access.entitlements||[];state.messages=generateMessages();state.favorites=readJSON('messages_favorites_v15',{});state.recent=readJSON('messages_recent_v15',[]);
+      $('categoryFilter').insertAdjacentHTML('beforeend',CATEGORY_DEFS.map(function(d){return '<option value="'+escapeHTML(d.id)+'">'+escapeHTML(d.label)+'</option>'}).join(''));
+      $('totalCount').textContent=state.messages.length.toLocaleString('ar-SA');$('categoryCount').textContent=CATEGORY_DEFS.length.toLocaleString('ar-SA');$('favoriteCount').textContent=Object.keys(state.favorites).length.toLocaleString('ar-SA');
+      $('audienceBadge').textContent=state.audience==='girls'?'صياغات الطالبات':'صياغات الطلاب';if($('changeAudienceButton'))$('changeAudienceButton').hidden=true;$('accountInfo').textContent=(state.account.school_name||'مدارس المشكاة الأهلية')+' · '+(state.account.full_name||'الموجه الطلابي');
+      var filterIds=['searchInput','stageFilter','categoryFilter','toneFilter'];for(var i=0;i<filterIds.length;i++)$(filterIds[i]).addEventListener(filterIds[i]==='searchInput'?'input':'change',applyFilters);
+      var personalize=['studentName','className','subjectName','schoolName','counselorName'];for(var j=0;j<personalize.length;j++)$(personalize[j]).addEventListener('input',function(){renderMore(true)});
+      $('clearFilters').onclick=function(){$('searchInput').value='';$('stageFilter').value='all';$('categoryFilter').value='all';$('toneFilter').value='all';state.view='all';setViewButtons();applyFilters()};
+      var switches=document.querySelectorAll('[data-view]');for(var k=0;k<switches.length;k++)switches[k].onclick=function(){state.view=this.getAttribute('data-view');setViewButtons();applyFilters()};
+      $('loadMore').onclick=function(){renderMore(false)};
+      $('gate').classList.add('hidden');$('app').classList.remove('hidden');renderUnifiedNav();ready();applyFilters();
+    }
+
+    function setViewButtons(){var buttons=document.querySelectorAll('[data-view]');for(var i=0;i<buttons.length;i++)buttons[i].classList.toggle('active',buttons[i].getAttribute('data-view')===state.view)}
+
+    function applySchoolContextToMessages(){
+      var ctx=(window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext)?window.MishkatSchoolContext.getContext():readJSON('mishkat_school_user_context_v2',{});
+      ctx=ctx||{};
+      var automaticAudience=ctx.schoolType==='girls'?'girls':'boys';if(state.audience!==automaticAudience){state.audience=automaticAudience;state.messages=generateMessages();if($('audienceBadge'))$('audienceBadge').textContent=state.audience==='girls'?'صياغات الطالبات':'صياغات الطلاب';}
+      if($('schoolName'))$('schoolName').value=ctx.schoolName||'مدارس المشكاة الأهلية';
+      if($('counselorName'))$('counselorName').value=ctx.counselorName||'';
+      document.querySelectorAll('[data-school-context-display="schoolName"]').forEach(function(n){n.textContent=ctx.schoolName||'مدارس المشكاة الأهلية'});
+      document.querySelectorAll('[data-school-context-display="counselorName"]').forEach(function(n){n.textContent=ctx.counselorName||'—'});
+      state.account=state.account||{};state.account.school_name=ctx.schoolName||state.account.school_name||'مدارس المشكاة الأهلية';state.account.full_name=ctx.counselorName||state.account.full_name||'الموجه الطلابي';
+      if($('accountInfo'))$('accountInfo').textContent=state.account.school_name+' · '+state.account.full_name;
+      var stageMap={'المرحلة الابتدائية':'upper_primary','الابتدائية':'upper_primary','المرحلة المتوسطة':'middle','المتوسطة':'middle','المرحلة الثانوية':'secondary','الثانوية':'secondary'};
+      var mapped=stageMap[ctx.stage];if(mapped&&$('stageFilter')){$('stageFilter').value=mapped;$('stageFilter').disabled=true;$('stageFilter').title='المرحلة حسب توزيع المستخدم';if(window.__MESSAGES_READY__)applyFilters();}
+      if(window.__MESSAGES_READY__)renderMore(true);
+    }
+
+    function boot(){
+      diag('School edition: direct boot');$('retryButton').onclick=function(){location.reload()};
+      var stored=readJSON('mishkat_school_user_context_v2',{})||{};
+      state.user={id:stored.id||'mishkat-school-user',email:''};
+      state.session=null;state.annualAccess=true;state.entitlements=[];
+      state.account={full_name:stored.counselorName||'الموجه الطلابي',school_name:stored.schoolName||'مدارس المشكاة الأهلية',is_system_admin:false};
+      var ctx=(window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext)?window.MishkatSchoolContext.getContext():stored;
+      var audience=ctx&&ctx.schoolType==='girls'?'girls':'boys';
+      state.audience=audience;
+      $('audienceChooser').classList.add('hidden');
+      startApp({account:state.account,annual:true,entitlements:[]});
+      applySchoolContextToMessages();loadStudentDirectory();
+      loadBubbleMessageTemplates();
+      window.addEventListener('mishkat:school-context-ready',applySchoolContextToMessages);
+      window.addEventListener('mishkat:school-context-changed',applySchoolContextToMessages);
+    }
+
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  })();
+  </script>
+<script src="../support-widget-rest.js?v=17.3.0"></script>
+  <script src="../smart-reminders.js?v=19.0.9"></script>
+  <script src="../bubble-schema.js?v=school-1.0.15"></script>
+  <script src="../bubble-config.js?v=school-1.0.15"></script>
+  <script src="../school-context.js?v=school-1.0.15"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.15"></script>
+  <script src="../school-directory.js?v=school-1.0.15"></script>
+  <script src="../global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>

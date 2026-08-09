@@ -1,0 +1,20 @@
+{
+  "version": "1.0.20",
+  "edition": "Mishkat School Platform",
+  "date": "2026-08-08",
+  "features": [
+    "Unified platform gateway header on all primary pages",
+    "Floating guidance chat launcher at bottom-right on all pages",
+    "Group and direct chat using Guidance_Message and Users Data",
+    "Role-scoped school and supervisory statistics",
+    "No changes required to existing Bubble core tables",
+    "Every guidance record opens on its dedicated report before data entry",
+    "New record opens form and save returns to the same report",
+    "Record report filters by student/name, academic year, and term"
+  ],
+  "school_version": "1.0.19",
+  "updated_at": "2026-08-08",
+  "name": "Mishkat School Platform",
+  "build": "record-report-first",
+  "label": "School Edition V1.0.19 - Record Report First"
+}

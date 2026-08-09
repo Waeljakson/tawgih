@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-platform-name="منصة خطة الموجه الطلابي">
+<head>
+  <meta name="app-version" content="13.0.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b766d">
+  <meta name="description" content="إنشاء خطة أسبوعية للموجه الطلابي حسب المرحلة والتقويم الدراسي والإجازات.">
+  <title>خطة الموجه الطلابي | منصة مدارس المشكاة الأهلية</title>
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles-v13.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../support-widget.css?v12">
+  <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+</head>
+<body>
+  <div id="accessGate" class="access-gate">
+    <div class="gate-spinner"></div>
+    <strong>جارٍ تجهيز منصة خطة الموجه الطلابي…</strong>
+    <p>يتم التحقق من الحساب والباقة وبيانات المدرسة.</p>
+  </div>
+
+  <div id="appShell" hidden>
+    <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
+      <div class="unified-nav-shell">
+        <a class="portal-home-link" href="../index.html" aria-label="العودة إلى بوابة المنصات"><span class="home-icon">⌂</span><span><strong>بوابة المنصات</strong><small>العودة إلى الصفحة الرئيسية</small></span></a>
+        <nav id="platformSwitcher" class="platform-switcher" aria-label="التنقل بين المنصات"></nav>
+        <div id="platformPlanBadge" class="platform-plan-badge"></div>
+      </div>
+    </header>
+
+    <header class="plan-header">
+      <div class="header-pattern"></div>
+      <div class="plan-header-inner">
+        <div class="school-brand"><div class="school-logo-box"><img id="schoolLogo" hidden alt="شعار المدرسة"><span id="schoolLogoPlaceholder">م</span></div><div><span>منصة خطة الموجه الطلابي</span><h1 id="schoolName">اسم المدرسة</h1><p id="userName">الموجه الطلابي</p></div></div>
+        <div class="header-copy"><span class="eyebrow">خطة أسبوعية مبنية على التقويم الفعلي</span><h2>من التقويم الدراسي إلى <b>خطة تنفيذ أسبوعية جاهزة</b></h2><p>حدد المرحلة وبداية الدراسة ونهايتها والإجازات، ثم تُنشئ المنصة الأسابيع تلقائيًا وتوزع عناصر الخطة والبرامج المناسبة للمرحلة.</p></div>
+        <div class="header-stat"><span>المراحل المدعومة</span><strong>4</strong><small>ابتدائية دنيا وعليا ومتوسطة وثانوية</small></div>
+      </div>
+    </header>
+
+    <main class="main-shell">
+      <section class="workspace-toolbar no-print">
+        <div><span class="section-kicker">منشئ الخطة الذكي</span><h2>بيانات الخطة والتقويم الدراسي</h2><p>يمكنك تعديل أي عنصر بعد إنشاء الخطة وقبل الحفظ أو الطباعة.</p></div>
+        <div class="toolbar-actions"><button id="newPlanButton" class="ghost-button" type="button">خطة جديدة</button><button id="savePlanButton" class="secondary-button" type="button" disabled>حفظ الخطة</button><button id="printPlanButton" class="primary-button" type="button" disabled>طباعة / حفظ PDF</button></div>
+      </section>
+
+      <section class="setup-grid no-print">
+        <article class="setup-card identity-card">
+          <div class="card-heading"><span>1</span><div><h3>هوية الخطة</h3><p>بيانات تظهر في الغلاف والمقدمة وكل أسبوع.</p></div></div>
+          <div class="form-grid">
+            <label><span>المرحلة الدراسية — تلقائي حسب التوزيع</span><select id="schoolStage" disabled><option value="lower_primary">الابتدائية الدنيا</option><option value="upper_primary">الابتدائية العليا</option><option value="middle">المرحلة المتوسطة</option><option value="secondary">المرحلة الثانوية</option></select></label>
+            <label><span>الفصل الدراسي</span><select id="termName"><option>الفصل الدراسي الأول</option><option>الفصل الدراسي الثاني</option><option>الفصل الدراسي الثالث</option><option>العام الدراسي كاملًا</option></select></label>
+            <label><span>العام الدراسي</span><input id="academicYear" type="text" placeholder="مثال: 1448 هـ / 2026-2027"></label>
+            <label><span>اسم الموجه الطلابي — تلقائي</span><input id="counselorName" type="text" readonly></label>
+            <label><span>اسم مدير المدرسة — تلقائي من بيانات المدرسة</span><input id="principalName" type="text" readonly></label>
+            <label><span>عنوان الخطة</span><input id="planTitle" type="text" value="خطة الأعمال الأسبوعية للموجه الطلابي"></label>
+          </div>
+        </article>
+
+        <article class="setup-card calendar-card">
+          <div class="card-heading"><span>2</span><div><h3>مدة الدراسة</h3><p>تُحسب الأسابيع من الأحد إلى الخميس تلقائيًا.</p></div></div>
+          <div class="form-grid calendar-fields">
+            <label><span>تاريخ بداية الدراسة</span><input id="studyStart" type="date"></label>
+            <label><span>تاريخ نهاية الدراسة</span><input id="studyEnd" type="date"></label>
+          </div>
+          <div class="calendar-note"><b>آلية التوزيع:</b> الأسبوع الذي تكون جميع أيامه إجازة يظهر كفاصل إجازة ولا يُحتسب ضمن ترقيم أسابيع الدراسة. أما الإجازة الجزئية فتظهر ملاحظة داخل الأسبوع وتُضبط بدايته ونهايته على أيام الدراسة الفعلية.</div>
+        </article>
+      </section>
+
+      <section class="holidays-panel no-print">
+        <div class="panel-heading"><div><span class="section-kicker">3 — التقويم</span><h2>الإجازات والفواصل الدراسية</h2><p>أضف الإجازات الفصلية والمطولة وإجازات المناسبات وأي توقف رسمي.</p></div><div class="holiday-count"><strong id="holidayCount">0</strong><small>إجازة مسجلة</small></div></div>
+        <div class="holiday-form">
+          <label><span>نوع الإجازة</span><select id="holidayType"><option value="term">إجازة فصلية</option><option value="extended">إجازة مطولة</option><option value="occasion">إجازة مناسبة</option><option value="official">إجازة رسمية</option><option value="other">أخرى</option></select></label>
+          <label class="holiday-title-field"><span>اسم الإجازة</span><input id="holidayTitle" type="text" placeholder="مثال: إجازة منتصف الفصل"></label>
+          <label><span>من</span><input id="holidayStart" type="date"></label>
+          <label><span>إلى</span><input id="holidayEnd" type="date"></label>
+          <div class="holiday-form-actions">
+            <button id="addHolidayButton" class="secondary-button" type="button">إضافة الإجازة</button>
+            <button id="cancelHolidayEditButton" class="ghost-button" type="button" hidden>إلغاء التعديل</button>
+          </div>
+        </div>
+        <div id="holidayList" class="holiday-list"><div class="empty-inline">لم تتم إضافة إجازات بعد.</div></div>
+      </section>
+
+      <section class="generate-panel no-print">
+        <div><span class="section-kicker">4 — الإنشاء</span><h2>إنشاء الخطة الأسبوعية</h2><p>ستُصاغ مقدمة خاصة بالمستخدم والمدرسة والمرحلة، ثم توزع البرامج والخدمات على أسابيع الدراسة الفعلية.</p></div>
+        <button id="generatePlanButton" class="generate-button" type="button"><span>إنشاء الخطة الآن</span><b>←</b></button>
+        <div id="planStatus" class="status-box" hidden></div>
+      </section>
+
+      <section class="saved-plans-section no-print">
+        <div class="panel-heading"><div><span class="section-kicker">الأرشيف</span><h2>خططي المحفوظة</h2><p>افتح خطة سابقة أو احذفها.</p></div><button id="refreshPlansButton" class="ghost-button" type="button">تحديث</button></div>
+        <div id="savedPlansList" class="saved-plans-list"><div class="loading-line">جارٍ تحميل الخطط…</div></div>
+      </section>
+
+      <section id="planPreviewSection" class="plan-preview-section" hidden>
+        <div class="preview-heading no-print"><div><span class="section-kicker">المعاينة والتحرير والمتابعة</span><h2>الخطة الأسبوعية الإلكترونية</h2><p>افتح أي أسبوع لتعديل محتواه، وحدد نفذ أو لم ينفذ لمتابعة معدل الإنجاز لحظيًا. نفس الخطة جاهزة للطباعة والحفظ PDF.</p></div><div class="preview-meta"><strong id="generatedWeekCount">0</strong><small>أسبوع دراسي</small></div></div>
+
+        <section id="planProgressDashboard" class="plan-progress-dashboard no-print">
+          <div class="overall-progress-card">
+            <div class="progress-ring" id="overallProgressRing"><strong id="overallProgressPercent">0%</strong><span>نسبة الإنجاز</span></div>
+            <div class="overall-progress-copy"><span>متابعة التنفيذ الإلكتروني</span><h3 id="progressPlanTitle">الخطة الأسبوعية</h3><p>تتغير النسبة مباشرة عند اختيار «نفذ» أو «لم ينفذ» في أي عنصر.</p><div class="overall-progress-bar"><i id="overallProgressBar"></i></div></div>
+          </div>
+          <div class="progress-metrics">
+            <article><span>العناصر المخططة</span><strong id="progressTotalItems">0</strong><small>عمل وبرنامج</small></article>
+            <article class="completed"><span>تم تنفيذها</span><strong id="progressCompletedItems">0</strong><small>محسوبة في الإنجاز</small></article>
+            <article class="failed"><span>لم تنفذ</span><strong id="progressNotCompletedItems">0</strong><small>تحتاج متابعة</small></article>
+            <article class="pending"><span>قيد الانتظار</span><strong id="progressPendingItems">0</strong><small>لم تحدد بعد</small></article>
+          </div>
+        </section>
+
+        <section class="week-control-panel no-print">
+          <div class="week-control-heading"><div><span>إدارة الأسابيع</span><h3>اضغط على الأسبوع لفتحه وتعديله</h3></div><small>التعديلات تحفظ داخل الخطة الإلكترونية وتظهر في النسخة المطبوعة.</small></div>
+          <div id="weekNavigator" class="week-navigator"></div>
+        </section>
+
+        <div id="planDocument" class="plan-document"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer no-print"><span>منصة خطة الموجه الطلابي — منصة مدارس المشكاة الأهلية</span><span>الدعم الفني عبر المحادثة داخل المنصة</span></footer>
+  </div>
+
+
+  <div id="weekEditorModal" class="modal week-editor-modal" hidden>
+    <div class="modal-backdrop" data-close-week-editor></div>
+    <div class="week-editor-card" role="dialog" aria-modal="true" aria-labelledby="weekEditorTitle">
+      <header class="week-editor-header">
+        <div><span>التحرير الإلكتروني للأسبوع</span><h2 id="weekEditorTitle">تعديل الأسبوع</h2><p id="weekEditorDates">—</p></div>
+        <button class="modal-close" data-close-week-editor type="button">×</button>
+      </header>
+      <div class="week-editor-progress"><div><span>إنجاز هذا الأسبوع</span><strong id="weekEditorProgressPercent">0%</strong></div><div class="week-editor-progress-bar"><i id="weekEditorProgressBar"></i></div></div>
+      <div class="week-editor-body">
+        <section class="week-editor-section date-editor-section">
+          <div class="editor-section-heading"><div><span>الفترة الزمنية</span><h3>تواريخ الأسبوع</h3></div></div>
+          <div class="editor-date-grid"><label><span>بداية الأسبوع الفعلية</span><input id="weekEditorStart" type="date"></label><label><span>نهاية الأسبوع الفعلية</span><input id="weekEditorEnd" type="date"></label></div>
+        </section>
+        <section class="week-editor-section">
+          <div class="editor-section-heading"><div><span>الأعمال والخدمات</span><h3>عناصر التنفيذ الأساسية</h3></div><button id="addWeekTaskButton" class="mini-button" type="button">+ إضافة عمل</button></div>
+          <div id="weekEditorTasks" class="week-editor-list"></div>
+        </section>
+        <section class="week-editor-section">
+          <div class="editor-section-heading"><div><span>البرامج الإرشادية</span><h3>برامج هذا الأسبوع</h3></div><button id="addWeekProgramButton" class="mini-button" type="button">+ إضافة برنامج</button></div>
+          <div id="weekEditorPrograms" class="week-editor-list"></div>
+          <label class="editor-wide-label"><span>ملاحظات الأسبوع</span><textarea id="weekEditorNote" rows="3"></textarea></label>
+        </section>
+        <section class="week-editor-section">
+          <div class="editor-section-heading"><div><span>أعمال التوجيه الخاصة</span><h3>الجلسات والحالات</h3></div></div>
+          <div class="editor-special-checks"><label><input id="weekEditorIndividual" type="checkbox"> جلسة فردية</label><label><input id="weekEditorCaseStudy" type="checkbox"> دراسة حالة</label><label><input id="weekEditorGroup" type="checkbox"> إرشاد جمعي</label></div>
+          <label class="editor-wide-label"><span>ملاحظات أعمال التوجيه الخاصة</span><textarea id="weekEditorSpecialNotes" rows="3"></textarea></label>
+        </section>
+        <section class="week-editor-section">
+          <div class="editor-section-heading"><div><span>أعمال مستجدة</span><h3>إضافات هذا الأسبوع</h3></div><button id="addEmergingTaskButton" class="mini-button" type="button">+ إضافة عمل مستجد</button></div>
+          <div id="weekEditorEmerging" class="week-editor-list"></div>
+        </section>
+      </div>
+      <footer class="week-editor-footer"><button class="ghost-button" data-close-week-editor type="button">إلغاء</button><button id="saveWeekEditsButton" class="primary-button" type="button">حفظ تعديلات الأسبوع</button></footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="../bubble-schema.js?v=school-1.0.15"></script>
+  <script src="../bubble-config.js?v=school-1.0.15"></script>
+  <script src="../school-context.js?v=school-1.0.15"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.15"></script>
+  <script src="../school-directory.js?v=school-1.0.15"></script>
+  <script src="app-v13.js?v=19.0.8"></script>
+  <script src="../support-widget.js?v13"></script>
+  <script src="../smart-reminders.js?v=19.0.9"></script>
+  <script src="../global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>
