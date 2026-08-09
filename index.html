@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-platform-name="منصة المدارس — مدارس المشكاة الأهلية">
+<head>
+  <meta name="app-version" content="school-1.0.17">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2f6b3a">
+  <meta name="description" content="منصة مدارس المشكاة الأهلية لخدمات التوجيه الطلابي والسجلات الرقمية.">
+  <title>منصة المدارس — مدارس المشكاة الأهلية</title>
+  <link rel="icon" type="image/png" href="assets/school-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles-v12.css">
+  <link rel="stylesheet" href="support-widget.css?v17.3.1">
+  <link rel="stylesheet" href="smart-reminders.css?v=19.0.9">
+  <style>
+    #authBoot[hidden]{display:none!important}
+    #authBoot{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;background:linear-gradient(145deg,#f5fafb,#eef7f7);font-family:Cairo,Tahoma,sans-serif;color:#173542}
+    .auth-boot-card{display:grid;place-items:center;gap:12px;padding:26px 30px;border:1px solid #d9e7e8;border-radius:22px;background:rgba(255,255,255,.94);box-shadow:0 18px 55px rgba(9,68,76,.12);text-align:center}
+    .auth-boot-spinner{width:38px;height:38px;border:4px solid #d8ece9;border-top-color:#0b8178;border-radius:50%;animation:authBootSpin .8s linear infinite}
+    .auth-boot-card strong{font-size:14px}.auth-boot-card small{font-size:10px;color:#667c86}
+    @keyframes authBootSpin{to{transform:rotate(360deg)}}
+  
+    /* School edition: no subscription UI */
+    .plans-overview,#openPromoButton,#signOutButton,#openAdminButton,.locked-platform-group{display:none!important}
+  </style>
+
+  <style id="mishkat-school-identity-v106">
+    :root{--mishkat-green:#315f35;--mishkat-green-2:#5f9b43;--mishkat-red:#c8242a;--guidance-blue:#0d659f;--guidance-orange:#ff9718;--mishkat-cream:#fffaf2}
+    .portal-header.dashboard-header{background:linear-gradient(125deg,#274f2d 0%,#315f35 42%,#0d659f 100%)!important}
+    .school-dual-brand{display:flex;align-items:center;gap:10px;direction:rtl}
+    .school-logo-wrap,.guidance-logo-wrap{background:#fff!important;border:1px solid rgba(255,255,255,.72);box-shadow:0 10px 28px rgba(0,0,0,.14);display:grid;place-items:center;overflow:hidden}
+    .school-logo-wrap{width:72px!important;height:72px!important;border-radius:20px!important}.guidance-logo-wrap{width:68px;height:68px;border-radius:19px}
+    .school-logo-wrap img,.guidance-logo-wrap img{width:92%;height:92%;object-fit:contain}.guidance-logo-wrap img{width:88%;height:88%}
+    .dashboard-toolbar,.summary-card,.platform-card{border-top:3px solid rgba(95,155,67,.32)}
+    .section-kicker{color:var(--mishkat-green)!important}.primary-button{background:linear-gradient(135deg,var(--mishkat-green),#244b29)!important}
+    .school-brand-mark{background:#fff!important;padding:8px}.school-brand-mark img{object-fit:contain!important}
+    @media(max-width:720px){.school-logo-wrap{width:58px!important;height:58px!important}.guidance-logo-wrap{width:54px;height:54px}}
+  </style>
+</head>
+<body class="mishkat-home">
+  <div id="authBoot" aria-live="polite" hidden style="display:none!important"><div class="auth-boot-card"><div class="auth-boot-spinner" aria-hidden="true"></div><strong>جارٍ فتح منصة المدارس</strong><small>يتم تجهيز خدمات مدارس المشكاة الأهلية...</small></div></div>
+  <section id="loginPage" class="login-page" hidden>
+    <div class="mesh mesh-one"></div><div class="mesh mesh-two"></div>
+    <div class="login-shell">
+      <div class="login-intro">
+        <div class="brand-mark school-brand-mark"><img src="assets/school-logo.png" alt="شعار مدارس المشكاة الأهلية"></div>
+        <span class="eyebrow">منصة موحدة لخدمات التوجيه الطلابي</span>
+        <h1>كل أدوات الموجه<br><b>في بوابة واحدة</b></h1>
+        <p>سجّل الدخول إلى منصة مدارس المشكاة الأهلية، وجميع خدمات التوجيه الطلابي متاحة بدون باقات أو اشتراكات.</p>
+        <div class="intro-points"><span>تحليل النتائج</span><span>السجلات الرقمية</span><span>العروض التقديمية</span><span>خطة الموجه الطلابي</span><span>إدارة موحدة للخدمات</span><span>مراسلات أولياء الأمور</span><span>تقارير الإنجاز</span><span>التقويم الذكي والتنبيهات</span><span>شهادات التقدير</span><span>هوية المدرسة</span></div>
+      </div>
+      <div class="auth-card">
+        <div class="auth-head"><span>حساب المدرسة</span><h2>تسجيل الدخول</h2><p>استخدم الحساب نفسه للدخول إلى جميع المنصات المشمولة في باقتك.</p></div>
+        <label><span>البريد الإلكتروني</span><input id="authEmail" type="email" autocomplete="email" placeholder="name@school.edu.sa"></label>
+        <label><span>كلمة المرور</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="6 أحرف على الأقل"></label>
+        <label><span>الاسم الكامل — للحساب الجديد</span><input id="authFullName" type="text" autocomplete="name" placeholder="اسم المستخدم"></label>
+        <div class="auth-actions"><button id="signInButton" class="primary-button" type="button">تسجيل الدخول</button><button id="signUpButton" class="secondary-button" type="button">إنشاء حساب</button></div>
+        <div class="price-note" hidden><strong>الباقات الفردية</strong><span>10 ريالات شهريًا أو 50 ريالًا سنويًا</span><strong>الباقة الشاملة</strong><span>50 ريالًا شهريًا أو 300 ريال سنويًا</span></div>
+        <div id="loginStatus" class="status-box" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="portalShell">
+    <header class="portal-header dashboard-header">
+      <div class="header-pattern"></div>
+      <div class="header-content dashboard-header-content">
+        <div class="school-identity">
+          <div class="school-dual-brand" aria-label="هوية مدارس المشكاة والتوجيه الطلابي">
+            <div class="school-logo-wrap"><img id="headerSchoolLogo" hidden alt="شعار مدارس المشكاة الأهلية"><span id="headerLogoPlaceholder">م</span></div>
+            <div class="guidance-logo-wrap"><img src="assets/guidance-logo.png" alt="شعار التوجيه الطلابي"></div>
+          </div>
+          <div class="school-copy"><span>منصة التوجيه الطلابي المدرسية</span><h1 id="headerSchoolName">مدارس المشكاة الأهلية</h1><p><b id="headerUserName">المستخدم</b> · خدمات التوجيه الطلابي</p></div>
+        </div>
+        <div class="header-plan header-service-gateway">
+          <div class="header-service-title"><span>بوابة الخدمات</span><strong>وصول سريع لمنصات التوجيه الطلابي</strong></div>
+          <div class="header-service-links" aria-label="روابط سريعة للخدمات">
+            <a href="records/index.html?from=header">السجلات</a><a href="plans/index.html?from=header">الخطة</a><a href="calendar/index.html?from=header">التقويم</a><a href="messages/index.html?from=header">المراسلات</a>
+            <a href="analysis/index.html?from=header">التحليل</a><a href="reports/index.html?from=header">التقارير</a><a href="certificates/index.html?from=header">الشهادات</a><a href="presentations/index.html?from=header">العروض</a>
+          </div>
+          <span id="headerPlanName" hidden>منصة المدارس</span><small id="headerPlanExpiry" hidden>جميع الخدمات متاحة</small>
+        </div>
+      </div>
+      <div class="header-wave"></div>
+    </header>
+
+    <main class="portal-layout dashboard-layout">
+      <section id="portalNotice" class="notice" hidden></section>
+
+      <section class="dashboard-toolbar">
+        <div class="toolbar-title">
+          <span class="section-kicker">لوحة التحكم الرئيسية</span>
+          <h2>اختر الخدمة التي تريد العمل عليها</h2>
+          <p id="accessExplanation">جميع خدمات المدرسة الأساسية متاحة، والخدمات قيد التطوير تظهر بوضوح.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="portalSupportButton" class="toolbar-button" type="button"><span class="toolbar-icon">?</span><span><b>الدعم الفني</b><small>محادثة مباشرة</small></span></button>
+          <button id="openProfileButton" class="toolbar-button" type="button"><span class="toolbar-icon">⌂</span><span><b>بيانات التوزيع</b><small>تلقائي من Bubble</small></span></button>
+          
+          <button id="openPromoButton" class="toolbar-button gift" type="button"><span class="toolbar-icon">🎁</span><span><b>كود هدية</b><small>تفعيل برومو كود</small></span></button>
+          <button id="openAdminButton" class="toolbar-button admin" type="button" hidden><span class="toolbar-icon">⚙</span><span><b>إدارة النظام</b><small>الطلبات والحسابات</small></span></button>
+          <button id="signOutButton" class="toolbar-button logout" type="button"><span class="toolbar-icon">↪</span><span><b>تسجيل الخروج</b><small>إنهاء الجلسة</small></span></button>
+        </div>
+      </section>
+
+      <section class="dashboard-summary" aria-label="ملخص الحساب">
+        <article class="summary-card plan-summary-card">
+          <div class="summary-card-icon">✓</div>
+          <div class="summary-card-copy"><span>حالة الحساب</span><h3 id="currentPackageTitle">منصة المدارس</h3><p id="currentPackageDetails">جميع الخدمات متاحة حاليًا.</p><div id="activePackageChips" class="package-chips"></div></div>
+        </article>
+        <article class="summary-card metric-card">
+          <div class="metric-symbol active-symbol">●</div>
+          <div><span>منصات متاحة</span><strong id="activePlatformCount">8</strong><small>يمكن الدخول إليها الآن</small></div>
+        </article>
+        <article class="summary-card metric-card">
+          <div class="metric-symbol locked-symbol">◆</div>
+          <div><span>خدمات قيد الإعداد</span><strong id="lockedPlatformCount">0</strong><small>سيتم تهيئتها تباعًا</small></div>
+        </article>
+      </section>
+
+      <section class="platforms-section dashboard-platforms">
+        <div class="section-heading dashboard-section-heading">
+          <div><span class="section-kicker">مساحة العمل</span><h2>المنصات الرقمية</h2><p>ابدأ من الخدمة التي تحتاجها، ويمكنك العودة إلى هذه الصفحة والتنقل بين خدمات المدرسة في أي وقت.</p></div>
+          <div class="platform-legend"><span><i class="legend-dot active-dot"></i> مفعّلة</span><span><i class="legend-dot locked-dot"></i> غير مفعّلة</span><span><i class="legend-dot coming-dot"></i> قريبًا</span></div>
+        </div>
+
+        <div class="platform-group active-platform-group">
+          <div class="platform-group-heading"><div><h3>منصاتي المتاحة</h3><p>خدمات المدرسة المتاحة حاليًا.</p></div><span id="activePlatformCountBadge" class="count-badge active-count">8</span></div>
+          <div id="activePlatformGrid" class="platform-grid active-platform-grid">
+<article class="platform-card analysis active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▥</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">01</span><h3>تحليل النتائج التعليمية</h3><p>تحليل ملفات Excel، مؤشرات التحصيل، ضعاف المواد، تقارير Word وPDF، وأرشفة التحليلات.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="analysis/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card records active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▤</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">02</span><h3>السجلات الرقمية للموجه الطلابي</h3><p>نماذج رقمية للسجلات الإرشادية، دراسة الحالة، الزيارات، المقابلات، المواظبة والأرشفة.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="records/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card presentations active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▰</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">03</span><h3>العروض التقديمية</h3><p>مكتبة عروض توجيهية احترافية مصنفة حسب المرحلة ونوع الطلاب.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="presentations/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card counselor-plan active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▦</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">04</span><h3>خطة الموجه الطلابي</h3><p>إنشاء خطة أسبوعية ذكية حسب المرحلة والتقويم الدراسي والبرامج.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="plans/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card smart-calendar active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▣</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">05</span><h3>التقويم الذكي والتنبيهات</h3><p>تقويم تنفيذي مرتبط بالخطة والمناسبات والبرامج والتنبيهات.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="calendar/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card messages active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">✉</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">06</span><h3>مراسلات الموجه الطلابي</h3><p>مكتبة رسائل أولياء الأمور للتفوق والغياب والسلوك والاختبارات وغيرها.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="messages/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card reports active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">▧</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">07</span><h3>تقارير الإنجاز</h3><p>إنشاء تقارير برامج الموجه الطلابي مع الطباعة وPDF وWord.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="reports/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+<article class="platform-card certificates active" data-static-school-platform="true">
+      <div class="platform-card-accent"></div>
+      <div class="platform-top"><div class="platform-icon" aria-hidden="true"><span style="font-size:24px;font-weight:900">★</span></div><span class="status-badge">متاحة</span></div>
+      <div class="platform-card-body"><span class="platform-number">08</span><h3>شهادات التقدير</h3><p>إنشاء شهادات تفوق وتقدير وتهنئة جاهزة للطباعة.</p></div>
+      <div class="platform-card-footer"><div class="platform-meta">متاحة ضمن منصة مدارس المشكاة الأهلية</div><a class="primary-button platform-action-button" href="certificates/index.html?from=portal" data-static-platform-link="true"><span>دخول المنصة</span><b>←</b></a></div>
+    </article>
+</div>
+        </div>
+
+        <div class="platform-group locked-platform-group">
+          <div class="platform-group-heading"><div><h3>خدمات إضافية</h3><p>منصات غير مشمولة في باقتك الحالية أو ما زالت قيد الإعداد.</p></div><span id="lockedPlatformCountBadge" class="count-badge locked-count">0</span></div>
+          <div id="lockedPlatformGrid" class="platform-grid locked-platform-grid"></div>
+        </div>
+      </section>
+
+      <section class="plans-overview compact-plans-overview">
+        <div class="section-heading dashboard-section-heading">
+          <div><span class="section-kicker">الترقية والاشتراك</span><h2>خطط واضحة بدون تكرار</h2><p>اختر منصة واحدة أو فعّل الباقة الشاملة لكل الخدمات الحالية والمستقبلية.</p></div>
+        </div>
+        <div class="compact-plans-grid">
+          <article class="compact-plan-card individual-plan">
+            <div class="compact-plan-head"><div><span>منصة واحدة</span><h3>10 <small>ريالات شهريًا</small></h3></div><strong>50 ريالًا سنويًا</strong></div>
+            <p>اختر الخدمة التي تحتاجها فقط، ويمكنك إضافة منصة أخرى لاحقًا كباقة مستقلة.</p>
+            <div class="individual-plan-actions">
+              <button class="plan-choice" data-quick-plan="results_analysis" type="button"><span>▥</span> تحليل النتائج</button>
+              <button class="plan-choice" data-quick-plan="guidance_records" type="button"><span>▤</span> السجلات الرقمية</button>
+              <button class="plan-choice" data-quick-plan="presentations" type="button"><span>▰</span> العروض التقديمية</button>
+              <button class="plan-choice" data-quick-plan="counselor_plan" type="button"><span>▦</span> خطة الموجه</button>
+              <button class="plan-choice" data-quick-plan="achievement_reports" type="button"><span>▧</span> تقارير الإنجاز</button>
+            </div>
+          </article>
+          <article class="compact-plan-card comprehensive-plan">
+            <div class="comprehensive-badge">الأوفر للمدرسة</div>
+            <div class="compact-plan-head"><div><span>الباقة الشاملة</span><h3>50 <small>ريالًا شهريًا</small></h3></div><strong>300 ريال سنويًا</strong></div>
+            <p>تفتح كل المنصات المتاحة، وتضم أي منصة جديدة عند إطلاقها ضمن مدة الاشتراك.</p>
+            <ul><li>تحليل النتائج التعليمية</li><li>السجلات الرقمية</li><li>العروض التقديمية</li><li>خطة الموجه الطلابي</li><li>تقارير الإنجاز</li><li>التقويم الذكي والتنبيهات — حصري الشاملة</li><li>شهادات التقدير</li><li>المنصات القادمة</li></ul>
+            <button class="primary-button comprehensive-button" data-quick-plan="all_access" type="button">طلب الباقة الشاملة</button>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="portal-footer"><span>منصة المدارس — مدارس المشكاة الأهلية</span><span>الدعم الفني عبر واتساب: 00966582712620</span></footer>
+  </div>
+
+  <div id="profileModal" class="modal" hidden>
+    <div class="modal-card compact-modal"><div class="modal-head"><div><span>هوية المستخدم</span><h2>بيانات التوزيع التلقائية</h2></div><button class="icon-button" data-close-modal="profileModal">×</button></div>
+      <p style="margin:0 0 12px;color:#64748b">هذه البيانات تأتي من حساب الموظف وتوزيعه في Bubble، ولا تحتاج إلى حفظ أو إعداد يدوي.</p>
+      <div class="school-context-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <div class="status-box" style="display:block"><span>الموجه الطلابي</span><strong id="profileAssignedUser">—</strong></div>
+        <div class="status-box" style="display:block"><span>المدرسة</span><strong id="profileAssignedSchool">—</strong></div>
+        <div class="status-box" style="display:block"><span>المجمع</span><strong id="profileAssignedCampus">—</strong></div>
+        <div class="status-box" style="display:block"><span>المرحلة</span><strong id="profileAssignedStage">—</strong></div>
+        <div class="status-box" style="display:block"><span>نوع المدرسة</span><strong id="profileAssignedSchoolType">بنين</strong></div>
+        <div class="status-box" style="display:block"><span>مدير المدرسة</span><strong id="profileAssignedManager">—</strong></div>
+      </div>
+      <input id="profileFullName" type="hidden"><input id="schoolProfileName" type="hidden">
+    </div>
+  </div>
+
+  <div id="subscriptionModal" class="modal" hidden style="display:none!important">
+    <div class="modal-card subscription-modal"><div class="modal-head"><div><span>طلب التفعيل</span><h2>اختر الباقة والمدة</h2></div><button class="icon-button" data-close-modal="subscriptionModal">×</button></div>
+      <div class="subscription-options">
+        <label class="option-card"><input type="radio" name="productCode" value="results_analysis" checked><span><b>منصة تحليل النتائج</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
+        <label class="option-card"><input type="radio" name="productCode" value="guidance_records"><span><b>منصة السجلات الرقمية</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
+        <label class="option-card"><input type="radio" name="productCode" value="presentations"><span><b>منصة العروض التقديمية</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
+        <label class="option-card"><input type="radio" name="productCode" value="counselor_plan"><span><b>منصة خطة الموجه الطلابي</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
+        <label class="option-card"><input type="radio" name="productCode" value="achievement_reports"><span><b>منصة تقارير الإنجاز</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
+        <label class="option-card featured-option"><input type="radio" name="productCode" value="all_access"><span><b>الباقة الشاملة</b><small>50 شهريًا أو 300 سنويًا</small></span></label>
+      </div>
+      <div class="period-options"><label><input type="radio" name="billingPeriod" value="monthly" checked><span>شهري</span></label><label><input type="radio" name="billingPeriod" value="yearly"><span>سنوي</span></label></div>
+      <div class="selected-plan"><span>الباقة المطلوبة</span><strong id="selectedPlanName">منصة تحليل النتائج — شهري</strong><b id="selectedPlanPrice">10 ريالات</b></div>
+      <div class="activation-steps"><p><b>1.</b> تواصل عبر واتساب للحصول على بيانات الاشتراك.</p><a id="whatsappActivationLink" class="whatsapp-button" target="_blank" rel="noopener">مراسلة واتساب</a><p><b>2.</b> بعد التواصل، فعّل الإقرار ثم أرسل طلب التفعيل.</p></div>
+      <label class="confirmation"><input id="whatsappConfirmed" type="checkbox"><span>أؤكد أنني تواصلت عبر واتساب، وأعلم أن التفعيل لن يتم قبل استكمال التواصل.</span></label>
+      <button id="sendActivationRequestButton" class="primary-button" type="button" disabled>إرسال طلب التفعيل</button><div id="subscriptionStatus" class="status-box" hidden></div>
+    </div>
+  </div>
+
+  <div id="promoModal" class="modal" hidden>
+    <div class="modal-card compact-modal promo-redeem-modal">
+      <div class="modal-head"><div><span>هدية من المنصة</span><h2>تفعيل برومو كود</h2></div><button class="icon-button" data-close-modal="promoModal">×</button></div>
+      <div class="gift-hero"><div class="gift-hero-icon">🎁</div><div><strong>لديك كود هدية؟</strong><p>أدخل الكود لتفعيل باقة شاملة أو منصة محددة لمدة من يوم إلى 10 أيام.</p></div></div>
+      <label><span>البرومو كود</span><input id="promoRedeemCode" class="promo-code-input" type="text" maxlength="32" autocomplete="off" placeholder="GIFT-XXXXXXXX"></label>
+      <button id="redeemPromoButton" class="primary-button" type="button">تفعيل الهدية</button>
+      <div id="promoRedeemStatus" class="status-box" hidden></div>
+      <p class="promo-note">يستخدم الكود وفق عدد الاستخدامات الذي حدده مدير النظام، وتبدأ مدة الهدية فور التفعيل.</p>
+    </div>
+  </div>
+
+  <div id="adminModal" class="modal" hidden>
+    <div class="modal-card admin-modal"><div class="modal-head"><div><span>مدير النظام</span><h2>طلبات التفعيل والحسابات وأكواد الهدايا</h2></div><button class="icon-button" data-close-modal="adminModal">×</button></div>
+      <div class="admin-tabs"><button class="admin-tab active" data-admin-tab="requests">طلبات التفعيل</button><button class="admin-tab" data-admin-tab="promo">أكواد الهدايا</button><button class="admin-tab" data-admin-tab="custom">طلبات العروض الخاصة</button><button class="admin-tab" data-admin-tab="users">المستخدمون والمديرون</button></div>
+      <div id="adminStatus" class="status-box" hidden></div>
+      <section id="adminRequestsPanel"><div id="adminRequestsList" class="admin-list"></div></section>
+      <section id="adminPromoPanel" hidden>
+        <div class="promo-admin-layout">
+          <div class="promo-create-card">
+            <div class="promo-section-head"><div><span>إنشاء كود جديد</span><h3>برومو كود هدية</h3></div><button id="generatePromoCodeButton" class="secondary-button" type="button">توليد كود</button></div>
+            <div class="promo-form-grid">
+              <label><span>الكود</span><input id="adminPromoCode" type="text" maxlength="32" placeholder="يُولّد تلقائيًا أو اكتب كودًا"></label>
+              <label><span>الباقة أو المنصة</span><select id="adminPromoProduct">
+                <option value="all_access">الباقة الشاملة</option>
+                <option value="results_analysis">تحليل النتائج التعليمية</option>
+                <option value="guidance_records">السجلات الرقمية</option>
+                <option value="presentations">العروض التقديمية</option>
+                <option value="counselor_plan">خطة الموجه الطلابي</option>
+                <option value="achievement_reports">تقارير الإنجاز</option>
+                <option value="messages_library">مكتبة الرسائل</option>
+              </select></label>
+              <label><span>مدة الهدية</span><select id="adminPromoDays">
+                <option value="1">يوم واحد</option><option value="2">يومان</option><option value="3">3 أيام</option><option value="4">4 أيام</option><option value="5">5 أيام</option><option value="6">6 أيام</option><option value="7">7 أيام</option><option value="8">8 أيام</option><option value="9">9 أيام</option><option value="10">10 أيام</option>
+              </select></label>
+              <label><span>عدد مرات الاستخدام</span><input id="adminPromoMaxUses" type="number" min="1" max="100" value="1"></label>
+              <label class="promo-expiry-field"><span>صلاحية استخدام الكود — اختياري</span><input id="adminPromoExpiresAt" type="datetime-local"></label>
+            </div>
+            <button id="createPromoCodeButton" class="primary-button" type="button">إنشاء البرومو كود</button>
+            <div id="promoAdminStatus" class="status-box" hidden></div>
+          </div>
+          <div><div class="promo-section-head"><div><span>الأكواد السابقة</span><h3>إدارة أكواد الهدايا</h3></div></div><div id="adminPromoList" class="admin-list promo-code-list"></div></div>
+        </div>
+      </section>
+      <section id="adminCustomRequestsPanel" hidden><div id="adminCustomRequestsList" class="admin-list"></div></section>
+      <section id="adminUsersPanel" hidden><div id="adminUsersList" class="admin-list"></div></section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="bubble-schema.js?v=school-1.0.15"></script>
+  <script src="bubble-config.js?v=school-1.0.15"></script>
+  <script src="school-context.js?v=school-1.0.15"></script>
+  <script src="bubble-persistence.js?v=school-1.0.15"></script>
+  <script src="school-directory.js?v=school-1.0.15"></script>
+  <script src="app-v12.js?v=school-1.0.14"></script>
+  <script src="guidance-access.js?v=school-1.0.16.1"></script>
+  <script src="global-shell.js?v=school-1.0.20"></script>
+</body>
+</html>
