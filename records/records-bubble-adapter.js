@@ -21,7 +21,7 @@
   function common(form={}){
     const c=ctx(),d=dir();
     const student=d?.findStudent?.(form.student_name_id||form.student_name||form.person_name_id||form.person_name||"")||null;
-    return {c,student,academicYear:c.academicYearId||d?.currentAcademicYear?.()?.id||"",term:c.termId||d?.currentTerm?.()?.id||"",school:c.schoolId||student?.schoolId||"",dep:c.stageId||student?.stageId||"",grade:student?.gradeId||form.grade_id||"",phone:form.guardian_phone||form.contact_numbers||student?.guardianPhone||form.Phone||""};
+    return {c,student,academicYear:c.academicYearId||d?.currentAcademicYear?.()?.id||"",term:c.termId||d?.currentTerm?.()?.id||"",school:student?.schoolId||c.schoolId||"",dep:student?.stageId||c.stageId||"",grade:student?.gradeId||form.grade_id||"",phone:form.guardian_phone||form.contact_numbers||student?.guardianPhone||form.Phone||""};
   }
   const lookup=(source,label)=>dir()?.findLookup?.(source,label)?.id||"";
   const firstLookup=(source,values)=>{for(const v of arr(values)){const id=lookup(source,stripCode(v));if(id)return id}return ""};

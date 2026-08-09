@@ -387,17 +387,25 @@ function prepareSchoolBubbleDefinitions(){
 function directoryItems(source){
   const items=state.directory?.[source]||[];
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
-  const norm=v=>cleanText(v).toLowerCase();
-  if(source==="students")return items.filter(student=>(!ctx.schoolName||!student.schoolName||norm(student.schoolName)===norm(ctx.schoolName))&&(!ctx.campus||!student.campus||norm(student.campus)===norm(ctx.campus))&&(!ctx.stage||!student.stage||norm(student.stage)===norm(ctx.stage)));
-  if(source==="employees")return items.filter(emp=>(!ctx.schoolName||!emp.schoolName||norm(emp.schoolName)===norm(ctx.schoolName))&&(!ctx.campus||!emp.campus||norm(emp.campus)===norm(ctx.campus)));
+  // students returned by guidance_bootstrap come directly from
+  // Current User -> user data -> User Student. Do NOT apply a second single-school
+  // filter here; that was hiding valid students for users assigned to multiple schools/stages.
+  if(source==="students")return items;
+  if(source==="employees"){
+    const ids=new Set((ctx.assignedSchoolIds||[]).map(String));
+    const names=new Set((ctx.assignedSchoolNames||[]).map(v=>cleanText(v).toLowerCase()));
+    if(!ids.size&&!names.size)return items;
+    return items.filter(emp=>!emp.schoolId&&!emp.schoolName||ids.has(String(emp.schoolId||""))||names.has(cleanText(emp.schoolName).toLowerCase()));
+  }
   return items;
 }
 function currentAcademicYearName(){return window.MishkatBubbleDirectory?.currentAcademicYear()?.name||"";}
 function currentAcademicTermName(){return window.MishkatBubbleDirectory?.currentTerm()?.name||"";}
 function sourceOptions(source,selected=""){
   const items=directoryItems(source);const person=source==="students"||source==="employees";const selectedText=String(selected||"");
-  const label=source==="students"?"اختر الطالب":source==="employees"?"اختر الموظف":"اختر";
-  return `<option value="">${items.length?label:`${label} — لم يتم تحميل بيانات Bubble بعد`}</option>`+items.map(item=>{
+  const label=source==="students"?`اختر الطالب — ${items.length} متاح`:source==="employees"?`اختر الموظف — ${items.length} متاح`:"اختر";
+  const emptyLabel=source==="students"?"لم يتم تحميل طلاب المستخدم من Bubble":source==="employees"?"لم يتم تحميل الموظفين من Bubble":"لم يتم تحميل البيانات";
+  return `<option value="">${items.length?label:emptyLabel}</option>`+items.map(item=>{
     const value=person?item.id:item.name;
     const chosen=String(value)===selectedText || item.name===selectedText;
     return `<option value="${escapeHtml(value)}"${chosen?" selected":""}>${escapeHtml(item.name)}</option>`;
@@ -405,6 +413,8 @@ function sourceOptions(source,selected=""){
 }
 async function loadSchoolBubbleDirectory(){
   state.directory=await window.MishkatBubbleDirectory?.load?.()||{students:[],employees:[],academicYears:[],terms:[],campuses:[],stages:[],grades:[],classes:[]};
+  const info=state.directory?.connection||{};
+  console.info("Mishkat Bubble directory",{students:state.directory?.students?.length||0,employees:state.directory?.employees?.length||0,academicYears:state.directory?.academicYears?.length||0,terms:state.directory?.terms?.length||0,...info});
 }
 function fillAcademicMeta(year="",term=""){
   if(el.metaAcademicYear){
@@ -1435,4 +1445,21 @@ async function init(){
     await loadArchive(true);setView("dashboard");
   }catch(error){console.error("Mishkat records init error",error);showToast("تم فتح منصة السجلات، لكن توجد وظيفة اختيارية لم تكتمل بعد.",true);}
 }
+
+window.addEventListener("mishkat:directory-ready",event=>{
+  const next=event?.detail;
+  if(next&&typeof next==="object"){
+    state.directory=next;
+    fillAcademicMeta(el.metaAcademicYear?.value||"",el.metaAcademicTerm?.value||"");
+    if(state.currentType&&state.currentView==="editor"){
+      const selected={};
+      el.dynamicRecordForm?.querySelectorAll?.('select[data-source="students"],select[data-source="employees"],select[data-student-select],select[data-employee-select]').forEach(node=>selected[node.dataset.field||node.dataset.col||Math.random()]=node.value);
+      // Re-open only if directory was initially empty; this repaints Bubble-backed selectors.
+      if((state.directory?.students?.length||0)>0 && el.dynamicRecordForm?.querySelector?.('select[data-source="students"] option')?.textContent?.includes("لم يتم تحميل")){
+        openRecord(state.currentType,state.currentRecordId?state.records.find(r=>r.id===state.currentRecordId)||null:null);
+      }
+    }
+    refreshStudentReportIndex();
+  }
+});
 init();
