@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta name="app-version" content="school-1.0.38">
+  <meta name="app-version" content="school-1.0.39">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -270,30 +270,53 @@
           <div class="report-builder-head">
             <div>
               <span>إنشاء التقرير</span>
-              <h3>اختر الطالب لعرض جميع السجلات المرتبطة به</h3>
+              <h3>اختر الطالب وحدد نطاق التقرير</h3>
             </div>
             <div class="available-students"><strong id="studentReportAvailableCount">0</strong><small>طالب مسجل</small></div>
           </div>
 
-          <div class="report-filter-grid report-filter-grid-simple">
-            <label class="span-2">
+          <div class="report-filter-grid">
+            <label class="span-2 student-report-search-field">
               <span>اسم الطالب</span>
-              <input id="studentReportName" type="search" list="studentNamesList" autocomplete="off" aria-label="اسم الطالب" placeholder="اكتب اسم الطالب للبحث">
+              <div class="student-report-search-wrap">
+                <input id="studentReportName" type="search" autocomplete="off" aria-label="اسم الطالب" placeholder="اكتب الاسم أو جزءًا منه للبحث">
+                <div id="studentReportSearchResults" class="student-report-search-results" hidden></div>
+              </div>
               <datalist id="studentNamesList"></datalist>
+            </label>
+            <label>
+              <span>الصف / الفصل</span>
+              <select id="studentReportClass"><option value="">كل الفصول</option></select>
+            </label>
+            <label>
+              <span>نوع السجل</span>
+              <select id="studentReportType"><option value="">كل أنواع السجلات</option></select>
+            </label>
+            <label>
+              <span>من تاريخ</span>
+              <input id="studentReportFrom" type="date">
+            </label>
+            <label>
+              <span>إلى تاريخ</span>
+              <input id="studentReportTo" type="date">
+            </label>
+            <label>
+              <span>حالة السجل</span>
+              <select id="studentReportStatusFilter">
+                <option value="">كل الحالات</option>
+                <option value="draft">مسودة</option>
+                <option value="completed">مكتمل</option>
+                <option value="archived">مؤرشف</option>
+              </select>
+            </label>
+            <label class="report-check">
+              <input id="studentReportIncludeConfidential" type="checkbox" checked>
+              <span>تضمين السجلات السرية ودراسات الحالة</span>
             </label>
           </div>
 
-          <div class="student-report-hidden-filters" hidden>
-            <select id="studentReportClass"><option value="">كل الفصول</option></select>
-            <select id="studentReportType"><option value="">كل أنواع السجلات</option></select>
-            <input id="studentReportFrom" type="date">
-            <input id="studentReportTo" type="date">
-            <select id="studentReportStatusFilter"><option value="">كل الحالات</option></select>
-            <input id="studentReportIncludeConfidential" type="checkbox" checked>
-          </div>
-
           <div class="report-builder-actions">
-            <button id="generateStudentReportButton" class="primary-button" type="button">عرض كل سجلات الطالب</button>
+            <button id="generateStudentReportButton" class="primary-button" type="button">عرض التقرير</button>
             <button id="resetStudentReportButton" class="ghost-button" type="button">مسح الاختيارات</button>
           </div>
           <div id="studentReportStatus" class="status-box" hidden></div>
@@ -428,13 +451,13 @@
   <div id="trialWatermark" class="trial-watermark" aria-hidden="true" hidden></div>
   <div id="screenShield" class="screen-shield" hidden><div><strong>المحتوى محمي في الحساب التجريبي</strong><span>تعود الشاشة عند الرجوع إلى المنصة.</span></div></div>
 
-  <script src="../bubble-schema.js?v=school-1.0.38"></script>
-  <script src="../bubble-config.js?v=school-1.0.38"></script>
-  <script src="../school-context.js?v=school-1.0.38"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.38"></script>
-  <script src="../school-directory.js?v=school-1.0.38"></script>
-  <script src="records-bubble-adapter.js?v=school-1.0.38"></script>
-  <script src="app.js?v=school-1.0.38"></script>
-  <script src="../global-shell.js?v=school-1.0.38"></script>
+  <script src="../bubble-schema.js?v=school-1.0.39"></script>
+  <script src="../bubble-config.js?v=school-1.0.39"></script>
+  <script src="../school-context.js?v=school-1.0.39"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.39"></script>
+  <script src="../school-directory.js?v=school-1.0.39"></script>
+  <script src="records-bubble-adapter.js?v=school-1.0.39"></script>
+  <script src="app.js?v=school-1.0.39"></script>
+  <script src="../global-shell.js?v=school-1.0.39"></script>
 </body>
 </html>

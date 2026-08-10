@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.38";
+const SCHOOL_SCHEMA_VERSION="1.0.39";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -427,21 +427,42 @@ function prepareSchoolBubbleDefinitions(){
       sec.fields=sec.fields.filter(field=>!field._remove);
     });
 
-    // في كل سجل مرتبط بطالب واحد: أضف رقم جوال ولي الأمر إن لم يكن موجودًا.
+    // كل سجل مرتبط بطالب واحد يعرض الصف ورقم جوال ولي الأمر كحقول ثابتة تلقائية.
     if(directStudent){
-      let phoneField=allFields(def).find(field=>field.key==="guardian_phone");
-      if(!phoneField){
-        const studentSection=(def.sections||[]).find(sec=>(sec.fields||[]).some(field=>field.key==="student_name"));
-        if(studentSection){
+      const studentSection=(def.sections||[]).find(sec=>(sec.fields||[]).some(field=>field.key==="student_name"));
+
+      if(studentSection){
+        let gradeField=allFields(def).find(field=>field.key==="grade");
+        if(!gradeField){
+          const classIndex=studentSection.fields.findIndex(field=>field.key==="class_name");
           const studentIndex=studentSection.fields.findIndex(field=>field.key==="student_name");
-          phoneField=f("guardian_phone","رقم جوال ولي الأمر","tel",{span:4,linkedReadonly:true,help:"يظهر تلقائيًا عند اختيار الطالب."});
-          studentSection.fields.splice(studentIndex+1,0,phoneField);
+          const insertAt=classIndex>=0?classIndex:studentIndex+1;
+          gradeField=f("grade","الصف","text",{span:3,linkedReadonly:true,help:"يظهر تلقائيًا عند اختيار الطالب."});
+          studentSection.fields.splice(insertAt,0,gradeField);
+        }else{
+          gradeField.type="text";
+          gradeField.label="الصف";
+          gradeField.linkedReadonly=true;
+          gradeField.span=3;
+          gradeField.help="يظهر تلقائيًا عند اختيار الطالب.";
         }
-      }else{
-        phoneField.type="tel";
-        phoneField.label="رقم جوال ولي الأمر";
-        phoneField.linkedReadonly=true;
-        phoneField.help="يظهر تلقائيًا عند اختيار الطالب.";
+
+        let phoneField=allFields(def).find(field=>field.key==="guardian_phone");
+        if(!phoneField){
+          const classIndex=studentSection.fields.findIndex(field=>field.key==="class_name");
+          const gradeIndex=studentSection.fields.findIndex(field=>field.key==="grade");
+          const studentIndex=studentSection.fields.findIndex(field=>field.key==="student_name");
+          const insertAt=(classIndex>=0?classIndex:gradeIndex>=0?gradeIndex:studentIndex)+1;
+          phoneField=f("guardian_phone","رقم جوال ولي الأمر","tel",{span:6,linkedReadonly:true,help:"يظهر تلقائيًا عند اختيار الطالب."});
+          studentSection.fields.splice(insertAt,0,phoneField);
+        }else{
+          phoneField.type="tel";
+          phoneField.label="رقم جوال ولي الأمر";
+          phoneField.linkedReadonly=true;
+          phoneField.span=6;
+          phoneField.help="يظهر تلقائيًا عند اختيار الطالب.";
+          delete phoneField.placeholder;
+        }
       }
     }
   });
@@ -513,7 +534,17 @@ function studentDisplayValue(value){
 async function loadSchoolBubbleDirectory(){
   state.directory=await window.MishkatBubbleDirectory?.load?.()||{students:[],employees:[],academicYears:[],terms:[],campuses:[],stages:[],grades:[],classes:[]};
   const info=state.directory?.connection||{};
-  console.info("Mishkat Bubble directory",{students:state.directory?.students?.length||0,studentClassesReceived:(window.MISHKAT_BUBBLE_DATA?.studentClasses||window.MISHKAT_BUBBLE_DATA?.student_classes||[]).length||0,studentsWithClass:(state.directory?.students||[]).filter(s=>s.className).length,employees:state.directory?.employees?.length||0,academicYears:state.directory?.academicYears?.length||0,terms:state.directory?.terms?.length||0,...info});
+  console.info("Mishkat directory",{
+    students:state.directory?.students?.length||0,
+    studentClassesReceived:(window.MISHKAT_BUBBLE_DATA?.studentClasses||window.MISHKAT_BUBBLE_DATA?.student_classes||[]).length||0,
+    studentPhonesReceived:(window.MISHKAT_BUBBLE_DATA?.studentPhones||window.MISHKAT_BUBBLE_DATA?.student_phones||[]).length||0,
+    studentsWithClass:(state.directory?.students||[]).filter(s=>s.className).length,
+    studentsWithParentPhone:(state.directory?.students||[]).filter(s=>s.guardianPhone).length,
+    employees:state.directory?.employees?.length||0,
+    academicYears:state.directory?.academicYears?.length||0,
+    terms:state.directory?.terms?.length||0,
+    ...info
+  });
 }
 function refreshPersonSelectors(){
   if(!el.dynamicRecordForm)return;
@@ -739,7 +770,7 @@ function activeEntitlement(){
   return active.find(e=>e.product_code==="all_access")||active.find(e=>e.product_code===CURRENT_PACKAGE_CODE)||null;
 }
 function isPremiumAccess(){
-  // منصة المدارس: جميع وظائف السجلات متاحة بدون باقات أو اشتراكات.
+  // منصة المدارس: السجلات والتقارير متاحة دائمًا للمستخدم المصرح له.
   return true;
 }
 function premiumLabel(){if(state.user?.id==="mishkat-school-local")return "متاحة"; return "مدارس المشكاة الأهلية"; }
@@ -1008,7 +1039,7 @@ function renderField(field){
   if(field.type==="note")return `<div class="static-note">${escapeHtml(field.text||field.label)}</div>`;
   const value=field.value??"";
   const cls=`${spanClass(field)}${field.linkedReadonly?" linked-school-field":""}`;
-  if(field.type==="textarea")return `<details class="${cls} collapsible-textarea"${cleanText(value)?" open":""}><summary><span>${escapeHtml(field.label)}</span><small>${cleanText(value)?"تم إدخال بيانات — اضغط للعرض":"اضغط للكتابة"}</small></summary><div class="collapsible-textarea-body"><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</div></details>`;
+  if(field.type==="textarea")return `<details class="${cls} collapsible-textarea"><summary><span>${escapeHtml(field.label)}</span><small>${cleanText(value)?"تم إدخال بيانات — اضغط للعرض":"اضغط للكتابة"}</small></summary><div class="collapsible-textarea-body"><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</div></details>`;
   if(field.type==="student-search")return `<label class="${cls} student-search-field"><span>${escapeHtml(field.label)}</span><input type="search" list="studentDirectoryList" autocomplete="off" ${inputAttrs(field)} value="${escapeHtml(studentDisplayValue(value))}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
   if(field.type==="select"){const options=field.source?sourceOptions(field.source,value):(field.options||[]).map(opt=>`<option value="${escapeHtml(opt)}"${opt===value?" selected":""}>${escapeHtml(opt)}</option>`).join("");return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><select ${inputAttrs(field)}>${options}</select>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;}
   return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><input type="${escapeHtml(field.type||"text")}" ${inputAttrs(field)} value="${escapeHtml(value)}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
@@ -1296,6 +1327,7 @@ function refreshStudentReportIndex(){
 
   el.studentReportAvailableCount.textContent=state.studentReportStudents.length;
   updateStudentReportClassOptions();
+  if(document.activeElement===el.studentReportName)renderStudentReportSearchResults(el.studentReportName.value);
 }
 async function prepareStudentReportsView(force=false){
   if(state.studentReportsLoading)return state.studentReportsLoading;
@@ -1324,6 +1356,31 @@ async function prepareStudentReportsView(force=false){
   return state.studentReportsLoading;
 }
 
+function reportStudentSearchMatches(query){
+  const q=normalizeStudentName(query);
+  const rows=state.studentReportStudents||[];
+  if(!q)return rows.slice(0,20);
+  return rows.filter(item=>normalizeStudentName(item.name).includes(q)).slice(0,30);
+}
+function renderStudentReportSearchResults(query=el.studentReportName?.value||""){
+  if(!el.studentReportSearchResults)return;
+  const matches=reportStudentSearchMatches(query);
+  if(!document.activeElement?.isSameNode?.(el.studentReportName) && !cleanText(query)){
+    el.studentReportSearchResults.hidden=true;return;
+  }
+  el.studentReportSearchResults.innerHTML=matches.length
+    ?matches.map(item=>`<button type="button" data-report-student-name="${escapeHtml(item.name)}"><strong>${escapeHtml(item.name)}</strong>${item.classes?.size?`<small>${escapeHtml([...item.classes].join("، "))}</small>`:""}</button>`).join("")
+    :'<div class="student-search-empty">لا توجد أسماء مطابقة.</div>';
+  el.studentReportSearchResults.hidden=false;
+}
+function chooseStudentReportName(name){
+  const match=(state.studentReportStudents||[]).find(item=>normalizeStudentName(item.name)===normalizeStudentName(name));
+  if(!match)return false;
+  el.studentReportName.value=match.name;
+  if(el.studentReportSearchResults)el.studentReportSearchResults.hidden=true;
+  updateStudentReportClassOptions();
+  return true;
+}
 function selectedStudentIndexEntry(){
   const key=normalizeStudentName(el.studentReportName?.value);
   return state.studentReportStudents.find(item=>item.key===key)||null;
@@ -1418,7 +1475,6 @@ function reportPeriodLabel(records,from,to){
   return dates.length?`${formatDate(dates[0])} — ${formatDate(dates.at(-1))}`:"—";
 }
 async function generateStudentReport(){
-  if(!isPremiumAccess()){showPaymentModal();return;}
   if(!state.studentReportsReady){
     const ready=await prepareStudentReportsView(false);
     if(!ready)return;
@@ -1430,23 +1486,47 @@ async function generateStudentReport(){
 
   let known=selectedStudentIndexEntry();
   if(!known){
-    refreshStudentReportIndex();
+    if(!chooseStudentReportName(studentName)){
+      return showBox(el.studentReportStatus,"اختر الطالب من نتائج البحث.",true);
+    }
     known=selectedStudentIndexEntry();
   }
   if(!known)return showBox(el.studentReportStatus,"اختر الطالب من نتائج البحث.",true);
 
-  // التقرير دائمًا يشمل كل السجلات المرتبطة بالطالب المحدد.
-  const records=(state.records||[]).filter(record=>
-    recordMatchesReportStudent(record,studentKey,"")
-  ).sort((a,b)=>reportRecordDate(b).localeCompare(reportRecordDate(a))||String(b.created_at||"").localeCompare(String(a.created_at||"")));
+  const allStudentRecords=(state.records||[]).filter(record=>recordMatchesReportStudent(record,studentKey,""));
+  const displayName=known.name||studentName;
+
+  if(!allStudentRecords.length){
+    state.studentReportRecords=[];
+    el.studentReportDocument.hidden=true;
+    el.printStudentReportButton.disabled=true;
+    return showBox(el.studentReportStatus,`لا يوجد سجلات للطالب ${displayName}.`);
+  }
+
+  const classFilter=el.studentReportClass?.value||"";
+  const typeFilter=el.studentReportType?.value||"";
+  const statusFilter=el.studentReportStatusFilter?.value||"";
+  const from=el.studentReportFrom?.value||"";
+  const to=el.studentReportTo?.value||"";
+  const includeConfidential=el.studentReportIncludeConfidential?.checked!==false;
+
+  const records=allStudentRecords.filter(record=>{
+    if(!recordMatchesReportStudent(record,studentKey,classFilter))return false;
+    if(typeFilter&&record.record_type!==typeFilter)return false;
+    if(statusFilter&&record.status!==statusFilter)return false;
+    if(!includeConfidential&&record.is_confidential)return false;
+    const date=reportRecordDate(record);
+    if(from&&date&&date<from)return false;
+    if(to&&date&&date>to)return false;
+    return true;
+  }).sort((a,b)=>reportRecordDate(b).localeCompare(reportRecordDate(a))||String(b.created_at||"").localeCompare(String(a.created_at||"")));
 
   state.studentReportRecords=records;
-  const displayName=known.name||studentName;
 
   if(!records.length){
     el.studentReportDocument.hidden=true;
     el.printStudentReportButton.disabled=true;
-    return showBox(el.studentReportStatus,`لا يوجد سجلات للطالب ${displayName}.`);
+    return showBox(el.studentReportStatus,`لا توجد سجلات مطابقة للفلاتر المحددة للطالب ${displayName}.`);
   }
 
   hideBox(el.studentReportStatus);
@@ -1455,14 +1535,14 @@ async function generateStudentReport(){
     .filter(ref=>normalizeStudentName(ref.name)===studentKey)
     .forEach(ref=>{if(ref.className)classes.add(ref.className)}));
 
-  const period=reportPeriodLabel(records,"","");
+  const period=reportPeriodLabel(records,from,to);
   el.studentReportSchoolName.textContent=state.account?.school_name||"اسم المدرسة";
   el.studentReportStudentName.textContent=displayName;
   el.studentReportProfileName.textContent=displayName;
-  el.studentReportProfileClasses.textContent=[...classes].join("، ")||known.classes?.values?.().next?.().value||"غير محدد";
+  el.studentReportProfileClasses.textContent=[...classes].join("، ")||classFilter||known.classes?.values?.().next?.().value||"غير محدد";
   el.studentReportProfilePeriod.textContent=period;
   el.studentReportGeneratedAt.textContent=new Date().toLocaleDateString("ar-SA");
-  el.studentReportScope.textContent=`${records.length} سجل — جميع السجلات المرتبطة بالطالب — ${period}`;
+  el.studentReportScope.textContent=`${records.length} سجل — ${typeFilter?(RECORDS[typeFilter]?.title||typeFilter):"جميع أنواع السجلات"} — ${period}`;
   el.studentReportCounselor.textContent=state.account?.full_name||state.user?.email||"—";
   el.studentReportFooterCount.textContent=records.length;
   el.studentReportReference.textContent=buildStudentReportReference(displayName);
@@ -1510,7 +1590,9 @@ async function generateStudentReport(){
   el.studentReportDocument.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function resetStudentReport(){
-  el.studentReportName.value="";el.studentReportClass.innerHTML='<option value="">كل الفصول</option>';
+  el.studentReportName.value="";
+  if(el.studentReportSearchResults)el.studentReportSearchResults.hidden=true;
+  el.studentReportClass.innerHTML='<option value="">كل الفصول</option>';
   el.studentReportType.value="";el.studentReportStatusFilter.value="";el.studentReportFrom.value="";el.studentReportTo.value="";
   el.studentReportIncludeConfidential.checked=true;el.studentReportDocument.hidden=true;el.printStudentReportButton.disabled=true;hideBox(el.studentReportStatus);
 }
@@ -1728,7 +1810,29 @@ function bindEvents(){
   el.dynamicRecordForm.addEventListener("change",handleSchoolBubbleChange);
   el.archiveSearch.addEventListener("input",debounce(renderArchive));el.archiveTypeFilter.addEventListener("change",renderArchive);el.archiveStatusFilter.addEventListener("change",renderArchive);el.refreshArchiveButton.addEventListener("click",()=>loadArchive(true));
   el.archiveList.addEventListener("click",e=>{const edit=e.target.closest("[data-edit-record]");if(edit)return openSavedRecord(edit.dataset.editRecord);const print=e.target.closest("[data-print-saved]");if(print)return openSavedRecord(print.dataset.printSaved,true);const report=e.target.closest("[data-student-report]");if(report)return openStudentReportForName(report.dataset.studentReport);const del=e.target.closest("[data-delete-record]");if(del)return deleteRecord(del.dataset.deleteRecord);});
-  if(el.studentReportName){el.studentReportName.addEventListener("input",debounce(updateStudentReportClassOptions,120));el.studentReportName.addEventListener("change",updateStudentReportClassOptions);}
+  if(el.studentReportName){
+    el.studentReportName.addEventListener("input",debounce(()=>{renderStudentReportSearchResults(el.studentReportName.value);updateStudentReportClassOptions();},80));
+    el.studentReportName.addEventListener("focus",()=>renderStudentReportSearchResults(el.studentReportName.value));
+    el.studentReportName.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){
+        const first=el.studentReportSearchResults?.querySelector?.("[data-report-student-name]");
+        if(first){e.preventDefault();chooseStudentReportName(first.dataset.reportStudentName);}
+      }
+    });
+    el.studentReportName.addEventListener("change",updateStudentReportClassOptions);
+  }
+  if(el.studentReportSearchResults)el.studentReportSearchResults.addEventListener("mousedown",e=>{
+    const button=e.target.closest("[data-report-student-name]");
+    if(!button)return;
+    e.preventDefault();
+    chooseStudentReportName(button.dataset.reportStudentName);
+    el.studentReportName.focus();
+  });
+  document.addEventListener("mousedown",e=>{
+    if(!el.studentReportSearchResults||!el.studentReportName)return;
+    if(e.target===el.studentReportName||el.studentReportSearchResults.contains(e.target))return;
+    el.studentReportSearchResults.hidden=true;
+  });
   if(el.generateStudentReportButton)el.generateStudentReportButton.addEventListener("click",generateStudentReport);
   if(el.resetStudentReportButton)el.resetStudentReportButton.addEventListener("click",resetStudentReport);
   if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",async()=>{const ok=await prepareStudentReportsView(true);if(ok)showToast("تم تحديث بيانات تقارير الطلاب.");});
