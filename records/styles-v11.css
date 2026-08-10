@@ -158,11 +158,11 @@
 @media(max-width:620px){.record-report-heading{flex-direction:column}.record-new-cta{width:100%}.record-report-title-group{width:100%;flex-direction:column}.record-report-filters{grid-template-columns:1fr}.record-report-search{grid-column:auto}.record-report-count{min-height:58px}.record-report-panel{border-radius:16px}.record-report-table-shell{padding:6px}}
 @media print{#recordReportView{display:none!important}}
 
-/* V1.0.33 — Daily incident conditional dropdowns */
+/* V1.0.34 — Daily incident conditional dropdowns */
 .incident-field-disabled{opacity:.52;transition:opacity .18s ease}
 .incident-field-disabled select{background:#f1f5f7!important;color:#8b99a1!important;cursor:not-allowed}
 
-/* V1.0.33 — New Record fresh-data loader */
+/* V1.0.34 — New Record fresh-data loader */
 .new-record-data-loader[hidden]{display:none!important}
 .new-record-data-loader{position:fixed;inset:0;z-index:2147482600;display:grid;place-items:center;background:rgba(247,251,249,.96);backdrop-filter:blur(6px);opacity:0;transition:opacity .22s ease;direction:rtl}
 .new-record-data-loader.visible{opacity:1}.new-record-data-loader.done{opacity:0;pointer-events:none}
