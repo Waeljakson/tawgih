@@ -42,7 +42,7 @@
     const c=cfg();
     const r=await timeout(fetch(url,{method:options.method||"GET",credentials:c.credentials||"include",headers:await headers(options.headers),body:options.body===undefined?undefined:JSON.stringify(options.body),cache:"no-store"}),Number(c.timeoutMs)||12000);
     const txt=await r.text();const data=txt?safeParse(txt,txt):null;
-    if(!r.ok){const e=new Error(data?.message||data?.error||`Bubble HTTP ${r.status}`);e.status=r.status;e.data=data;throw e}
+    if(!r.ok){const e=new Error(data?.message||data?.error||`HTTP ${r.status}`);e.status=r.status;e.data=data;throw e}
     return data;
   }
   function normalizeResponse(data){
