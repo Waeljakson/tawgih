@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.41";
+const SCHOOL_SCHEMA_VERSION="1.0.42";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -541,6 +541,7 @@ async function loadSchoolBubbleDirectory(){
     studentsWithClass:(state.directory?.students||[]).filter(s=>s.className).length,
     studentsWithParentPhone:(state.directory?.students||[]).filter(s=>s.guardianPhone).length,
     sampleParentPhone:(state.directory?.students||[]).find(s=>s.guardianPhone)?.guardianPhone||"",
+    studentsByGrade:(state.directory?.students||[]).reduce((acc,s)=>{const k=s.grade||s.gradeId||"بدون صف";acc[k]=(acc[k]||0)+1;return acc;},{}),
     employees:state.directory?.employees?.length||0,
     academicYears:state.directory?.academicYears?.length||0,
     terms:state.directory?.terms?.length||0,
