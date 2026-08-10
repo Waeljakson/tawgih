@@ -157,3 +157,7 @@
 @media(max-width:900px){.record-report-filters{grid-template-columns:1fr 1fr}.record-report-search{grid-column:1/-1}.record-report-count{min-height:60px}.record-report-heading{align-items:flex-start}.record-report-title-group{align-items:flex-start}}
 @media(max-width:620px){.record-report-heading{flex-direction:column}.record-new-cta{width:100%}.record-report-title-group{width:100%;flex-direction:column}.record-report-filters{grid-template-columns:1fr}.record-report-search{grid-column:auto}.record-report-count{min-height:58px}.record-report-panel{border-radius:16px}.record-report-table-shell{padding:6px}}
 @media print{#recordReportView{display:none!important}}
+
+/* V1.0.32 — Daily incident conditional dropdowns */
+.incident-field-disabled{opacity:.52;transition:opacity .18s ease}
+.incident-field-disabled select{background:#f1f5f7!important;color:#8b99a1!important;cursor:not-allowed}

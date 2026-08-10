@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.31";
+const SCHOOL_SCHEMA_VERSION="1.0.32";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -84,9 +84,9 @@ const BEHAVIORAL_PROBLEMS = ["التلفظ على معلم","الشغب داخل
 const GUIDANCE_SKILLS = ["التعزيز","الإرشاد بنظرية الذات","التواصل مع ولي الأمر","الغمر","الإرشاد الديني","التواصل مع الزملاء للإيضاح والاستفسار","التعاقد السلوكي","ضرب الأمثلة التوضيحية","التدخل للإصلاح","الإطفاء","الإرشاد إلى عاقبة السلوك","الاقتصاد الرمزي","الإرشاد العقلاني الانفعالي","إرشاد جمعي سريع","التواصل مع المعلمين"];
 const VISIT_TOPICS = ["الغياب","الصلاة","النظافة الشخصية","التأخر","الاحترام","التنابذ بالألقاب أو التلفظ على الزملاء","بر الوالدين","امتهان الكتب المدرسية","الاستذكار الجيد","تنظيم الوقت","الأمانة","إدارة المشاعر","القرارات الخطرة","تحقيق الأهداف","العلاقات الاجتماعية","الاستعداد للاختبارات","المحافظة على الممتلكات","إدارة الغضب"];
 const CASE_SKILLS = ["مهارة الأسئلة","التشجيع والإعادة والتلخيص","التعبير عن مشاعر المسترشد","التعبير عن المعاني","إنهاء المقابلة","المواجهة","أسئلة المسترشد للموجه","التفسير","تقديم المعلومات"];
-const DAILY_BEHAVIOR_CODES = ["101 — التلفظ على معلم","102 — التلفظ على زميل","103 — ألفاظ أو إيحاءات بذيئة","104 — تحرش","105 — شغب داخل المدرسة","106 — عبث بمرافق المدرسة","107 — فرط حركة","108 — تشتت انتباه","109 — عدم الاستجابة للمعلم","110 — المشاركة بمضاربة أو شجار","111 — إيذاء زميل نفسيًا","112 — تعطيل سير الحصة"];
-const DAILY_EDUCATION_CODES = ["201 — إهمال تأدية الواجبات","202 — خروج من الفصل بدون إذن","203 — إهمال إحضار الأدوات","204 — التأخر الصباحي","205 — التأخر عن الحصص","206 — التكلم بدون إذن","207 — النوم أثناء الحصص","208 — عدم الانتباه للشرح","209 — نسيان متكرر للكتب المدرسية","210 — عدم المشاركة بالحصة الدراسية","211 — إهمال أبحاث أو ملف إنجاز","212 — امتهان الكتاب المدرسي"];
-const DAILY_ACTION_CODES = ["401 — الإرشاد العقلاني الانفعالي","402 — الإرشاد بالواقع","403 — الإرشاد بنظرية الذات","404 — الإرشاد الديني","405 — ضرب الأمثلة التوضيحية","406 — الإرشاد إلى عاقبة السلوك","407 — أسلوب الاقتصاد الرمزي","408 — السحب التدريجي","409 — إرشاد جمعي سريع","410 — التدخل للإصلاح","411 — التواصل مع ولي الأمر","412 — التواصل مع الزملاء للإيضاح والاستفسار","413 — التواصل مع المعلمين","414 — اقتراح برنامج لتنظيم الوقت","415 — الغمر","416 — التعاقد السلوكي"];
+const DAILY_BEHAVIOR_CODES = ["التلفظ على معلم","التلفظ على زميل","ألفاظ أو إيحاءات بذيئة","تحرش","شغب داخل المدرسة","عبث بمرافق المدرسة","فرط حركة","تشتت انتباه","عدم الاستجابة للمعلم","المشاركة بمضاربة أو شجار","إيذاء زميل نفسيًا","تعطيل سير الحصة"];
+const DAILY_EDUCATION_CODES = ["إهمال تأدية الواجبات","خروج من الفصل بدون إذن","إهمال إحضار الأدوات","التأخر الصباحي","التأخر عن الحصص","التكلم بدون إذن","النوم أثناء الحصص","عدم الانتباه للشرح","نسيان متكرر للكتب المدرسية","عدم المشاركة بالحصة الدراسية","إهمال أبحاث أو ملف إنجاز","امتهان الكتاب المدرسي"];
+const DAILY_ACTION_CODES = ["الإرشاد العقلاني الانفعالي","الإرشاد بالواقع","الإرشاد بنظرية الذات","الإرشاد الديني","ضرب الأمثلة التوضيحية","الإرشاد إلى عاقبة السلوك","أسلوب الاقتصاد الرمزي","السحب التدريجي","إرشاد جمعي سريع","التدخل للإصلاح","التواصل مع ولي الأمر","التواصل مع الزملاء للإيضاح والاستفسار","التواصل مع المعلمين","اقتراح برنامج لتنظيم الوقت","الغمر","التعاقد السلوكي"];
 
 function section(title, fields, subtitle = "") { return { title, subtitle, fields }; }
 function f(key, label, type = "text", opts = {}) { return { key, label, type, ...opts }; }
@@ -494,6 +494,63 @@ function setSchoolContextFromStudent(student){
   // School in Bubble is the campus/complex. When a student is chosen, show the exact School/Dep linked to that student.
   fillSchoolContextMeta(student?.campus||student?.schoolName||"",student?.stage||"");
 }
+function stripVisibleCode(value){
+  return String(value??"").replace(/^\s*\d+\s*[—-]\s*/,"").trim();
+}
+function updateDailyIncidentCategoryControls({clearInactive=false}={}){
+  if(state.currentType!=="daily_incident"||!el.dynamicRecordForm)return;
+  const group=el.dynamicRecordForm.querySelector('[data-choice-group="incident_category"]');
+  const selected=group?.querySelector('input:checked')?.value||"";
+  const behavior=el.dynamicRecordForm.querySelector('[data-field="behavior_code"]');
+  const education=el.dynamicRecordForm.querySelector('[data-field="education_code"]');
+  const behaviorEnabled=selected==="سلوكي";
+  const educationEnabled=selected==="تعليمي";
+
+  if(behavior){
+    behavior.disabled=!behaviorEnabled;
+    behavior.closest("label")?.classList.toggle("incident-field-disabled",!behaviorEnabled);
+    if(clearInactive&&!behaviorEnabled)behavior.value="";
+  }
+  if(education){
+    education.disabled=!educationEnabled;
+    education.closest("label")?.classList.toggle("incident-field-disabled",!educationEnabled);
+    if(clearInactive&&!educationEnabled)education.value="";
+  }
+}
+async function hydrateSelectedStudentClass(student,select,rowClassInput=null){
+  if(!student)return student;
+  if(student.className){
+    if(rowClassInput)rowClassInput.value=student.className;
+    else setLinkedValue("class_name",student.className);
+    return student;
+  }
+
+  if(rowClassInput)rowClassInput.value="جارٍ تحميل الفصل...";
+  else{
+    const classInput=el.dynamicRecordForm.querySelector('[data-field="class_name"]');
+    if(classInput)classInput.value="جارٍ تحميل الفصل...";
+  }
+
+  try{
+    const hydrated=await window.MishkatBubbleDirectory?.hydrateStudentClass?.(student.id||student.name);
+    if(!hydrated)return student;
+    if(select&&select.value&&![hydrated.id,hydrated.name].includes(select.value))return hydrated;
+
+    if(rowClassInput)rowClassInput.value=hydrated.className||"";
+    else{
+      Object.entries(STUDENT_LINK_MAP).forEach(([fieldKey,studentKey])=>setLinkedValue(fieldKey,hydrated[studentKey]||""));
+      const box=ensureStudentSummary(select);
+      if(box){box.innerHTML=studentSummaryMarkup(hydrated);box.hidden=!box.innerHTML;}
+    }
+    return hydrated;
+  }catch(error){
+    console.warn("Mishkat: Student Class hydration failed.",error);
+    if(rowClassInput&&rowClassInput.value==="جارٍ تحميل الفصل...")rowClassInput.value="";
+    const classInput=el.dynamicRecordForm.querySelector('[data-field="class_name"]');
+    if(classInput&&classInput.value==="جارٍ تحميل الفصل...")classInput.value="";
+    return student;
+  }
+}
 function selectedStudent(value){return window.MishkatBubbleDirectory?.findStudent?.(value)||null;}
 function selectedEmployee(value){return window.MishkatBubbleDirectory?.findEmployee?.(value)||null;}
 function setLinkedValue(key,value){const input=el.dynamicRecordForm.querySelector(`[data-field="${CSS.escape(key)}"]`);if(input)input.value=value??"";}
@@ -517,6 +574,7 @@ function applyStudentToForm(student,select){
   setSchoolContextFromStudent(student);
   Object.entries(STUDENT_LINK_MAP).forEach(([fieldKey,studentKey])=>setLinkedValue(fieldKey,student[studentKey]||""));
   if(box){box.innerHTML=studentSummaryMarkup(student);box.hidden=!box.innerHTML;}
+  if(!student.className)hydrateSelectedStudentClass(student,select);
 }
 function refreshAllStudentSummaries(){
   el.dynamicRecordForm.querySelectorAll('select[data-source="students"]:not([data-col])').forEach(select=>applyStudentToForm(selectedStudent(select.value),select));
@@ -529,7 +587,7 @@ function handleRepeaterStudent(select){
   const wrapper=select.closest("[data-repeat-key]");const row=select.closest("tr");if(!wrapper||!row)return;
   const duplicate=select.value && Array.from(wrapper.querySelectorAll("select[data-student-select]")).some(other=>other!==select&&other.value===select.value);
   if(duplicate){select.value="";showToast("هذا الطالب مضاف بالفعل. اختر طالبًا مختلفًا.",true);refreshUniqueStudents(wrapper);return;}
-  const student=selectedStudent(select.value);const cls=row.querySelector('[data-col="class_name"]');if(cls)cls.value=student?.className||"";
+  const student=selectedStudent(select.value);const cls=row.querySelector('[data-col="class_name"]');if(cls)cls.value=student?.className||"";if(student&&!student.className)hydrateSelectedStudentClass(student,select,cls);
   // في الإرشاد الجمعي نملأ بيانات الجلسة من أول طالب مختار دون فرضها على باقي المشاركين.
   if(state.currentType==="group_guidance" && student){
     const first=wrapper.querySelector("select[data-student-select]");if(first===select)setSchoolContextFromStudent(student);
@@ -538,6 +596,7 @@ function handleRepeaterStudent(select){
 }
 function handleSchoolBubbleChange(event){
   const target=event.target;if(!(target instanceof HTMLElement))return;
+  if(target.matches('input[name="choice_incident_category"]')){updateDailyIncidentCategoryControls({clearInactive:true});return;}
   if(target.matches("select[data-student-select]"))return handleRepeaterStudent(target);
   if(target.matches('select[data-source="students"]')){applyStudentToForm(selectedStudent(target.value),target);return;}
   if(target.matches('select[data-source="employees"]')){
@@ -873,6 +932,8 @@ function getDefaultFormData(def){
 }
 
 function setFieldValue(key,value){
+  if(["behavior_code","education_code"].includes(key))value=stripVisibleCode(value);
+  if(key==="action_codes"&&Array.isArray(value))value=value.map(stripVisibleCode);
   const input=el.dynamicRecordForm.querySelector(`[data-field="${CSS.escape(key)}"]`);
   if(input){
     if(input.matches('select[data-source="students"],select[data-source="employees"]')){const text=String(value??"");const opt=Array.from(input.options).find(o=>o.value===text||o.textContent===text);input.value=opt?.value||"";}else input.value=value??"";
@@ -904,7 +965,7 @@ function setFieldValue(key,value){
   }
 }
 
-function populateForm(data={}){Object.entries(data).forEach(([k,v])=>setFieldValue(k,v));refreshAllStudentSummaries();el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);}
+function populateForm(data={}){Object.entries(data).forEach(([k,v])=>setFieldValue(k,v));refreshAllStudentSummaries();el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);updateDailyIncidentCategoryControls();}
 
 function collectFormData(){
   const data={};
@@ -1503,6 +1564,22 @@ async function init(){
   try{await loadArchive(true);}catch(error){console.warn("Mishkat archive load failed",error);}
   setView("dashboard");
 }
+
+window.addEventListener("mishkat:student-class-ready",event=>{
+  const detail=event?.detail||{};
+  if(!detail.studentId||!detail.className||!el.dynamicRecordForm)return;
+  el.dynamicRecordForm.querySelectorAll('select[data-source="students"],select[data-student-select]').forEach(select=>{
+    if(select.value!==detail.studentId)return;
+    if(select.matches("select[data-student-select]")){
+      const cls=select.closest("tr")?.querySelector('[data-col="class_name"]');
+      if(cls)cls.value=detail.className;
+    }else{
+      setLinkedValue("class_name",detail.className);
+      const student=selectedStudent(detail.studentId),box=ensureStudentSummary(select);
+      if(box&&student){box.innerHTML=studentSummaryMarkup(student);box.hidden=!box.innerHTML;}
+    }
+  });
+});
 
 function handleDirectoryUpdate(event){
   const next=event?.detail;
