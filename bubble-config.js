@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.40 STABLE DIRECTORY LOADING
+ * Mishkat School Platform — Bubble connection settings V1.0.41 STABLE DIRECTORY LOADING
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -93,6 +93,31 @@
     out.students=arr("students","student","Students","schoolStudents","school_students");
     out.studentClasses=arr("student_classes","studentClasses","Student Classes","student classes");
     out.studentPhones=arr("student_phones","studentPhones","Student Phones","student phones");
+
+    // Preserve Parent phone immediately from guidance_bootstrap.
+    // Later supplementation may omit this field; the maps survive that merge.
+    const existingPhoneById=(data.studentPhoneById&&typeof data.studentPhoneById==="object")?data.studentPhoneById:{};
+    const existingPhoneByName=(data.studentPhoneByName&&typeof data.studentPhoneByName==="object")?data.studentPhoneByName:{};
+    const phoneById={...existingPhoneById};
+    const phoneByName={...existingPhoneByName};
+    const studentId=row=>String(row?._id||row?.id||row?.["unique id"]||row?.["Unique ID"]||"").trim();
+    const studentName=row=>String(row?.["Full Name"]||row?.full_name||row?.["Student Name"]||row?.student_name||row?.Name||row?.name||"")
+      .trim().toLowerCase().replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه")
+      .replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[^\p{L}\p{N}]+/gu," ").trim();
+    const parentPhone=row=>String(
+      row?.["Parent phone"]??row?.["Parent Phone"]??row?.["parent phone"]??row?.parent_phone??
+      row?.guardian_phone??row?.["Guardian Phone"]??row?.["رقم ولي الأمر"]??row?.["رقم جوال ولي الأمر"]??""
+    ).trim();
+
+    out.students.forEach(row=>{
+      const phone=parentPhone(row);
+      if(!phone)return;
+      const id=studentId(row),name=studentName(row);
+      if(id)phoneById[id]=phone;
+      if(name)phoneByName[name]=phone;
+    });
+    out.studentPhoneById=phoneById;
+    out.studentPhoneByName=phoneByName;
     out.employees=arr("employees","employee","Users Data","usersData","users_data","staff","schoolEmployees","school_employees");
     out.academicYears=arr("academicYears","academic_years","academic year","years");
     out.terms=arr("terms","academicTerms","academic_terms","semesters");

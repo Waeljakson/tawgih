@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.40
+ * Mishkat School Platform - Bubble directory adapter V1.0.41
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -200,6 +200,8 @@
     if(primaryStudentClasses.length)out.studentClasses=primaryStudentClasses;
     const primaryStudentPhones=listFrom(primary,["studentPhones","student_phones","Student Phones","student phones"]);
     if(primaryStudentPhones.length)out.studentPhones=primaryStudentPhones;
+    if(primary.studentPhoneById&&typeof primary.studentPhoneById==="object")out.studentPhoneById={...(extra.studentPhoneById||{}),...primary.studentPhoneById};
+    if(primary.studentPhoneByName&&typeof primary.studentPhoneByName==="object")out.studentPhoneByName={...(extra.studentPhoneByName||{}),...primary.studentPhoneByName};
 
     // Employee selectors use Users Data. Keep the full employee directory available here;
     // the records UI scopes it to Current User's Schools.
@@ -340,6 +342,8 @@
     const students=listFrom(src,["students","student","Students","schoolStudents","school_students"]);
     const studentClasses=listFrom(src,["studentClasses","student_classes","Student Classes","student classes"]);
     const studentPhones=listFrom(src,["studentPhones","student_phones","Student Phones","student phones"]);
+    const studentPhoneById=(src.studentPhoneById&&typeof src.studentPhoneById==="object")?src.studentPhoneById:{};
+    const studentPhoneByName=(src.studentPhoneByName&&typeof src.studentPhoneByName==="object")?src.studentPhoneByName:{};
     const employees=listFrom(src,["employees","employee","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);
     const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
@@ -355,7 +359,16 @@
       // This avoids assigning a phone to the wrong student if Bubble drops empty list items.
       if(studentPhones.length===students.length){
         const directPhone=String(studentPhones[i]??"").trim();
-        if(directPhone)student.guardianPhone=directPhone;
+        if(directPhone)student.guardianPhone=normalizePhoneDisplay(directPhone);
+      }
+
+      // Stable fallback: Parent phone captured from the original bootstrap response.
+      // Match by Student ID first, then normalized Full Name.
+      if(!student.guardianPhone){
+        const byId=student.id?studentPhoneById[String(student.id)]:"";
+        const byName=student.name?studentPhoneByName[norm(student.name)]:"";
+        const preservedPhone=byId||byName||"";
+        if(preservedPhone)student.guardianPhone=normalizePhoneDisplay(preservedPhone);
       }
       return student;
     });
