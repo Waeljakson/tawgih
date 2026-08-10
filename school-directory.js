@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.34
+ * Mishkat School Platform - Bubble directory adapter V1.0.35
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -166,6 +166,8 @@
     }
     const fullStudents=listFrom(extra,["students","Students","schoolStudents","school_students"]);
     out.students=hydrateStudentRefs(scopedStudentRefs,fullStudents);
+    const primaryStudentClasses=listFrom(primary,["studentClasses","student_classes","Student Classes","student classes"]);
+    if(primaryStudentClasses.length)out.studentClasses=primaryStudentClasses;
 
     // Employee selectors use Users Data. Keep the full employee directory available here;
     // the records UI scopes it to Current User's Schools.
@@ -304,11 +306,21 @@
     const src={...FALLBACK,...snapshot};
     const lookup=createLookup(src);
     const students=listFrom(src,["students","student","Students","schoolStudents","school_students"]);
+    const studentClasses=listFrom(src,["studentClasses","student_classes","Student Classes","student classes"]);
     const employees=listFrom(src,["employees","employee","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);
     const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
+    const normalizedStudents=students.map((x,i)=>{
+      const student=normalizeStudent(x,i,lookup);
+      // guidance_bootstrap returns student_classes in the exact same order as Current User's Students.
+      // This direct text value is authoritative for display and avoids depending on Data API relation hydration.
+      const directClass=studentClasses[i];
+      const directClassName=(directClass&&typeof directClass==="object")?classLabelOf(directClass,x):String(directClass??"").trim();
+      if(directClassName&&!looksLikeBubbleId(directClassName))student.className=directClassName;
+      return student;
+    });
     return {
-      students:students.map((x,i)=>normalizeStudent(x,i,lookup)).filter(x=>x.name&&x.active),
+      students:normalizedStudents.filter(x=>x.name&&x.active),
       employees:employees.map((x,i)=>normalizeEmployee(x,i,lookup)).filter(x=>x.name&&x.active),
       academicYears:(years.length?years:FALLBACK.academicYears).map(normalizeAcademicYear).filter(x=>x.name),
       terms:terms.map((x,i)=>normalizeSimple(x,i,"term")).filter(x=>x.name&&x.active),

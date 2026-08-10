@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.34 STABLE DIRECTORY LOADING
+ * Mishkat School Platform — Bubble connection settings V1.0.35 STABLE DIRECTORY LOADING
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -91,6 +91,7 @@
     out.departments=arr("departments","Departments","Department","Dep list","dep_list");
     out.grades=arr("grades","Grade","Grades");
     out.students=arr("students","student","Students","schoolStudents","school_students");
+    out.studentClasses=arr("student_classes","studentClasses","Student Classes","student classes");
     out.employees=arr("employees","employee","Users Data","usersData","users_data","staff","schoolEmployees","school_employees");
     out.academicYears=arr("academicYears","academic_years","academic year","years");
     out.terms=arr("terms","academicTerms","academic_terms","semesters");
