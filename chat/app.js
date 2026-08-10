@@ -61,44 +61,112 @@
   function ctx(){return global.MishkatSchoolContext?.getContext?.()||{};}
   function store(){return global.MishkatBubbleStore;}
   function directory(){return global.MishkatBubbleDirectory;}
+  function counselorEndpoint(){
+    const bootstrap=String(global.MISHKAT_BUBBLE_CONFIG?.directoryEndpoint||"").trim();
+    if(bootstrap&&/\/guidance_bootstrap(?:\?|$)/.test(bootstrap)){
+      return bootstrap.replace(/\/guidance_bootstrap(?:\?.*)?$/,"/guidance_counselors");
+    }
+    return "https://almeshkat.mgtech.online/version-test/api/1.1/wf/guidance_counselors";
+  }
+  async function fetchCounselors(){
+    const token=global.MishkatBubbleAuth?.getToken?.()||
+      sessionStorage.getItem("mishkat_bubble_user_token_v1")||"";
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),12000);
+    try{
+      const response=await fetch(counselorEndpoint(),{
+        method:"GET",
+        headers:{
+          Accept:"application/json",
+          ...(token?{Authorization:`Bearer ${token}`}:{})
+        },
+        cache:"no-store",
+        credentials:"omit",
+        signal:controller.signal
+      });
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(`guidance_counselors_${response.status}`);
+      const rows=payload?.response?.counselors;
+      return Array.isArray(rows)?rows:[];
+    }finally{
+      clearTimeout(timer);
+    }
+  }
   function currentUserId(){const c=ctx();return String(c.id||directory()?.findEmployee?.(c.counselorName)?.id||"school-user");}
   function currentName(){return ctx().counselorName||"المستخدم الحالي";}
   function setConn(text,kind=""){const el=$("connectionState");if(!el)return;el.textContent=text;el.className="connection-state"+(kind?" "+kind:"");}
   function setContext(){const c=ctx();$("ctxUser").textContent=c.counselorName||"—";$("ctxSchool").textContent=c.schoolName||"—";$("ctxStage").textContent=c.stage||"—";}
-  function loadEmployees(){
+  async function loadEmployees(){
     const snap=directory()?.getSnapshot?.()||{};
-    const rows=Array.isArray(snap.employees)?snap.employees:[];
+    const directoryEmployees=Array.isArray(snap.employees)?snap.employees:[];
+    const employeeById=new Map(directoryEmployees.map(e=>[String(e?.id||""),e]));
     const me=currentUserId();
 
-    // Users Data -> Current Job = موجه طلابي
-    // Display text is always Users Data -> Full Name.
-    const counselors=rows
-      .map(e=>({
-        ...e,
-        chatFullName:fullNameOf(e),
-        chatCurrentJob:currentJobOf(e)
-      }))
-      .filter(e=>e.chatFullName && e?.active!==false && counselorRole(e.chatCurrentJob))
-      .sort((a,b)=>a.chatFullName.localeCompare(b.chatFullName,"ar"));
+    if($("contactList")){
+      $("contactList").innerHTML='<div class="loading-line">جارٍ تحميل أسماء الموجهين الطلابيين...</div>';
+    }
 
-    state.allCounselors=counselors;
-    state.employees=counselors.filter(e=>String(e.id)!==String(me));
+    try{
+      const rows=await fetchCounselors();
 
-    const total=counselors.length;
-    if($("counselorCount"))$("counselorCount").textContent=String(total);
-    if($("groupCounselorCount"))$("groupCounselorCount").textContent=String(total);
+      const counselors=rows.map((raw,index)=>{
+        const id=idOf(raw)||`counselor-${index+1}`;
+        const existing=employeeById.get(String(id))||{};
+        const fullName=String(raw?.["Full Name"]||raw?.full_name||existing?.fullName||existing?.name||"").trim();
 
-    console.info("Mishkat counselor chat directory",{
-      totalUsersData:rows.length,
-      counselors:counselors.length,
-      sample:counselors[0]?{
-        fullName:counselors[0].chatFullName,
-        currentJob:counselors[0].chatCurrentJob
-      }:null,
-      unresolvedCurrentJobs:rows.filter(e=>e?.currentJobId&&!currentJobOf(e)).length
-    });
+        return {
+          ...existing,
+          id,
+          fullName,
+          name:fullName,
+          chatFullName:fullName,
+          chatCurrentJob:"موجه طلابي",
+          role:"موجه طلابي",
+          currentJobName:"موجه طلابي",
+          active:raw?.Active===false?false:(existing?.active!==false),
+          raw:{...(existing?.raw||{}),...raw}
+        };
+      }).filter(e=>e.chatFullName&&e.active!==false)
+        .sort((a,b)=>a.chatFullName.localeCompare(b.chatFullName,"ar"));
 
-    renderContacts();
+      state.allCounselors=counselors;
+      state.employees=counselors.filter(e=>String(e.id)!==String(me));
+
+      const total=counselors.length;
+      if($("counselorCount"))$("counselorCount").textContent=String(total);
+      if($("groupCounselorCount"))$("groupCounselorCount").textContent=String(total);
+
+      console.info("Mishkat counselor chat endpoint",{
+        endpoint:counselorEndpoint(),
+        counselors:total,
+        firstFullName:counselors[0]?.chatFullName||""
+      });
+
+      renderContacts();
+      updateConversationHead();
+      return counselors;
+    }catch(err){
+      console.error("guidance_counselors load failed",err);
+
+      const fallback=directoryEmployees
+        .map(e=>({...e,chatFullName:fullNameOf(e),chatCurrentJob:currentJobOf(e)}))
+        .filter(e=>e.chatFullName&&e.active!==false&&counselorRole(e.chatCurrentJob))
+        .sort((a,b)=>a.chatFullName.localeCompare(b.chatFullName,"ar"));
+
+      state.allCounselors=fallback;
+      state.employees=fallback.filter(e=>String(e.id)!==String(me));
+
+      const total=fallback.length;
+      if($("counselorCount"))$("counselorCount").textContent=String(total);
+      if($("groupCounselorCount"))$("groupCounselorCount").textContent=String(total);
+
+      renderContacts();
+      if(!fallback.length&&$("contactList")){
+        $("contactList").innerHTML='<div class="loading-line">تعذر تحميل قائمة الموجهين الطلابيين.</div>';
+      }
+      updateConversationHead();
+      return fallback;
+    }
   }
 
   function renderContacts(){
@@ -112,7 +180,9 @@
     $("groupChatItem")?.classList.toggle("active",state.mode==="group");
 
     if(!rows.length){
-      list.innerHTML='<div class="loading-line">لا يوجد موجهون مطابقون للبحث.</div>';
+      list.innerHTML=state.employees.length
+        ?'<div class="loading-line">لا يوجد موجهون مطابقون للبحث.</div>'
+        :'<div class="loading-line">لا يوجد موجهون طلابيون متاحون في القائمة.</div>';
       return;
     }
 
@@ -203,7 +273,7 @@
     const btn=$("sendMessageBtn");btn.disabled=true;setConn("جارٍ الإرسال...","loading");
     const c=ctx();const meta={scope:state.mode==="group"?"guidance_all":"direct",senderName:currentName(),senderRole:c.counselorRole||"",senderSchool:c.schoolName||"",senderStage:c.stage||""};
     try{
-      await store().logMessage({messageType:state.mode==="group"?"chat_group":"chat_direct",subject:state.mode==="group"?"مجموعة الموجهين الطلابيين":`محادثة مع ${state.selectedEmployee?.name||"مستخدم"}`,messageText:text,recipientEmployeeId:state.mode==="direct"?state.selectedEmployee.id:undefined,recipientType:state.mode==="group"?"student_counselors_group":"internal_employee",sent:true,channel:"internal_chat",notes:JSON.stringify(meta)});
+      await store().logMessage({messageType:state.mode==="group"?"chat_group":"chat_direct",subject:state.mode==="group"?"مجموعة الموجهين الطلابيين":`محادثة مع ${state.selectedEmployee?.chatFullName||state.selectedEmployee?.name||"مستخدم"}`,messageText:text,recipientEmployeeId:state.mode==="direct"?state.selectedEmployee.id:undefined,recipientType:state.mode==="group"?"student_counselors_group":"internal_employee",sent:true,channel:"internal_chat",notes:JSON.stringify(meta)});
       input.value="";resizeInput();updateCount();await loadMessages({silent:true});setConn(store().remoteEnabled?.()?"تم الإرسال":"تم الحفظ محليًا");
     }catch(err){console.error(err);setConn("تعذر الإرسال","error");}
     finally{updateConversationHead();}
@@ -217,9 +287,18 @@
     $("sendMessageBtn").addEventListener("click",sendMessage);
     $("messageInput").addEventListener("input",()=>{resizeInput();updateCount();});
     $("messageInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.ctrlKey){e.preventDefault();sendMessage();}});
-    global.addEventListener("mishkat:school-context-ready",()=>{setContext();loadEmployees();});
-    global.addEventListener("mishkat:school-context-changed",()=>{setContext();loadEmployees();});
+    global.addEventListener("mishkat:school-context-ready",()=>{setContext();loadEmployees().catch(console.error);});
+    global.addEventListener("mishkat:school-context-changed",()=>{setContext();loadEmployees().catch(console.error);});
   }
-  async function boot(){bind();setContext();try{await directory()?.load?.();}catch(_e){}loadEmployees();updateConversationHead();await loadMessages();state.poll=setInterval(()=>{if(!document.hidden)loadMessages({silent:true});},7000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadMessages({silent:true});});}
+  async function boot(){
+    bind();
+    setContext();
+    try{await directory()?.load?.();}catch(_e){}
+    await loadEmployees();
+    updateConversationHead();
+    await loadMessages();
+    state.poll=setInterval(()=>{if(!document.hidden)loadMessages({silent:true});},7000);
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadMessages({silent:true});});
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })(window);

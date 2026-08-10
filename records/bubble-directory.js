@@ -71,7 +71,7 @@
     }
     const supplementalGroups=[
       ["classes",["classes","Classes","Class"]],
-      ["jobTitles",["jobTitles","job_titles","Job Titels","Job Titles","Job Titel","Job Title"]],
+      ["jobTitles",["jobTitles","job_titels","job_titles","Job Titels","Job Titles","Job Titel","Job Title"]],
       ["usersData",["usersData","users_data","Users Data","employees","staff","schoolEmployees","school_employees"]],
       ["guidanceActions",["guidanceActions","Guidance_Action"]],
       ["guidanceWays",["guidanceWays","Guidance_Way"]],
@@ -109,7 +109,7 @@
       departments:listFrom(src,["departments","Departments","Department"]),
       grades:listFrom(src,["grades","Grades"]),
       classes:listFrom(src,["classes","Classes","Class"]),
-      jobTitles:listFrom(src,["jobTitles","job_titles","Job Titels","Job Titles","Job Titel","Job Title"])
+      jobTitles:listFrom(src,["jobTitles","job_titels","job_titles","Job Titels","Job Titles","Job Titel","Job Title"])
     };
     const indexes={};
     Object.entries(groups).forEach(([key,rows])=>{
@@ -219,11 +219,11 @@
     const store=global.MishkatBubbleStore,config=global.MISHKAT_BUBBLE_CONFIG||{};
     if(!store?.remoteEnabled?.() && !config.dataApiBase && !config.objectApiBase)return null;
     const typeNames=supplementOnly?[
-      "School","Department","Grades","Class","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
+      "School","Department","Grades","Class","job_titels","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
     ]:[
-      "School","Department","Grades","Class","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
+      "School","Department","Grades","Class","job_titels","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
     ];
