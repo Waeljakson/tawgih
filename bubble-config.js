@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.41 STABLE DIRECTORY LOADING
+ * Mishkat School Platform — Bubble connection settings V1.0.42 STABLE DIRECTORY LOADING
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.

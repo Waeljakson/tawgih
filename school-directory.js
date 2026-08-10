@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.41
+ * Mishkat School Platform - Bubble directory adapter V1.0.42
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -107,6 +107,30 @@
     return sign+digits.slice(0,decimalPos)+"."+digits.slice(decimalPos);
   }
 
+  function parentPhoneOf(raw){
+    const direct=pick(raw,[
+      "Parent phone","Parent Phone","parent phone","parent_phone",
+      "guardian_phone","phone","mobile","Guardian Phone",
+      "رقم ولي الأمر","رقم جوال ولي الأمر"
+    ],"");
+    if(direct!==""&&direct!==null&&direct!==undefined)return normalizePhoneDisplay(direct);
+
+    for(const [key,value] of Object.entries(raw||{})){
+      if(value===undefined||value===null||String(value).trim()==="")continue;
+      const nk=keyNorm(key);
+      const isParentPhone =
+        nk==="parentphone" ||
+        nk==="guardianphone" ||
+        nk==="parentmobile" ||
+        nk==="guardianmobile" ||
+        (nk.includes("parent")&&(nk.includes("phone")||nk.includes("mobile"))) ||
+        (nk.includes("guardian")&&(nk.includes("phone")||nk.includes("mobile"))) ||
+        (nk.includes("ولي")&&(nk.includes("رقم")||nk.includes("جوال")));
+      if(isParentPhone)return normalizePhoneDisplay(value);
+    }
+    return "";
+  }
+
   const unwrapIncoming=(value)=>{
     const cfg=global.MISHKAT_BUBBLE_CONFIG||{};
     if(typeof cfg.normalizeDirectoryPayload==="function")return cfg.normalizeDirectoryPayload(value);
@@ -183,30 +207,36 @@
     const currentFull=userId?userRows.find(row=>idOf(pick(row,["User","user"],""))===userId):null;
     if(scopedUser||currentFull)out.currentUsersData={...(currentFull||{}),...(scopedUser||{})};
 
-    // Students MUST remain the exact Current User's user data's Students list.
-    // Never replace the scoped Users Data list with the full Students Data API table.
+    // Students:
+    // Workflow API student lists can be truncated. Prefer the complete Students Data API
+    // result during supplement merge, then enforce the current user's School + Department + Grades
+    // in scopeStudentsToCurrentUser() before publishing anything to the UI.
     const primaryStudents=listFrom(primary,["students","student","Students","schoolStudents","school_students"]);
-    const actualUserStudents=currentFull?relationList(currentFull,["Students"]):[];
-    let scopedStudentRefs=primaryStudents.length?primaryStudents:actualUserStudents;
-    if(primaryStudents.length&&actualUserStudents.length){
-      const allowed=new Set(actualUserStudents.map(idOf).filter(Boolean));
-      const intersected=primaryStudents.filter(row=>allowed.has(idOf(row)));
-      // Current User's user data's Students is authoritative when both sources are available.
-      scopedStudentRefs=intersected.length?intersected:actualUserStudents;
-    }
     const fullStudents=listFrom(extra,["students","Students","schoolStudents","school_students"]);
-    out.students=hydrateStudentRefs(scopedStudentRefs,fullStudents);
+    const actualUserStudents=currentFull?relationList(currentFull,["Students"]):[];
+
+    if(fullStudents.length){
+      out.students=fullStudents;
+    }else{
+      const fallbackRefs=primaryStudents.length?primaryStudents:actualUserStudents;
+      out.students=hydrateStudentRefs(fallbackRefs,fullStudents);
+    }
+
     const primaryStudentClasses=listFrom(primary,["studentClasses","student_classes","Student Classes","student classes"]);
     if(primaryStudentClasses.length)out.studentClasses=primaryStudentClasses;
+
     const primaryStudentPhones=listFrom(primary,["studentPhones","student_phones","Student Phones","student phones"]);
     if(primaryStudentPhones.length)out.studentPhones=primaryStudentPhones;
-    if(primary.studentPhoneById&&typeof primary.studentPhoneById==="object")out.studentPhoneById={...(extra.studentPhoneById||{}),...primary.studentPhoneById};
-    if(primary.studentPhoneByName&&typeof primary.studentPhoneByName==="object")out.studentPhoneByName={...(extra.studentPhoneByName||{}),...primary.studentPhoneByName};
+
+    if(primary.studentPhoneById&&typeof primary.studentPhoneById==="object")
+      out.studentPhoneById={...(extra.studentPhoneById||{}),...primary.studentPhoneById};
+    if(primary.studentPhoneByName&&typeof primary.studentPhoneByName==="object")
+      out.studentPhoneByName={...(extra.studentPhoneByName||{}),...primary.studentPhoneByName};
 
     // Employee selectors use Users Data. Keep the full employee directory available here;
     // the records UI scopes it to Current User's Schools.
     out.employees=listFrom(out,["employees","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
-    out.__mishkatScope={...(primary.__mishkatScope||extra.__mishkatScope||{}),studentsFromUsersData:true,authoritativeStudents:true};
+    out.__mishkatScope={...(primary.__mishkatScope||extra.__mishkatScope||{}),studentsFromCompleteDataApi:Boolean(fullStudents.length),studentScope:"school+stage+grades"};
     return out;
   };
 
@@ -292,7 +322,7 @@
       grade: labelOf(gradeRaw), gradeId: idOf(gradeRaw),
       className: classLabelOf(classRaw,raw), classId: idOf(classRaw),
       guardianName: String(pick(raw,["guardian_name","parent_name","father_name","Guardian Name","ولي الأمر","اسم ولي الأمر"],"")),
-      guardianPhone: normalizePhoneDisplay(pick(raw,["Parent phone","Parent Phone","parent phone","parent_phone","guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر","رقم جوال ولي الأمر"],"")),
+      guardianPhone: parentPhoneOf(raw),
       birthDate: String(pick(raw,["birth_date","date_of_birth","DOB","تاريخ الميلاد"],"")).slice(0,10),
       previousSchool: String(pick(raw,["previous_school","Previous School","المدرسة السابقة"],"")),
       active: activeOf(raw,true), userId:idOf(pick(raw,["user","User"],"")), raw
@@ -581,10 +611,7 @@
         : "";
       const className=exactTitel||classLabelOf(classThing,fullStudent)||classLabelOf(classRef,fullStudent);
       const resolvedId=idOf(classThing)||classId;
-      const parentPhone=normalizePhoneDisplay(pick(fullStudent,[
-        "Parent phone","Parent Phone","parent phone","parent_phone",
-        "guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر","رقم جوال ولي الأمر"
-      ],student.guardianPhone||""));
+      const parentPhone=parentPhoneOf(fullStudent)||student.guardianPhone||"";
 
       student.raw=fullStudent;
       if(className)student.className=className;
