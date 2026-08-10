@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Records -> Bubble adapter V1.0.24
+ * Records -> Bubble adapter V1.0.25
  * Writes only to Data Types whose fields were confirmed from the supplied Bubble screenshots.
  * Rich form data that has no direct Bubble field remains preserved in the local archive mirror.
  */
