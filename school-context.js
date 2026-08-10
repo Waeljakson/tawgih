@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.38
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.39
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
