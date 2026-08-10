@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.47
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.49
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -70,7 +70,7 @@
     schools:makeIndex(listFrom(src,["schools","school","Schools","School"])),
     departments:makeIndex(listFrom(src,["departments","Departments","Department"])),
     grades:makeIndex(listFrom(src,["grades","Grade","Grades"])),
-    jobTitles:makeIndex(listFrom(src,["jobTitles","job_titles","Job Titels","Job Titles","Job Titel","Job Title"])),
+    jobTitles:makeIndex(listFrom(src,["jobTitles","job_titels","job_titles","Job Titels","Job Titles","Job Titel","Job Title"])),
     usersData:listFrom(src,["usersData","users_data","Users Data","employees","staff","schoolEmployees","school_employees"])
   };}
   function resolveRef(value,map){value=first(value);if(value==null)return value;if(typeof value==="object")return value;return map?.get?.(String(value))||value;}

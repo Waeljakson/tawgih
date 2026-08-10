@@ -9,7 +9,7 @@
     version: "2026-08-10-r6-school-scope",
     dataTypes: {
       academicYear:"academic year", usersData:"Users Data", students:"Students", terms:"terms", school:"School",
-      department:"Department", grades:"Grades", class:"Class", jobTitle:"Job Titels",
+      department:"Department", grades:"Grades", class:"Class", jobTitle:"job_titels",
       guidanceAttandance:"Guidance_Attandance", guidanceCases:"Guidance_Cases", guidanceCollective:"Guidance_Collective",
       guidanceContact:"Guidance_Contact", guidanceFail:"guidance_Fail", guidanceFailType:"Guidance_FailType",
       guidanceLate:"Guidance_Late", guidanceLog:"Guidance_Log", guidanceMettings:"Guidance_Mettings",
@@ -26,7 +26,7 @@
     },
     fields: {
       academicYear:{active:"Active",end:"End",start:"start",title:"title"},
-      usersData:{active:"Active",activitySchools:"activity schools",currentJob:"Current Job",dep:"Dep",depList:"Dep list",dob:"DOB",email:"Email",employeeCode:"Employee Code",enName:"En Name",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",gender:"Gender",grades:"Grades",idNumber:"ID Number",isRegistered:"Is Registered",jobTitle:"Job Titels",joinDate:"join Date",phoneNumber:"Phone Number",profilePic:"Profile Pic",schools:"Schools",secondName:"Second Name",students:"Students",user:"User",userType:"User Type",thirdName:"Third Name"},
+      usersData:{active:"Active",activitySchools:"activity schools",currentJob:"Current Job",dep:"Dep",depList:"Dep list",dob:"DOB",email:"Email",employeeCode:"Employee Code",enName:"En Name",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",gender:"Gender",grades:"Grades",idNumber:"ID Number",isRegistered:"Is Registered",jobTitle:"job_titels",joinDate:"join Date",phoneNumber:"Phone Number",profilePic:"Profile Pic",schools:"Schools",secondName:"Second Name",students:"Students",user:"User",userType:"User Type",thirdName:"Third Name"},
       department:{depName:"Dep. Name",grade:"Grade",order:"Order",schools:"Schools",studentDepartment:"stu dep",type:"type"},
       students:{active:"Active",class:"Class",code:"code",dep:"Dep",enrollment:"enrollment",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",grade:"grade",localId:"local id",nationalId:"National ID",parentPhone:"Parent phone",parents:"parents",school:"School",secondName:"Second Name",thirdName:"Third Name",user:"user"},
 

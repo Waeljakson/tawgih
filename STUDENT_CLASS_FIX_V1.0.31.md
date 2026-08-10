@@ -1,4 +1,4 @@
-# V1.0.47 — Student Class fix
+# V1.0.49 — Student Class fix
 
 - Student class source remains exactly `Students -> Class`.
 - Added Class display aliases: Class Name, class_name, ClassName, Section, اسم الفصل, الفصل, Name, Title, label, display.
