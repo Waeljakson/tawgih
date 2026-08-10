@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta name="app-version" content="school-1.0.25">
+  <meta name="app-version" content="school-1.0.26">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -381,17 +381,12 @@
         <div class="settings-grid">
           <article class="settings-card">
             <h3>بيانات التوزيع — تلقائية من Bubble</h3>
-            <label><span>اسم المدرسة</span><input id="schoolProfileName" type="text" readonly></label>
-            <label><span>اسم الموجه الطلابي</span><input id="profileFullName" type="text" readonly></label>
             <label><span>المجمع</span><input id="profileCampusName" type="text" readonly></label>
             <label><span>المرحلة</span><input id="profileStageName" type="text" readonly></label>
-            <label><span>مدير المدرسة</span><input id="profileManagerName" type="text" readonly></label>
             <label><span>نوع المدرسة</span><input id="profileSchoolType" type="text" readonly></label>
-            <div class="school-logo-preview">
-              <img id="schoolLogoPreview" src="../assets/school-logo.png" alt="شعار مدارس المشكاة الأهلية">
-              <div id="settingsLogoPlaceholder" class="logo-placeholder" hidden></div>
-            </div>
-            <small>لا تحتاج لحفظ هذه البيانات؛ يتم تحديثها تلقائيًا من توزيع المستخدم في Bubble.</small>
+            <label><span>مدير المدرسة</span><input id="profileManagerName" type="text" readonly></label>
+            <label><span>الموجه الطلابي</span><input id="profileFullName" type="text" readonly></label>
+            <small>المجمع من Current User's user data's Schools، والمرحلة من Dep list، وباقي البيانات تُستكمل تلقائيًا من بيانات المستخدم والمدرسة في Bubble.</small>
           </article>
 
           <article class="settings-card subscription-card" hidden>
@@ -453,13 +448,13 @@
   <div id="trialWatermark" class="trial-watermark" aria-hidden="true" hidden></div>
   <div id="screenShield" class="screen-shield" hidden><div><strong>المحتوى محمي في الحساب التجريبي</strong><span>تعود الشاشة عند الرجوع إلى المنصة.</span></div></div>
 
-  <script src="../bubble-schema.js?v=school-1.0.25"></script>
-  <script src="../bubble-config.js?v=school-1.0.25"></script>
-  <script src="../school-context.js?v=school-1.0.25"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.25"></script>
-  <script src="../school-directory.js?v=school-1.0.25"></script>
-  <script src="records-bubble-adapter.js?v=school-1.0.25"></script>
-  <script src="app.js?v=school-1.0.25"></script>
-  <script src="../global-shell.js?v=school-1.0.25"></script>
+  <script src="../bubble-schema.js?v=school-1.0.26"></script>
+  <script src="../bubble-config.js?v=school-1.0.26"></script>
+  <script src="../school-context.js?v=school-1.0.26"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.26"></script>
+  <script src="../school-directory.js?v=school-1.0.26"></script>
+  <script src="records-bubble-adapter.js?v=school-1.0.26"></script>
+  <script src="app.js?v=school-1.0.26"></script>
+  <script src="../global-shell.js?v=school-1.0.26"></script>
 </body>
 </html>
