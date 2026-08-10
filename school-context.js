@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.23
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.24
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -12,12 +12,12 @@
   const pick=(obj,keys,fallback="")=>{for(const key of keys){const v=obj?.[key];if(v!==undefined&&v!==null&&(!(typeof v==="string")||v.trim()!==""))return v;}return fallback;};
   const first=value=>Array.isArray(value)?(value[0]??""):value;
   const idOf=value=>{value=first(value);if(value==null)return "";if(typeof value==="string"||typeof value==="number")return String(value);return String(pick(value,["id","_id","unique_id","unique id","Unique ID"],""));};
-  const text=value=>{value=first(value);if(value==null)return "";if(typeof value==="string"||typeof value==="number")return String(value);return String(pick(value,["Full Name","full_name","Dep. Name","School Name","school name","name","Name","title","Title","label","display","اسم","الاسم","school_name","اسم المدرسة"],""));};
+  const text=value=>{value=first(value);if(value==null)return "";if(typeof value==="string"||typeof value==="number")return String(value);return String(pick(value,["Full Name","full_name","Dep. Name","School Name","school name","SchoolName","schoolName","School_Name","school_name","مجمع","المجمع","اسم المجمع","name","Name","title","Title","label","display","اسم","الاسم","اسم المدرسة"],""));};
   const json=(value,fallback=null)=>{try{return JSON.parse(value)}catch(_e){return fallback}};
   const norm=v=>String(v??"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
   const boolOf=v=>v===true||v===1||["true","yes","نعم","1"].includes(String(v).trim().toLowerCase());
   const same=(a,b)=>norm(a)&&norm(b)&&norm(a)===norm(b);
-  function listFrom(src,keys){for(const key of keys){if(Array.isArray(src?.[key]))return src[key];}return [];}
+  function listFrom(src,keys){let empty=[];for(const key of keys){if(Array.isArray(src?.[key])){if(src[key].length)return src[key];empty=src[key];}}return empty;}
   function makeIndex(rows){const m=new Map();(rows||[]).forEach(row=>{const id=idOf(row);if(id)m.set(id,row);});return m;}
   function createLookup(src){return {
     schools:makeIndex(listFrom(src,["schools","Schools","School"])),
@@ -133,22 +133,38 @@
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
     const year=currentAcademicYearOf(years),term=currentOf(terms);const manager=autoManager(user,employees,src,lookup);const schoolType=user.schoolType||"boys";
     const roleKey=roleKeyOf(user.counselorRole||"");
-    const assignedSchoolRows=relationArray(rawUser,["activity schools","activity_schools","Schools","schools","School","school"],lookup.schools);
-    const assignedStageRows=relationArray(rawUser,["Dep list","dep_list","Dep","dep","Department","department"],lookup.departments);
-    const assignedGradeRows=relationArray(rawUser,["Grades","grades","Grade","grade"],lookup.grades);
+    // guidance_bootstrap already returns Current User's user data's Schools / Dep list / Grades.
+    // It does not need to return the whole Users Data thing. If rawUser is unavailable,
+    // the top-level scoped lists are authoritative and MUST drive both display and filtering.
+    let assignedSchoolRows=relationArray(rawUser,["Schools","schools","School","school","activity schools","activity_schools"],lookup.schools);
+    let assignedStageRows=relationArray(rawUser,["Dep list","dep_list","Dep","dep","Department","department"],lookup.departments);
+    let assignedGradeRows=relationArray(rawUser,["Grades","grades","Grade","grade"],lookup.grades);
+    const bootstrapSchoolRows=listFrom(src,["schools","Schools","School"]).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
+    const bootstrapStageRows=listFrom(src,["departments","Departments","Department"]).map(v=>resolveRef(v,lookup.departments)).filter(Boolean);
+    const bootstrapGradeRows=listFrom(src,["grades","Grades"]).map(v=>resolveRef(v,lookup.grades)).filter(Boolean);
+    if(!assignedSchoolRows.length)assignedSchoolRows=bootstrapSchoolRows;
+    if(!assignedStageRows.length)assignedStageRows=bootstrapStageRows;
+    if(!assignedGradeRows.length)assignedGradeRows=bootstrapGradeRows;
     const assignedSchoolIds=[...new Set(assignedSchoolRows.map(idOf).filter(Boolean))];
     const assignedSchoolNames=[...new Set(assignedSchoolRows.map(text).filter(Boolean))];
     const assignedStageIds=[...new Set(assignedStageRows.map(idOf).filter(Boolean))];
     const assignedStageNames=[...new Set(assignedStageRows.map(text).filter(Boolean))];
     const assignedGradeIds=[...new Set(assignedGradeRows.map(idOf).filter(Boolean))];
     const assignedGradeNames=[...new Set(assignedGradeRows.map(text).filter(Boolean))];
+    const primarySchool=user.schoolRaw||assignedSchoolRows[0]||null;
+    const primaryStage=assignedStageRows.find(x=>user.stageId&&idOf(x)===String(user.stageId))||assignedStageRows[0]||null;
+    const resolvedSchoolName=user.schoolName||text(primarySchool)||assignedSchoolNames[0]||stored.schoolName||"مدارس المشكاة الأهلية";
+    const resolvedSchoolId=user.schoolId||idOf(primarySchool)||assignedSchoolIds[0]||stored.schoolId||"";
+    const resolvedStage=user.stage||text(primaryStage)||assignedStageNames[0]||stored.stage||"";
+    const resolvedStageId=user.stageId||idOf(primaryStage)||assignedStageIds[0]||stored.stageId||"";
     const canViewSchoolStats=["school_manager","counselor"].includes(roleKey);
     const canViewSupervisionStats=["general_supervisor","complexes_director","complex_supervisor"].includes(roleKey);
     const context={
       id:user.id||stored.id||"",employeeCode:user.employeeCode||stored.employeeCode||"",counselorName:user.counselorName||stored.counselorName||"",
       counselorRole:user.counselorRole||stored.counselorRole||(schoolType==="girls"?"الموجهة الطلابية":"الموجه الطلابي"),
-      schoolName:user.schoolName||stored.schoolName||"مدارس المشكاة الأهلية",schoolId:user.schoolId||stored.schoolId||"",
-      campus:user.campus||stored.campus||"",campusId:user.campusId||stored.campusId||"",stage:user.stage||stored.stage||"",stageId:user.stageId||stored.stageId||"",
+      schoolName:resolvedSchoolName,schoolId:resolvedSchoolId,
+      // In this Bubble deployment School == المجمع. Never derive campus from a separate field.
+      campus:resolvedSchoolName,campusId:resolvedSchoolId,stage:resolvedStage,stageId:resolvedStageId,
       academicYear:text(year)||stored.academicYear||"",academicYearId:idOf(year)||stored.academicYearId||"",term:text(term)||stored.term||"",termId:idOf(term)||stored.termId||"",
       managerId:manager?.id||"",managerName:manager?.name||"",managerRole:manager?.role||(schoolType==="girls"?"مديرة المدرسة":"مدير المدرسة"),
       schoolType,audienceType:schoolType,schoolTypeLabel:schoolType==="girls"?"بنات":"بنين",studentsLabel:schoolType==="girls"?"الطالبات":"الطلاب",studentLabel:schoolType==="girls"?"الطالبة":"الطالب",
