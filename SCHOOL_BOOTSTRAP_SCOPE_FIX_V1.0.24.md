@@ -1,4 +1,4 @@
-# V1.0.24 — Bootstrap School Scope Fix
+# V1.0.25 — Bootstrap School Scope Fix
 
 - `schools` from `guidance_bootstrap` is authoritative for `Current User's user data's Schools`.
 - Bubble `School` is the platform's **المجمع**.

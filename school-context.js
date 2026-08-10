@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.24
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.25
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -133,28 +133,28 @@
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
     const year=currentAcademicYearOf(years),term=currentOf(terms);const manager=autoManager(user,employees,src,lookup);const schoolType=user.schoolType||"boys";
     const roleKey=roleKeyOf(user.counselorRole||"");
-    // guidance_bootstrap already returns Current User's user data's Schools / Dep list / Grades.
-    // It does not need to return the whole Users Data thing. If rawUser is unavailable,
-    // the top-level scoped lists are authoritative and MUST drive both display and filtering.
-    let assignedSchoolRows=relationArray(rawUser,["Schools","schools","School","school","activity schools","activity_schools"],lookup.schools);
-    let assignedStageRows=relationArray(rawUser,["Dep list","dep_list","Dep","dep","Department","department"],lookup.departments);
-    let assignedGradeRows=relationArray(rawUser,["Grades","grades","Grade","grade"],lookup.grades);
-    const bootstrapSchoolRows=listFrom(src,["schools","Schools","School"]).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
-    const bootstrapStageRows=listFrom(src,["departments","Departments","Department"]).map(v=>resolveRef(v,lookup.departments)).filter(Boolean);
-    const bootstrapGradeRows=listFrom(src,["grades","Grades"]).map(v=>resolveRef(v,lookup.grades)).filter(Boolean);
-    if(!assignedSchoolRows.length)assignedSchoolRows=bootstrapSchoolRows;
-    if(!assignedStageRows.length)assignedStageRows=bootstrapStageRows;
-    if(!assignedGradeRows.length)assignedGradeRows=bootstrapGradeRows;
+    // AUTHORITATIVE DISTRIBUTION SCOPE FROM BUBBLE:
+    // guidance_bootstrap.schools == Current User's user data's Schools
+    // guidance_bootstrap.departments == Current User's user data's Dep list
+    // guidance_bootstrap.grades == Current User's user data's Grades
+    // Do NOT infer the campus from Student.School or from a generic School search.
+    const bootstrapSchoolRows=listFrom(src,["schools"]).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
+    const bootstrapStageRows=listFrom(src,["departments"]).map(v=>resolveRef(v,lookup.departments)).filter(Boolean);
+    const bootstrapGradeRows=listFrom(src,["grades"]).map(v=>resolveRef(v,lookup.grades)).filter(Boolean);
+    let assignedSchoolRows=bootstrapSchoolRows.length?bootstrapSchoolRows:relationArray(rawUser,["Schools"],lookup.schools);
+    let assignedStageRows=bootstrapStageRows.length?bootstrapStageRows:relationArray(rawUser,["Dep list"],lookup.departments);
+    let assignedGradeRows=bootstrapGradeRows.length?bootstrapGradeRows:relationArray(rawUser,["Grades"],lookup.grades);
     const assignedSchoolIds=[...new Set(assignedSchoolRows.map(idOf).filter(Boolean))];
     const assignedSchoolNames=[...new Set(assignedSchoolRows.map(text).filter(Boolean))];
     const assignedStageIds=[...new Set(assignedStageRows.map(idOf).filter(Boolean))];
     const assignedStageNames=[...new Set(assignedStageRows.map(text).filter(Boolean))];
     const assignedGradeIds=[...new Set(assignedGradeRows.map(idOf).filter(Boolean))];
     const assignedGradeNames=[...new Set(assignedGradeRows.map(text).filter(Boolean))];
-    const primarySchool=user.schoolRaw||assignedSchoolRows[0]||null;
-    const primaryStage=assignedStageRows.find(x=>user.stageId&&idOf(x)===String(user.stageId))||assignedStageRows[0]||null;
-    const resolvedSchoolName=user.schoolName||text(primarySchool)||assignedSchoolNames[0]||stored.schoolName||"مدارس المشكاة الأهلية";
-    const resolvedSchoolId=user.schoolId||idOf(primarySchool)||assignedSchoolIds[0]||stored.schoolId||"";
+    const primarySchool=assignedSchoolRows[0]||null;
+    const primaryStage=assignedStageRows[0]||null;
+    const resolvedSchoolName=text(primarySchool)||assignedSchoolNames[0]||"";
+    const resolvedSchoolId=idOf(primarySchool)||assignedSchoolIds[0]||"";
+    const resolvedCampusName=assignedSchoolNames.length?assignedSchoolNames.join("، "):resolvedSchoolName;
     const resolvedStage=user.stage||text(primaryStage)||assignedStageNames[0]||stored.stage||"";
     const resolvedStageId=user.stageId||idOf(primaryStage)||assignedStageIds[0]||stored.stageId||"";
     const canViewSchoolStats=["school_manager","counselor"].includes(roleKey);
@@ -164,7 +164,7 @@
       counselorRole:user.counselorRole||stored.counselorRole||(schoolType==="girls"?"الموجهة الطلابية":"الموجه الطلابي"),
       schoolName:resolvedSchoolName,schoolId:resolvedSchoolId,
       // In this Bubble deployment School == المجمع. Never derive campus from a separate field.
-      campus:resolvedSchoolName,campusId:resolvedSchoolId,stage:resolvedStage,stageId:resolvedStageId,
+      campus:resolvedCampusName,campusId:resolvedSchoolId,stage:resolvedStage,stageId:resolvedStageId,
       academicYear:text(year)||stored.academicYear||"",academicYearId:idOf(year)||stored.academicYearId||"",term:text(term)||stored.term||"",termId:idOf(term)||stored.termId||"",
       managerId:manager?.id||"",managerName:manager?.name||"",managerRole:manager?.role||(schoolType==="girls"?"مديرة المدرسة":"مدير المدرسة"),
       schoolType,audienceType:schoolType,schoolTypeLabel:schoolType==="girls"?"بنات":"بنين",studentsLabel:schoolType==="girls"?"الطالبات":"الطلاب",studentLabel:schoolType==="girls"?"الطالبة":"الطالب",
@@ -189,15 +189,17 @@
     const schoolIds=new Set((c.assignedSchoolIds||[]).map(String)),schoolNames=new Set((c.assignedSchoolNames||[]).map(norm));
     const stageIds=new Set((c.assignedStageIds||[]).map(String)),stageNames=new Set((c.assignedStageNames||[]).map(norm));
     const gradeIds=new Set((c.assignedGradeIds||[]).map(String)),gradeNames=new Set((c.assignedGradeNames||[]).map(norm));
-    const matches=(value,ids,names,map)=>{
-      if(!ids.size&&!names.size)return true;
+    // School is mandatory. If Current User's user data's Schools was not returned, show no students.
+    if(!schoolIds.size&&!schoolNames.size)return [];
+    const matches=(value,ids,names,map,{required=false}={})=>{
+      if(!ids.size&&!names.size)return !required;
       const resolved=resolveRef(value,map),rid=idOf(resolved),rname=norm(text(resolved));
       if(rid&&ids.has(String(rid)))return true;
       if(rname&&names.has(rname))return true;
-      return false; // fail closed: never leak a student whose School/Dep/Grade cannot be verified.
+      return false;
     };
     return rows.filter(s=>
-      matches(pick(s,["School","school"],""),schoolIds,schoolNames,lookup.schools)&&
+      matches(pick(s,["School","school"],""),schoolIds,schoolNames,lookup.schools,{required:true})&&
       matches(pick(s,["Dep","Department","department"],""),stageIds,stageNames,lookup.departments)&&
       matches(pick(s,["grade","Grade","Grades"],""),gradeIds,gradeNames,lookup.grades)
     );
