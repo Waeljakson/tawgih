@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.39";
+const SCHOOL_SCHEMA_VERSION="1.0.40";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -540,6 +540,7 @@ async function loadSchoolBubbleDirectory(){
     studentPhonesReceived:(window.MISHKAT_BUBBLE_DATA?.studentPhones||window.MISHKAT_BUBBLE_DATA?.student_phones||[]).length||0,
     studentsWithClass:(state.directory?.students||[]).filter(s=>s.className).length,
     studentsWithParentPhone:(state.directory?.students||[]).filter(s=>s.guardianPhone).length,
+    sampleParentPhone:(state.directory?.students||[]).find(s=>s.guardianPhone)?.guardianPhone||"",
     employees:state.directory?.employees?.length||0,
     academicYears:state.directory?.academicYears?.length||0,
     terms:state.directory?.terms?.length||0,
@@ -686,7 +687,13 @@ function applyStudentToForm(student,select){
   const box=ensureStudentSummary(select);
   if(!student){if(box){box.hidden=true;box.innerHTML="";}return;}
   setSchoolContextFromStudent(student);
+
+  // Parent phone comes directly from the selected Students record.
+  // Set it explicitly as well as through STUDENT_LINK_MAP so every record type
+  // receives the value immediately when the student is chosen.
+  setLinkedValue("guardian_phone",student.guardianPhone||"");
   Object.entries(STUDENT_LINK_MAP).forEach(([fieldKey,studentKey])=>setLinkedValue(fieldKey,student[studentKey]||""));
+
   if(box){box.innerHTML=studentSummaryMarkup(student);box.hidden=!box.innerHTML;}
   if(!student.className||!student.guardianPhone)hydrateSelectedStudentClass(student,select);
 }
@@ -738,6 +745,27 @@ function handleSchoolBubbleChange(event){
   }
   if(target.matches('select[data-source="employees"]')){
     const emp=selectedEmployee(target.value);if(target.dataset.field==="referrer_name")setLinkedValue("referrer_role",emp?.role||"");
+  }
+}
+
+function handleSchoolBubbleInput(event){
+  const target=event.target;if(!(target instanceof HTMLElement))return;
+
+  // Searchable student fields use <input list>. Choosing a datalist result fires
+  // "input" immediately; waiting only for "change" delayed/blocked linked fields.
+  if(target.matches('input[data-source="students"]')){
+    const student=selectedStudent(target.value);
+    if(!student)return;
+    target.value=student.name;
+    applyStudentToForm(student,target);
+    return;
+  }
+
+  if(target.matches("input[data-student-select]")){
+    const student=selectedStudent(target.value);
+    if(!student)return;
+    target.value=student.name;
+    handleRepeaterStudent(target);
   }
 }
 
@@ -1807,6 +1835,7 @@ function bindEvents(){
   if(el.recordReportTerm)el.recordReportTerm.addEventListener("change",renderCurrentRecordReport);
   if(el.recordReportBody)el.recordReportBody.addEventListener("click",e=>{const edit=e.target.closest("[data-report-edit]");if(edit)return openSavedRecord(edit.dataset.reportEdit);const print=e.target.closest("[data-report-print]");if(print)return openSavedRecord(print.dataset.reportPrint,true);const del=e.target.closest("[data-report-delete]");if(del)return deleteRecord(del.dataset.reportDelete);});
   el.dynamicRecordForm.addEventListener("click",e=>{const add=e.target.closest("[data-add-row]");if(add){const wrapper=el.dynamicRecordForm.querySelector(`[data-repeat-key="${CSS.escape(add.dataset.addRow)}"]`);const columns=JSON.parse(wrapper.dataset.repeatColumns||"[]");wrapper.querySelector("tbody").insertAdjacentHTML("beforeend",renderRepeatRow(columns,{}));refreshUniqueStudents(wrapper);return;}const del=e.target.closest("[data-delete-row]");if(del){const wrapper=del.closest("[data-repeat-key]");const tbody=del.closest("tbody");if(tbody.children.length>1)del.closest("tr").remove();else Array.from(del.closest("tr").querySelectorAll("input,textarea,select")).forEach(i=>i.value="");refreshUniqueStudents(wrapper);}});
+  el.dynamicRecordForm.addEventListener("input",handleSchoolBubbleInput);
   el.dynamicRecordForm.addEventListener("change",handleSchoolBubbleChange);
   el.archiveSearch.addEventListener("input",debounce(renderArchive));el.archiveTypeFilter.addEventListener("change",renderArchive);el.archiveStatusFilter.addEventListener("change",renderArchive);el.refreshArchiveButton.addEventListener("click",()=>loadArchive(true));
   el.archiveList.addEventListener("click",e=>{const edit=e.target.closest("[data-edit-record]");if(edit)return openSavedRecord(edit.dataset.editRecord);const print=e.target.closest("[data-print-saved]");if(print)return openSavedRecord(print.dataset.printSaved,true);const report=e.target.closest("[data-student-report]");if(report)return openStudentReportForName(report.dataset.studentReport);const del=e.target.closest("[data-delete-record]");if(del)return deleteRecord(del.dataset.deleteRecord);});

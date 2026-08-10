@@ -158,11 +158,11 @@
 @media(max-width:620px){.record-report-heading{flex-direction:column}.record-new-cta{width:100%}.record-report-title-group{width:100%;flex-direction:column}.record-report-filters{grid-template-columns:1fr}.record-report-search{grid-column:auto}.record-report-count{min-height:58px}.record-report-panel{border-radius:16px}.record-report-table-shell{padding:6px}}
 @media print{#recordReportView{display:none!important}}
 
-/* V1.0.39 — Daily incident conditional dropdowns */
+/* V1.0.40 — Daily incident conditional dropdowns */
 .incident-field-disabled{opacity:.52;transition:opacity .18s ease}
 .incident-field-disabled select{background:#f1f5f7!important;color:#8b99a1!important;cursor:not-allowed}
 
-/* V1.0.39 — New Record fresh-data loader */
+/* V1.0.40 — New Record fresh-data loader */
 .new-record-data-loader[hidden]{display:none!important}
 .new-record-data-loader{position:fixed;inset:0;z-index:2147482600;display:grid;place-items:center;background:rgba(247,251,249,.96);backdrop-filter:blur(6px);opacity:0;transition:opacity .22s ease;direction:rtl}
 .new-record-data-loader.visible{opacity:1}.new-record-data-loader.done{opacity:0;pointer-events:none}
@@ -173,7 +173,7 @@
 .nrdl-bar{width:180px;height:5px;background:#dfe9e2;border-radius:99px;overflow:hidden}.nrdl-bar i{display:block;width:38%;height:100%;background:#3c7c48;border-radius:inherit;animation:nrdlBar 1.05s ease-in-out infinite}
 @keyframes nrdlFill{0%{height:4%}75%{height:94%}100%{height:99%}}@keyframes nrdlBar{0%{transform:translateX(210%)}100%{transform:translateX(-310%)}}
 
-/* V1.0.39 — searchable student selector */
+/* V1.0.40 — searchable student selector */
 .student-search-field input[type="search"]{
   padding-inline-start:42px;
   background-image:linear-gradient(transparent,transparent);
@@ -187,7 +187,7 @@
   font-weight:700;
 }
 
-/* V1.0.39 — fixed linked fields, collapsed multiline editors, student reports */
+/* V1.0.40 — fixed linked fields, collapsed multiline editors, student reports */
 .record-meta-grid #metaTitle[readonly]{
   background:#f4f8fa;
   color:#27495c;
@@ -259,7 +259,7 @@
   .collapsible-textarea-body textarea{display:block!important;min-height:45px}
 }
 
-/* V1.0.39 — compact student-linked fields + report search */
+/* V1.0.40 — compact student-linked fields + report search */
 .form-field input[data-field="grade"][readonly],
 .form-field input[data-field="class_name"][readonly],
 .form-field input[data-field="guardian_phone"][readonly]{
