@@ -114,7 +114,7 @@
       <section class="panel">
         <div class="panel-title"><h2>تخصيص الرسالة</h2><small>تُطبق البيانات مباشرة عند النسخ</small></div>
         <div class="personalize">
-          <select id="studentName" class="field" aria-label="اسم الطالب"><option value="">اختر الطالب من Bubble</option></select>
+          <select id="studentName" class="field" aria-label="اسم الطالب"><option value="">اختر الطالب</option></select>
           <input id="className" class="field" placeholder="الصف والفصل" readonly aria-readonly="true">
           <input id="subjectName" class="field" placeholder="المادة — اختياري">
           <div class="field" style="height:auto;min-height:48px;background:#f4f8fa;display:grid;gap:2px"><small>المدرسة — تلقائي</small><strong data-school-context-display="schoolName">—</strong></div>
@@ -368,7 +368,7 @@
       try{
         var dir=window.MishkatSchoolDirectory||window.MishkatBubbleDirectory;if(dir&&dir.load)await dir.load();
         var rows=(directorySnapshot().students||[]);var current=$('studentName').value;
-        $('studentName').innerHTML='<option value="">اختر الطالب من Bubble</option>'+rows.map(function(st){return '<option value="'+escapeHTML(st.id)+'">'+escapeHTML(st.name)+'</option>'}).join('');
+        $('studentName').innerHTML='<option value="">اختر الطالب</option>'+rows.map(function(st){return '<option value="'+escapeHTML(st.id)+'">'+escapeHTML(st.name)+'</option>'}).join('');
         if(rows.some(function(st){return String(st.id)===String(current)}))$('studentName').value=current;
         $('studentName').onchange=function(){var st=selectedStudentRecord();$('className').value=st?[st.grade,st.className].filter(Boolean).join(' / '):'';renderMore(true)};
       }catch(e){console.warn('Student directory unavailable',e)}
@@ -388,7 +388,7 @@
         var ctx=window.MishkatSchoolContext&&window.MishkatSchoolContext.getContext?window.MishkatSchoolContext.getContext():{};
         var stageMap={'المرحلة الابتدائية':'upper_primary','الابتدائية':'upper_primary','المرحلة المتوسطة':'middle','المتوسطة':'middle','المرحلة الثانوية':'secondary','الثانوية':'secondary'};var stage=stageMap[ctx.stage]||'middle';
         var gender=ctx.schoolType==='girls'?'girls':'boys';
-        rows.forEach(function(r){var rg=String(r.Gender||'').toLowerCase();if(rg&&rg!==gender&&rg!=='all'&&rg!=='الكل')return;var id='bubble-template-'+(window.MishkatBubbleStore.idOf(r)||Math.random().toString(36).slice(2));if(state.messages.some(function(m){return m.id===id}))return;state.messages.push({id:id,category:'template',categoryLabel:'قالب معتمد',topic:r.Title||'رسالة معتمدة',contextLabel:'قالب Bubble',stage:stage,tone:'formal',text:r.Content||''})});
+        rows.forEach(function(r){var rg=String(r.Gender||'').toLowerCase();if(rg&&rg!==gender&&rg!=='all'&&rg!=='الكل')return;var id='bubble-template-'+(window.MishkatBubbleStore.idOf(r)||Math.random().toString(36).slice(2));if(state.messages.some(function(m){return m.id===id}))return;state.messages.push({id:id,category:'template',categoryLabel:'قالب معتمد',topic:r.Title||'رسالة معتمدة',contextLabel:'قالب معتمد',stage:stage,tone:'formal',text:r.Content||''})});
         $('totalCount').textContent=state.messages.length.toLocaleString('ar-SA');applyFilters();
       }catch(e){console.warn('Bubble message templates unavailable',e)}
     }
@@ -499,11 +499,11 @@
   </script>
 <script src="../support-widget-rest.js?v=17.3.0"></script>
   <script src="../smart-reminders.js?v=19.0.9"></script>
-  <script src="../bubble-schema.js?v=school-1.0.36"></script>
-  <script src="../bubble-config.js?v=school-1.0.36"></script>
-  <script src="../school-context.js?v=school-1.0.36"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.36"></script>
-  <script src="../school-directory.js?v=school-1.0.36"></script>
-  <script src="../global-shell.js?v=school-1.0.36"></script>
+  <script src="../bubble-schema.js?v=school-1.0.37"></script>
+  <script src="../bubble-config.js?v=school-1.0.37"></script>
+  <script src="../school-context.js?v=school-1.0.37"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.37"></script>
+  <script src="../school-directory.js?v=school-1.0.37"></script>
+  <script src="../global-shell.js?v=school-1.0.37"></script>
 </body>
 </html>

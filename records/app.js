@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.36";
+const SCHOOL_SCHEMA_VERSION="1.0.37";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -186,19 +186,19 @@ const RECORDS = {
   },
   guardian_contact: {
     title: "سجل التواصل", category: "التواصل والشراكة", icon: "☎️", confidential: false,
-    description: "سجل مدارس المشكاة لتوثيق الاتصال أو المقابلة مع ولي الأمر، مرتبط ببيانات الطالب المدرسية ومهيأ للربط بقاعدة بيانات Bubble.",
+    description: "سجل مدارس المشكاة لتوثيق الاتصال أو المقابلة مع ولي الأمر، مرتبط ببيانات الطالب المدرسية ومرتبط ببيانات الطالب المدرسية.",
     studentKey: "student_name", classKey: "class_name", sections: [
       section("بيانات المدرسة والطالب", [
         f("academic_term","الفصل الدراسي","select",{span:3,required:true,options:["","الفصل الأول","الفصل الثاني","الفصل الثالث"]}),
         f("school_year","العام الدراسي","text",{span:3,required:true,value:"1448",placeholder:"مثال: 1448"}),
-        f("campus","المجمع","select",{span:3,options:[""],help:"يتم تحميل المجمعات من قاعدة بيانات Bubble."}),
-        f("stage","المرحلة","select",{span:3,options:[""],help:"يتم تحميل المراحل من قاعدة بيانات Bubble."}),
-        f("grade","الصف","select",{span:3,options:[""],help:"يتم تحميل الصفوف من قاعدة بيانات Bubble."}),
-        f("class_name","الفصل","select",{span:3,options:[""],help:"يتم تحميل الفصول من قاعدة بيانات Bubble."}),
+        f("campus","المجمع","select",{span:3,options:[""],help:"يتم تحميل المجمعات تلقائيًا."}),
+        f("stage","المرحلة","select",{span:3,options:[""],help:"يتم تحميل المراحل تلقائيًا."}),
+        f("grade","الصف","select",{span:3,options:[""],help:"يتم تحميل الصفوف تلقائيًا."}),
+        f("class_name","الفصل","select",{span:3,options:[""],help:"يتم تحميل الفصول تلقائيًا."}),
         f("student_search","بحث سريع عن الطالب","text",{span:6,placeholder:"ابحث بالاسم"}),
-        f("student_name","اسم الطالب","select",{span:6,required:true,options:[""],help:"القائمة ستُملأ بأسماء طلاب الفصل المختار من Bubble."}),
-        f("guardian_name","اسم ولي الأمر","text",{span:6,placeholder:"يمكن جلبه تلقائيًا من بيانات الطالب في Bubble"}),
-        f("guardian_phone","رقم التواصل","tel",{span:6,placeholder:"يمكن جلبه تلقائيًا من بيانات الطالب في Bubble"})
+        f("student_name","اسم الطالب","select",{span:6,required:true,options:[""],help:"اكتب الاسم أو جزءًا منه ثم اختر الطالب."}),
+        f("guardian_name","اسم ولي الأمر","text",{span:6,placeholder:"يظهر تلقائيًا عند اختيار الطالب"}),
+        f("guardian_phone","رقم التواصل","tel",{span:6,placeholder:"يظهر تلقائيًا عند اختيار الطالب"})
       ],"اختيار الطالب سيكون من قاعدة المدرسة، وليس كتابة حرة للاسم."),
       section("بيانات التواصل", [
         f("contact_date","التاريخ","date",{span:4,required:true}),
@@ -285,14 +285,14 @@ const RECORDS = {
       section("بيانات المدرسة والطالب", [
         f("academic_term","الفصل الدراسي","select",{span:3,required:true,options:["","الفصل الأول","الفصل الثاني","الفصل الثالث"]}),
         f("school_year","العام الدراسي","text",{span:3,required:true,value:"1448",placeholder:"مثال: 1448"}),
-        f("campus","المجمع","select",{span:3,options:[""],help:"يتم تحميل المجمعات من قاعدة بيانات Bubble."}),
-        f("stage","المرحلة","select",{span:3,options:[""],help:"يتم تحميل المراحل من قاعدة بيانات Bubble."}),
-        f("grade","الصف","select",{span:3,options:[""],help:"يتم تحميل الصفوف من قاعدة بيانات Bubble."}),
-        f("class_name","الفصل","select",{span:3,options:[""],help:"يتم تحميل الفصول من قاعدة بيانات Bubble."}),
+        f("campus","المجمع","select",{span:3,options:[""],help:"يتم تحميل المجمعات تلقائيًا."}),
+        f("stage","المرحلة","select",{span:3,options:[""],help:"يتم تحميل المراحل تلقائيًا."}),
+        f("grade","الصف","select",{span:3,options:[""],help:"يتم تحميل الصفوف تلقائيًا."}),
+        f("class_name","الفصل","select",{span:3,options:[""],help:"يتم تحميل الفصول تلقائيًا."}),
         f("student_search","بحث سريع عن الطالب","text",{span:6,placeholder:"ابحث بالاسم"}),
-        f("student_name","اسم الطالب","select",{span:6,required:true,options:[""],help:"القائمة ستُملأ بأسماء طلاب الفصل المختار من Bubble."}),
+        f("student_name","اسم الطالب","select",{span:6,required:true,options:[""],help:"اكتب الاسم أو جزءًا منه ثم اختر الطالب."}),
         f("incident_date","تاريخ الموقف","date",{span:3,required:true}),
-        f("student_reference","رقم الطالب / المرجع","text",{span:3,placeholder:"يُجلب تلقائيًا من Bubble"})
+        f("student_reference","رقم الطالب / المرجع","text",{span:3,placeholder:"يُجلب تلقائيًا"})
       ],"اختيار الطالب سيكون من قاعدة المدرسة، وليس كتابة حرة للاسم."),
       section("تفاصيل الموقف", [
         f("incident_category","نوع الموقف","radio",{options:["سلوكي","تعليمي","أخرى"]}),
@@ -346,41 +346,104 @@ function prepareSchoolBubbleDefinitions(){
   if(schoolBubblePrepared)return;
   Object.values(RECORDS).forEach(def=>{
     const directStudent=hasDirectStudent(def);
+
     (def.sections||[]).forEach(sec=>{
       // البيانات المدرسية الأساسية موحدة أعلى كل سجل، لذلك لا نكررها داخل أقسام النموذج.
       sec.fields=(sec.fields||[]).filter(field=>
         !["academic_term","school_year","academic_year","campus","complex","stage"].includes(field.key) &&
-        !(field.key==="semester" && String(field.label||"").includes("الفصل الدراسي"))
+        !(field.key==="semester" && String(field.label||"").includes("الفصل الدراسي")) &&
+        field.key!=="guardian_name"
       );
+
+      // توحيد أي حقل قديم لأرقام التواصل ليصبح رقم جوال ولي الأمر.
       (sec.fields||[]).forEach(field=>{
-        if(field.key==="student_search")field._remove=true;
+        if(field.key==="contact_numbers")field.key="guardian_phone";
+
+        if(field.key==="student_search"){field._remove=true;return;}
+
         const labelText=String(field.label||"");
         const studentNameField=field.key==="student_name" || (/اسم الطالب|اسم الطالبة/.test(labelText) && !/توقيع/.test(labelText));
         const automaticIdentity=["counselor_name","counselor5","principal_name"].includes(field.key);
         const employeeField=["referral_source","referrer_name","meeting_with","responsible_employee","employee_name","source_employee"].includes(field.key)
           || (/اسم الموظف|المطلوب مقابلته|القائم بالتحويل|مصدر الإحالة|الموظف المسؤول|مسؤول التنفيذ|المشرف/.test(labelText) && !automaticIdentity);
+
         if(studentNameField){
-          field.type="select";field.source="students";field.required=true;field.label=labelText||"اسم الطالب";delete field.options;delete field.value;
+          field.type="student-search";
+          field.source="students";
+          field.required=true;
+          field.label=labelText||"اسم الطالب";
+          field.placeholder="اكتب جزءًا من اسم الطالب للبحث";
+          field.help="اكتب الاسم أو جزءًا منه ثم اختر الطالب من النتائج.";
+          delete field.options;
+          delete field.value;
         }
+
+        if(field.key==="guardian_phone"){
+          field.type="tel";
+          field.label="رقم جوال ولي الأمر";
+          field.linkedReadonly=true;
+          field.span=field.span||4;
+          field.help="يظهر تلقائيًا عند اختيار الطالب.";
+          delete field.placeholder;
+        }
+
         if(employeeField){
-          field.type="select";field.source="employees";delete field.options;delete field.value;
-          field.help=field.help||"يتم اختيار الموظف من جدول Users Data في Bubble.";
+          field.type="select";
+          field.source="employees";
+          delete field.options;
+          delete field.value;
+          field.help=field.help||"يتم اختيار الموظف من بيانات الموظفين.";
         }
+
         if(directStudent && STUDENT_LINK_MAP[field.key]){
           field.linkedReadonly=true;
           if(["campus","complex","stage","grade","class_name","student_reference"].includes(field.key))field.type="text";
         }
+
         if(field.type==="repeater"){
-          (field.columns||[]).forEach(col=>{
+          const cols=field.columns||[];
+          cols.forEach(col=>{
             const colLabel=String(col.label||"");
             if(col.key==="student_name"||(/اسم الطالب|اسم الطالبة/.test(colLabel)&&!/توقيع/.test(colLabel)))col.type="student-select";
             if(col.key==="class_name")col.type="student-class";
+            if(col.key==="guardian_phone"||col.key==="contact_numbers"){
+              col.key="guardian_phone";
+              col.label="رقم جوال ولي الأمر";
+              col.type="student-phone";
+            }
             if(["employee_name","responsible_employee","supervisor_employee"].includes(col.key)||/اسم الموظف|مسؤول التنفيذ|المشرف/.test(colLabel))col.type="employee-select";
           });
+
+          // كل صف يحتوي اختيار طالب يحصل على رقم جوال ولي الأمر تلقائيًا.
+          if(cols.some(col=>col.key==="student_name") && !cols.some(col=>col.key==="guardian_phone")){
+            const studentIndex=cols.findIndex(col=>col.key==="student_name");
+            const classIndex=cols.findIndex(col=>col.key==="class_name");
+            const insertAt=classIndex>=0?classIndex+1:studentIndex+1;
+            cols.splice(insertAt,0,{key:"guardian_phone",label:"رقم جوال ولي الأمر",type:"student-phone"});
+          }
         }
       });
+
       sec.fields=sec.fields.filter(field=>!field._remove);
     });
+
+    // في كل سجل مرتبط بطالب واحد: أضف رقم جوال ولي الأمر إن لم يكن موجودًا.
+    if(directStudent){
+      let phoneField=allFields(def).find(field=>field.key==="guardian_phone");
+      if(!phoneField){
+        const studentSection=(def.sections||[]).find(sec=>(sec.fields||[]).some(field=>field.key==="student_name"));
+        if(studentSection){
+          const studentIndex=studentSection.fields.findIndex(field=>field.key==="student_name");
+          phoneField=f("guardian_phone","رقم جوال ولي الأمر","tel",{span:4,linkedReadonly:true,help:"يظهر تلقائيًا عند اختيار الطالب."});
+          studentSection.fields.splice(studentIndex+1,0,phoneField);
+        }
+      }else{
+        phoneField.type="tel";
+        phoneField.label="رقم جوال ولي الأمر";
+        phoneField.linkedReadonly=true;
+        phoneField.help="يظهر تلقائيًا عند اختيار الطالب.";
+      }
+    }
   });
   schoolBubblePrepared=true;
 }
@@ -432,12 +495,20 @@ function currentAcademicTermName(){return window.MishkatBubbleDirectory?.current
 function sourceOptions(source,selected=""){
   const items=directoryItems(source);const person=source==="students"||source==="employees";const selectedText=String(selected||"");
   const label=source==="students"?`اختر الطالب — ${items.length} متاح`:source==="employees"?`اختر الموظف — ${items.length} متاح`:"اختر";
-  const emptyLabel=source==="students"?"لم يتم تحميل طلاب المستخدم من Bubble":source==="employees"?"لم يتم تحميل الموظفين من Bubble":"لم يتم تحميل البيانات";
+  const emptyLabel=source==="students"?"لم يتم تحميل أسماء الطلاب":source==="employees"?"لم يتم تحميل أسماء الموظفين":"لم يتم تحميل البيانات";
   return `<option value="">${items.length?label:emptyLabel}</option>`+items.map(item=>{
     const value=person?item.id:item.name;
     const chosen=String(value)===selectedText || item.name===selectedText;
     return `<option value="${escapeHtml(value)}"${chosen?" selected":""}>${escapeHtml(item.name)}</option>`;
   }).join("");
+}
+function studentDirectoryDatalistOptions(){
+  return directoryItems("students").map(item=>`<option value="${escapeHtml(item.name)}"></option>`).join("");
+}
+function studentDisplayValue(value){
+  const text=String(value??"").trim();
+  if(!text)return "";
+  return selectedStudent(text)?.name||text;
 }
 async function loadSchoolBubbleDirectory(){
   state.directory=await window.MishkatBubbleDirectory?.load?.()||{students:[],employees:[],academicYears:[],terms:[],campuses:[],stages:[],grades:[],classes:[]};
@@ -446,28 +517,32 @@ async function loadSchoolBubbleDirectory(){
 }
 function refreshPersonSelectors(){
   if(!el.dynamicRecordForm)return;
-  el.dynamicRecordForm.querySelectorAll('select[data-source="students"],select[data-source="employees"]').forEach(select=>{
-    const source=select.dataset.source,current=select.value;
-    select.innerHTML=sourceOptions(source,current);
+
+  const datalist=el.dynamicRecordForm.querySelector("#studentDirectoryList");
+  if(datalist)datalist.innerHTML=studentDirectoryDatalistOptions();
+
+  el.dynamicRecordForm.querySelectorAll('select[data-source="employees"]').forEach(select=>{
+    const current=select.value;
+    select.innerHTML=sourceOptions("employees",current);
     if(current&&[...select.options].some(o=>o.value===current))select.value=current;
   });
-  el.dynamicRecordForm.querySelectorAll('select[data-student-select]').forEach(select=>{
-    const current=select.value;select.innerHTML=sourceOptions("students",current);if(current&&[...select.options].some(o=>o.value===current))select.value=current;
-  });
   el.dynamicRecordForm.querySelectorAll('select[data-employee-select]').forEach(select=>{
-    const current=select.value;select.innerHTML=sourceOptions("employees",current);if(current&&[...select.options].some(o=>o.value===current))select.value=current;
+    const current=select.value;
+    select.innerHTML=sourceOptions("employees",current);
+    if(current&&[...select.options].some(o=>o.value===current))select.value=current;
   });
-  // Re-apply the selected student after Bubble hydration so linked fields such as Students -> Class
-  // are filled even when the Class thing arrived after the initial student list.
+
   refreshAllStudentSummaries();
-  el.dynamicRecordForm.querySelectorAll("select[data-student-select]").forEach(select=>{
-    const wrapper=select.closest("[data-repeat-key]"),row=select.closest("tr");
-    if(!wrapper||!row||!select.value)return;
-    const student=selectedStudent(select.value);
+  el.dynamicRecordForm.querySelectorAll("input[data-student-select]").forEach(input=>{
+    const wrapper=input.closest("[data-repeat-key]"),row=input.closest("tr");
+    if(!wrapper||!row||!input.value)return;
+    const student=selectedStudent(input.value);
+    if(!student)return;
     const cls=row.querySelector('[data-col="class_name"]');
-    if(cls)cls.value=student?.className||"";
+    const phone=row.querySelector('[data-col="guardian_phone"]');
+    if(cls)cls.value=student.className||"";
+    if(phone)phone.value=student.guardianPhone||"";
   });
-  el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);
 }
 function fillAcademicMeta(year="",term=""){
   if(el.metaAcademicYear){
@@ -583,28 +658,51 @@ function applyStudentToForm(student,select){
   if(!student.className)hydrateSelectedStudentClass(student,select);
 }
 function refreshAllStudentSummaries(){
-  el.dynamicRecordForm.querySelectorAll('select[data-source="students"]:not([data-col])').forEach(select=>applyStudentToForm(selectedStudent(select.value),select));
+  el.dynamicRecordForm.querySelectorAll('input[data-source="students"]:not([data-col])').forEach(input=>{
+    const student=selectedStudent(input.value);
+    if(student)applyStudentToForm(student,input);
+  });
 }
 function refreshUniqueStudents(wrapper){
-  if(!wrapper)return;const selects=Array.from(wrapper.querySelectorAll("select[data-student-select]"));
-  selects.forEach(select=>{const mine=select.value;const used=new Set(selects.filter(x=>x!==select).map(x=>x.value).filter(Boolean));Array.from(select.options).forEach(opt=>{if(opt.value)opt.disabled=used.has(opt.value)&&opt.value!==mine;});});
+  // البحث الحر داخل القائمة لا يحتاج تعطيل options؛ منع التكرار يتم عند الاختيار.
+  return wrapper;
 }
-function handleRepeaterStudent(select){
-  const wrapper=select.closest("[data-repeat-key]");const row=select.closest("tr");if(!wrapper||!row)return;
-  const duplicate=select.value && Array.from(wrapper.querySelectorAll("select[data-student-select]")).some(other=>other!==select&&other.value===select.value);
-  if(duplicate){select.value="";showToast("هذا الطالب مضاف بالفعل. اختر طالبًا مختلفًا.",true);refreshUniqueStudents(wrapper);return;}
-  const student=selectedStudent(select.value);const cls=row.querySelector('[data-col="class_name"]');if(cls)cls.value=student?.className||"";if(student&&!student.className)hydrateSelectedStudentClass(student,select,cls);
-  // في الإرشاد الجمعي نملأ بيانات الجلسة من أول طالب مختار دون فرضها على باقي المشاركين.
-  if(state.currentType==="group_guidance" && student){
-    const first=wrapper.querySelector("select[data-student-select]");if(first===select)setSchoolContextFromStudent(student);
+function handleRepeaterStudent(input){
+  const wrapper=input.closest("[data-repeat-key]");const row=input.closest("tr");if(!wrapper||!row)return;
+  const normalized=normalizeStudentName(input.value);
+  const duplicate=normalized && Array.from(wrapper.querySelectorAll("input[data-student-select]")).some(other=>other!==input&&normalizeStudentName(other.value)===normalized);
+  if(duplicate){input.value="";showToast("هذا الطالب مضاف بالفعل. اختر طالبًا مختلفًا.",true);return;}
+
+  const student=selectedStudent(input.value);
+  const cls=row.querySelector('[data-col="class_name"]');
+  const phone=row.querySelector('[data-col="guardian_phone"]');
+  if(!student){
+    if(cls)cls.value="";
+    if(phone)phone.value="";
+    return;
   }
-  refreshUniqueStudents(wrapper);
+
+  input.value=student.name;
+  if(cls)cls.value=student.className||"";
+  if(phone)phone.value=student.guardianPhone||"";
+  if(student&&!student.className)hydrateSelectedStudentClass(student,input,cls);
+
+  // في الإرشاد الجمعي نملأ بيانات الجلسة من أول طالب مختار دون فرضها على باقي المشاركين.
+  if(state.currentType==="group_guidance"){
+    const first=wrapper.querySelector("input[data-student-select]");
+    if(first===input)setSchoolContextFromStudent(student);
+  }
 }
 function handleSchoolBubbleChange(event){
   const target=event.target;if(!(target instanceof HTMLElement))return;
   if(target.matches('input[name="choice_incident_category"]')){updateDailyIncidentCategoryControls({clearInactive:true});return;}
-  if(target.matches("select[data-student-select]"))return handleRepeaterStudent(target);
-  if(target.matches('select[data-source="students"]')){applyStudentToForm(selectedStudent(target.value),target);return;}
+  if(target.matches("input[data-student-select]"))return handleRepeaterStudent(target);
+  if(target.matches('input[data-source="students"]')){
+    const student=selectedStudent(target.value);
+    if(student){target.value=student.name;applyStudentToForm(student,target);}
+    else applyStudentToForm(null,target);
+    return;
+  }
   if(target.matches('select[data-source="employees"]')){
     const emp=selectedEmployee(target.value);if(target.dataset.field==="referrer_name")setLinkedValue("referrer_role",emp?.role||"");
   }
@@ -698,6 +796,9 @@ function setView(view){
   el.navButtons.forEach(b=>b.classList.toggle("active",b.dataset.view===view));
   window.scrollTo({top:0,behavior:"smooth"});
   if(view==="archive")loadArchive();
+  if(view==="studentReports"){
+    refreshDirectoryForNewRecord().catch(()=>{}).then(()=>loadArchive(true)).then(()=>refreshStudentReportIndex());
+  }
   if(view==="recordReport")renderCurrentRecordReport();
   if(view==="admin"&&state.account?.is_system_admin)loadAdminData();
 }
@@ -747,7 +848,7 @@ const RECORD_REPORT_COLUMNS = {
     {label:"الطالب",keys:["student_name"]},{label:"الفصل",keys:["class_name"]},{label:"التصنيف",keys:["classification"]},{label:"تاريخ الاكتشاف",keys:["discovery_date"],kind:"date"},{label:"ملخص المشكلة",keys:["problem_summary"]},{label:"التشخيص",keys:["final_diagnosis"]}
   ],
   guardian_invitation:[
-    {label:"الطالب",keys:["student_name"]},{label:"ولي الأمر",keys:["guardian_name"]},{label:"موعد الحضور",keys:["appointment_date"],kind:"date"},{label:"الساعة",keys:["appointment_time"]},{label:"سبب الدعوة",keys:["invitation_reason"]},{label:"الاستجابة",keys:["response"]}
+    {label:"الطالب",keys:["student_name"]},{label:"رقم جوال ولي الأمر",keys:["guardian_phone","contact_numbers"]},{label:"موعد الحضور",keys:["appointment_date"],kind:"date"},{label:"الساعة",keys:["appointment_time"]},{label:"سبب الدعوة",keys:["invitation_reason"]},{label:"الاستجابة",keys:["response"]}
   ],
   observation_visit:[
     {label:"الفصل",keys:["class_name"]},{label:"تاريخ الزيارة",keys:["visit_date"],kind:"date"},{label:"التركيز",keys:["focus"]},{label:"المشاركة",keys:["participation"]},{label:"طلاب للمتابعة",keys:["follow_up_students"],kind:"students"},{label:"ملاحظات",keys:["observation_notes"]}
@@ -876,9 +977,10 @@ function renderRepeatRow(columns,row={}){
 function renderTableControl(col,value){
   const v=escapeHtml(value);
   if(col.type==="textarea")return `<textarea data-col="${escapeHtml(col.key)}" rows="2">${v}</textarea>`;
-  if(col.type==="student-select")return `<select data-col="${escapeHtml(col.key)}" data-student-select>${sourceOptions("students",value)}</select>`;
+  if(col.type==="student-select")return `<input data-col="${escapeHtml(col.key)}" data-student-select type="search" list="studentDirectoryList" autocomplete="off" placeholder="ابحث عن الطالب" value="${escapeHtml(studentDisplayValue(value))}">`;
   if(col.type==="employee-select")return `<select data-col="${escapeHtml(col.key)}" data-employee-select>${sourceOptions("employees",value)}</select>`;
   if(col.type==="student-class")return `<input data-col="${escapeHtml(col.key)}" type="text" value="${v}" readonly aria-readonly="true">`;
+  if(col.type==="student-phone")return `<input data-col="${escapeHtml(col.key)}" type="tel" value="${v}" readonly aria-readonly="true">`;
   if(col.type==="select")return `<select data-col="${escapeHtml(col.key)}">${(col.options||[]).map(o=>`<option value="${escapeHtml(o)}"${o===value?" selected":""}>${escapeHtml(o)}</option>`).join("")}</select>`;
   return `<input data-col="${escapeHtml(col.key)}" type="${escapeHtml(col.type||"text")}" value="${v}">`;
 }
@@ -904,28 +1006,17 @@ function renderField(field){
   const value=field.value??"";
   const cls=`${spanClass(field)}${field.linkedReadonly?" linked-school-field":""}`;
   if(field.type==="textarea")return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
+  if(field.type==="student-search")return `<label class="${cls} student-search-field"><span>${escapeHtml(field.label)}</span><input type="search" list="studentDirectoryList" autocomplete="off" ${inputAttrs(field)} value="${escapeHtml(studentDisplayValue(value))}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
   if(field.type==="select"){const options=field.source?sourceOptions(field.source,value):(field.options||[]).map(opt=>`<option value="${escapeHtml(opt)}"${opt===value?" selected":""}>${escapeHtml(opt)}</option>`).join("");return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><select ${inputAttrs(field)}>${options}</select>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;}
   return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><input type="${escapeHtml(field.type||"text")}" ${inputAttrs(field)} value="${escapeHtml(value)}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
 }
 
 function renderRecordForm(def){
-  el.dynamicRecordForm.innerHTML=def.sections.map(s=>`<section class="form-section"><header class="form-section-header"><h3>${escapeHtml(s.title)}</h3>${s.subtitle?`<small>${escapeHtml(s.subtitle)}</small>`:""}</header><div class="form-section-body">${s.fields.map(renderField).join("")}</div></section>`).join("");
+  el.dynamicRecordForm.innerHTML=`<datalist id="studentDirectoryList">${studentDirectoryDatalistOptions()}</datalist>`+def.sections.map(s=>`<section class="form-section"><header class="form-section-header"><h3>${escapeHtml(s.title)}</h3>${s.subtitle?`<small>${escapeHtml(s.subtitle)}</small>`:""}</header><div class="form-section-body">${s.fields.map(renderField).join("")}</div></section>`).join("");
   el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);
 }
 
-function wireSchoolStudentSearch(){
-  const search=el.dynamicRecordForm.querySelector('[data-field="student_search"]');
-  const student=el.dynamicRecordForm.querySelector('[data-field="student_name"]');
-  if(!search||!student)return;
-  const filter=()=>{
-    const q=String(search.value||"").trim().toLocaleLowerCase("ar");
-    Array.from(student.options).forEach((opt,index)=>{
-      if(index===0){opt.hidden=false;return;}
-      opt.hidden=Boolean(q)&&!String(opt.textContent||"").toLocaleLowerCase("ar").includes(q);
-    });
-  };
-  search.addEventListener("input",filter);
-}
+function wireSchoolStudentSearch(){/* اختيار الطالب أصبح قابلًا للبحث مباشرة داخل الحقل. */}
 
 function getDefaultFormData(def){
   const data={};
@@ -938,11 +1029,16 @@ function getDefaultFormData(def){
 }
 
 function setFieldValue(key,value){
+  if(key==="contact_numbers"&&!el.dynamicRecordForm.querySelector('[data-field="contact_numbers"]'))key="guardian_phone";
   if(["behavior_code","education_code"].includes(key))value=stripVisibleCode(value);
   if(key==="action_codes"&&Array.isArray(value))value=value.map(stripVisibleCode);
   const input=el.dynamicRecordForm.querySelector(`[data-field="${CSS.escape(key)}"]`);
   if(input){
-    if(input.matches('select[data-source="students"],select[data-source="employees"]')){const text=String(value??"");const opt=Array.from(input.options).find(o=>o.value===text||o.textContent===text);input.value=opt?.value||"";}else input.value=value??"";
+    if(input.matches('input[data-source="students"]')){
+      input.value=studentDisplayValue(value);
+    }else if(input.matches('select[data-source="employees"]')){
+      const text=String(value??"");const opt=Array.from(input.options).find(o=>o.value===text||o.textContent===text);input.value=opt?.value||"";
+    }else input.value=value??"";
     return;
   }
   const group=el.dynamicRecordForm.querySelector(`[data-choice-group="${CSS.escape(key)}"]`);
@@ -977,7 +1073,11 @@ function collectFormData(){
   const data={};
   el.dynamicRecordForm.querySelectorAll("[data-field]").forEach(input=>{
     const key=input.dataset.field;
-    if(input.matches('select[data-source="students"]')){data[key]=input.selectedOptions[0]?.textContent?.trim()||"";data[`${key}_id`]=input.value||"";}
+    if(input.matches('input[data-source="students"]')){
+      const student=selectedStudent(input.value);
+      data[key]=student?.name||cleanText(input.value);
+      data[`${key}_id`]=student?.id||"";
+    }
     else if(input.matches('select[data-source="employees"]')){data[key]=input.selectedOptions[0]?.textContent?.trim()||"";data[`${key}_id`]=input.value||"";}
     else data[key]=input.value;
   });
@@ -988,7 +1088,7 @@ function collectFormData(){
   });
   el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(wrapper=>{
     data[wrapper.dataset.repeatKey]=Array.from(wrapper.querySelectorAll("tbody tr")).map(tr=>{
-      const row={};tr.querySelectorAll("[data-col]").forEach(i=>{const key=i.dataset.col;if(i.matches("select[data-student-select],select[data-employee-select]")){row[key]=i.selectedOptions[0]?.textContent?.trim()||"";row[`${key}_id`]=i.value||"";}else row[key]=i.value;});return row;
+      const row={};tr.querySelectorAll("[data-col]").forEach(i=>{const key=i.dataset.col;if(i.matches("input[data-student-select]")){const student=selectedStudent(i.value);row[key]=student?.name||cleanText(i.value);row[`${key}_id`]=student?.id||"";}else if(i.matches("select[data-employee-select]")){row[key]=i.selectedOptions[0]?.textContent?.trim()||"";row[`${key}_id`]=i.value||"";}else row[key]=i.value;});return row;
     }).filter(row=>Object.values(row).some(v=>cleanText(v)));
   });
   el.dynamicRecordForm.querySelectorAll("[data-matrix-key]").forEach(wrapper=>{
@@ -1045,7 +1145,7 @@ async function refreshDirectoryForNewRecord(){
 }
 async function openNewRecordWithFreshData(type){
   if(!type)return;
-  showNewRecordDataLoader("يتم جلب الطلاب والفصول وموظفي المرحلة من Bubble");
+  showNewRecordDataLoader("يتم جلب الطلاب والفصول وموظفي المرحلة");
   try{
     await refreshDirectoryForNewRecord();
     openRecord(type,null);
@@ -1095,8 +1195,8 @@ async function saveCurrentRecord(){
       if(state.currentRecordId){const idx=items.findIndex(x=>x.id===state.currentRecordId);row={...(idx>=0?items[idx]:{}),...payload,...bubbleMeta,id:state.currentRecordId,updated_at:now,created_at:(idx>=0?items[idx].created_at:now)};if(idx>=0)items[idx]=row;else items.unshift(row)}
       else{row={...payload,...bubbleMeta,id:(crypto.randomUUID?crypto.randomUUID():`local-${Date.now()}`),created_at:now,updated_at:now};items.unshift(row);state.currentRecordId=row.id}
       writeLocalSchoolRecords(items);state.records=items;state.archiveLoaded=true;el.recordPrintId.textContent=String(state.currentRecordId).slice(0,8).toUpperCase();
-      if(bubbleResult.supported)showToast(bubbleResult.remote?"تم حفظ السجل في Bubble بنجاح.":"تم حفظ السجل وفق هيكل Bubble (الوضع المحلي لحين تفعيل API).");
-      else showToast("تم حفظ السجل محليًا. لم يتم ربط هذا النوع بجدول Bubble حتى لا تُحفظ البيانات في جدول غير صحيح.");
+      if(bubbleResult.supported)showToast(bubbleResult.remote?"تم حفظ السجل بنجاح.":"تم حفظ السجل بنجاح.");
+      else showToast("تم حفظ السجل محليًا.");
       const savedType=state.currentType;setTimeout(()=>openRecordReport(savedType,true),80);
       return;
     }
@@ -1162,25 +1262,33 @@ function recordStudentReferences(record){
 }
 function refreshStudentReportIndex(){
   if(!el.studentReportName||!el.studentReportAvailableCount)return;
+
+  // أسماء الطلاب في صفحة التقارير مصدرها قائمة الطلاب الحالية فقط.
   const map=new Map();
+  (state.directory?.students||[]).forEach(student=>{
+    const key=normalizeStudentName(student.name);if(!key)return;
+    map.set(key,{key,name:student.name,classes:new Set(student.className?[student.className]:[]),records:new Set()});
+  });
+
+  // السجلات تضيف عدد السجلات/الفصول فقط للطلاب الموجودين حاليًا في القائمة المصرح بها.
   (state.records||[]).forEach(record=>{
     recordStudentReferences(record).forEach(ref=>{
       const key=normalizeStudentName(ref.name);
-      if(!key)return;
-      if(!map.has(key))map.set(key,{key,name:ref.name,classes:new Set(),records:new Set()});
-      const item=map.get(key);if(ref.className)item.classes.add(ref.className);item.records.add(record.id);
+      const item=map.get(key);
+      if(!item)return;
+      if(ref.className)item.classes.add(ref.className);
+      item.records.add(record.id);
     });
   });
-  (state.directory?.students||[]).forEach(student=>{
-    const key=normalizeStudentName(student.name);if(!key)return;
-    if(!map.has(key))map.set(key,{key,name:student.name,classes:new Set(),records:new Set()});
-    const item=map.get(key);if(student.className)item.classes.add(student.className);
-  });
+
   state.studentReportStudents=[...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ar"));
   const current=el.studentReportName.value;
-  el.studentReportName.innerHTML='<option value="">اختر الطالب من Bubble</option>'+state.studentReportStudents.map(item=>`<option value="${escapeHtml(item.name)}">${escapeHtml(item.name)}${item.records.size?` — ${item.records.size} سجل`:''}</option>`).join("");
-  if(state.studentReportStudents.some(x=>x.name===current))el.studentReportName.value=current;
-  if(el.studentNamesList)el.studentNamesList.innerHTML="";
+
+  if(el.studentNamesList){
+    el.studentNamesList.innerHTML=state.studentReportStudents.map(item=>`<option value="${escapeHtml(item.name)}"></option>`).join("");
+  }
+  if(current&&!state.studentReportStudents.some(x=>x.name===current))el.studentReportName.value="";
+
   el.studentReportAvailableCount.textContent=state.studentReportStudents.length;
   updateStudentReportClassOptions();
 }
@@ -1406,7 +1514,7 @@ async function handleLogoUpload(file){if(!file)return;if(file.size>1.5*1024*1024
 async function saveSchoolProfile(){
   // School edition: distribution identity is read-only and comes from Bubble.
   applyAccountUI();
-  if(el.settingsStatus)showBox(el.settingsStatus,"بيانات التوزيع تُحدّث تلقائيًا من Bubble ولا تحتاج إلى حفظ يدوي.");
+  if(el.settingsStatus)showBox(el.settingsStatus,"بيانات التوزيع تُحدّث تلقائيًا ولا تحتاج إلى حفظ يدوي.");
 }
 
 function showPaymentModal(){
@@ -1561,7 +1669,7 @@ function bindEvents(){
   if(el.studentReportName){el.studentReportName.addEventListener("change",updateStudentReportClassOptions);}
   if(el.generateStudentReportButton)el.generateStudentReportButton.addEventListener("click",generateStudentReport);
   if(el.resetStudentReportButton)el.resetStudentReportButton.addEventListener("click",resetStudentReport);
-  if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",()=>loadArchive(true).then(()=>{refreshStudentReportIndex();showToast("تم تحديث بيانات تقارير الطلاب.");}));
+  if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",()=>refreshDirectoryForNewRecord().catch(()=>{}).then(()=>loadArchive(true)).then(()=>{refreshStudentReportIndex();showToast("تم تحديث بيانات تقارير الطلاب.");}));
   if(el.printStudentReportButton)el.printStudentReportButton.addEventListener("click",printStudentReport);
   if(el.studentReportTimeline)el.studentReportTimeline.addEventListener("click",e=>{const open=e.target.closest("[data-open-report-record]");if(open)openSavedRecord(open.dataset.openReportRecord);});
   window.addEventListener("afterprint",restoreStudentReportPrintState);
@@ -1616,7 +1724,7 @@ async function init(){
     fillAcademicMeta();fillSchoolContextMeta();applyAccountUI();renderUnifiedPlatformSwitcher();renderCatalog();refreshStudentReportIndex();
   }catch(error){
     console.error("Mishkat Bubble directory init error",error);
-    showToast("السجلات ظاهرة، لكن تعذر تحديث بيانات Bubble الآن.",true);
+    showToast("السجلات ظاهرة، لكن تعذر تحديث البيانات الآن.",true);
   }
   try{await loadArchive(true);}catch(error){console.warn("Mishkat archive load failed",error);}
   setView("dashboard");

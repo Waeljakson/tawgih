@@ -73,7 +73,7 @@ async function loadCertificateStudents(){
   try{if(dir?.load)await dir.load()}catch(e){console.warn('Certificate student directory unavailable',e)}
   const rows=certificateDirectory().students||[];
   const current=$('studentNameInput').value;
-  $('studentNameInput').innerHTML='<option value="">اختر الطالب من Bubble</option>'+rows.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  $('studentNameInput').innerHTML='<option value="">اختر الطالب</option>'+rows.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
   $('batchInput').innerHTML=rows.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}${s.grade||s.className?` — ${esc([s.grade,s.className].filter(Boolean).join(' / '))}`:''}</option>`).join('');
   if(rows.some(s=>String(s.id)===String(current)))$('studentNameInput').value=current;
   const apply=()=>{const st=selectedCertStudent();$('classInput').value=st?.grade||'';$('sectionInput').value=st?.className||'';render()};

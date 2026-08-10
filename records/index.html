@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta name="app-version" content="school-1.0.36">
+  <meta name="app-version" content="school-1.0.37">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -109,7 +109,7 @@
         <div class="hero-copy">
           <div class="hero-eyebrow"><span class="eyebrow-dot"></span> منصة السجلات الرقمية</div>
           <h1>سجلات مدارس المشكاة الأهلية<br><span>إدارة إلكترونية متكاملة</span></h1>
-          <p>نماذج رقمية للسجلات الإرشادية والمواقف اليومية والزيارات والمقابلات والمتابعة، مهيأة للربط بقاعدة بيانات المدرسة في Bubble.</p>
+          <p>نماذج رقمية للسجلات الإرشادية والمواقف اليومية والزيارات والمقابلات والمتابعة، مرتبطة ببيانات المدرسة.</p>
           <div class="hero-features"><span><b>✓</b> تعبئة إلكترونية</span><span><b>✓</b> بحث سريع</span><span><b>✓</b> طباعة احترافية</span></div>
         </div>
         <div class="school-identity-card">
@@ -278,8 +278,8 @@
           <div class="report-filter-grid">
             <label class="span-2">
               <span>اسم الطالب</span>
-              <select id="studentReportName" aria-label="اسم الطالب"><option value="">اختر الطالب من Bubble</option></select>
-              <datalist id="studentNamesList" hidden></datalist>
+              <input id="studentReportName" type="search" list="studentNamesList" autocomplete="off" aria-label="اسم الطالب" placeholder="اكتب اسم الطالب للبحث">
+              <datalist id="studentNamesList"></datalist>
             </label>
             <label>
               <span>الصف / الفصل</span>
@@ -380,13 +380,13 @@
         <div class="view-heading"><div><span class="section-kicker">الحساب والهوية</span><h2>إعدادات مدارس المشكاة الأهلية</h2><p>الاسم والشعار يظهران تلقائيًا في جميع السجلات والطباعة.</p></div></div>
         <div class="settings-grid">
           <article class="settings-card">
-            <h3>بيانات التوزيع — تلقائية من Bubble</h3>
+            <h3>بيانات التوزيع — تلقائية</h3>
             <label><span>المجمع</span><input id="profileCampusName" type="text" readonly></label>
             <label><span>المرحلة</span><input id="profileStageName" type="text" readonly></label>
             <label><span>نوع المدرسة</span><input id="profileSchoolType" type="text" readonly></label>
             <label><span>مدير المدرسة</span><input id="profileManagerName" type="text" readonly></label>
             <label><span>الموجه الطلابي</span><input id="profileFullName" type="text" readonly></label>
-            <small>المجمع من Current User's user data's Schools، والمرحلة من Dep list، وباقي البيانات تُستكمل تلقائيًا من بيانات المستخدم والمدرسة في Bubble.</small>
+            <small>تُستكمل بيانات التوزيع تلقائيًا من حساب المستخدم وبيانات المدرسة.</small>
           </article>
 
           <article class="settings-card subscription-card" hidden>
@@ -448,13 +448,13 @@
   <div id="trialWatermark" class="trial-watermark" aria-hidden="true" hidden></div>
   <div id="screenShield" class="screen-shield" hidden><div><strong>المحتوى محمي في الحساب التجريبي</strong><span>تعود الشاشة عند الرجوع إلى المنصة.</span></div></div>
 
-  <script src="../bubble-schema.js?v=school-1.0.36"></script>
-  <script src="../bubble-config.js?v=school-1.0.36"></script>
-  <script src="../school-context.js?v=school-1.0.36"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.36"></script>
-  <script src="../school-directory.js?v=school-1.0.36"></script>
-  <script src="records-bubble-adapter.js?v=school-1.0.36"></script>
-  <script src="app.js?v=school-1.0.36"></script>
-  <script src="../global-shell.js?v=school-1.0.36"></script>
+  <script src="../bubble-schema.js?v=school-1.0.37"></script>
+  <script src="../bubble-config.js?v=school-1.0.37"></script>
+  <script src="../school-context.js?v=school-1.0.37"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.37"></script>
+  <script src="../school-directory.js?v=school-1.0.37"></script>
+  <script src="records-bubble-adapter.js?v=school-1.0.37"></script>
+  <script src="app.js?v=school-1.0.37"></script>
+  <script src="../global-shell.js?v=school-1.0.37"></script>
 </body>
 </html>
