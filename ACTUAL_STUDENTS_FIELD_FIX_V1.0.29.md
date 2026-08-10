@@ -1,4 +1,4 @@
-# V1.0.42 — Actual Users Data Students field
+# V1.0.43 — Actual Users Data Students field
 
 Correction based on the live Bubble schema:
 
