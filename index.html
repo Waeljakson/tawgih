@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl" data-platform-name="منصة المدارس — مدارس المشكاة الأهلية">
 <head>
-  <meta name="app-version" content="school-1.0.17">
+  <meta name="app-version" content="school-1.0.27">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2f6b3a">
@@ -220,14 +220,13 @@
     <div class="modal-card compact-modal"><div class="modal-head"><div><span>هوية المستخدم</span><h2>بيانات التوزيع التلقائية</h2></div><button class="icon-button" data-close-modal="profileModal">×</button></div>
       <p style="margin:0 0 12px;color:#64748b">هذه البيانات تأتي من حساب الموظف وتوزيعه في Bubble، ولا تحتاج إلى حفظ أو إعداد يدوي.</p>
       <div class="school-context-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
-        <div class="status-box" style="display:block"><span>الموجه الطلابي</span><strong id="profileAssignedUser">—</strong></div>
-        <div class="status-box" style="display:block"><span>المدرسة</span><strong id="profileAssignedSchool">—</strong></div>
-        <div class="status-box" style="display:block"><span>المجمع</span><strong id="profileAssignedCampus">—</strong></div>
-        <div class="status-box" style="display:block"><span>المرحلة</span><strong id="profileAssignedStage">—</strong></div>
-        <div class="status-box" style="display:block"><span>نوع المدرسة</span><strong id="profileAssignedSchoolType">بنين</strong></div>
-        <div class="status-box" style="display:block"><span>مدير المدرسة</span><strong id="profileAssignedManager">—</strong></div>
+        <div class="status-box" style="display:grid;gap:5px"><span>المجمع</span><strong id="profileAssignedCampus">—</strong></div>
+        <div class="status-box" style="display:grid;gap:5px"><span>المرحلة</span><strong id="profileAssignedStage">—</strong></div>
+        <div class="status-box" style="display:grid;gap:5px"><span>نوع المدرسة</span><strong id="profileAssignedSchoolType">—</strong></div>
+        <div class="status-box" style="display:grid;gap:5px"><span>مدير المدرسة</span><strong id="profileAssignedManager">—</strong></div>
+        <div class="status-box" style="display:grid;gap:5px;grid-column:1/-1"><span>الموجه الطلابي</span><strong id="profileAssignedUser">—</strong></div>
       </div>
-      <input id="profileFullName" type="hidden"><input id="schoolProfileName" type="hidden">
+      <input id="profileFullName" type="hidden">
     </div>
   </div>
 
@@ -298,13 +297,13 @@
   </div>
 
   <div id="toast" class="toast" hidden></div>
-  <script src="bubble-schema.js?v=school-1.0.24"></script>
-  <script src="bubble-config.js?v=school-1.0.24"></script>
-  <script src="school-context.js?v=school-1.0.24"></script>
-  <script src="bubble-persistence.js?v=school-1.0.24"></script>
-  <script src="school-directory.js?v=school-1.0.24"></script>
-  <script src="app-v12.js?v=school-1.0.14"></script>
-  <script src="guidance-access.js?v=school-1.0.16.1"></script>
-  <script src="global-shell.js?v=school-1.0.24"></script>
+  <script src="bubble-schema.js?v=school-1.0.27"></script>
+  <script src="bubble-config.js?v=school-1.0.27"></script>
+  <script src="school-context.js?v=school-1.0.27"></script>
+  <script src="bubble-persistence.js?v=school-1.0.27"></script>
+  <script src="school-directory.js?v=school-1.0.27"></script>
+  <script src="app-v12.js?v=school-1.0.27"></script>
+  <script src="guidance-access.js?v=school-1.0.27"></script>
+  <script src="global-shell.js?v=school-1.0.27"></script>
 </body>
 </html>

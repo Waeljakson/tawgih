@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.26
+ * Mishkat School Platform - Bubble directory adapter V1.0.27
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -26,12 +26,47 @@
     if(typeof value === "string" || typeof value === "number") return String(value);
     return String(pick(value,["id","_id","unique_id","unique id","Unique ID","slug"],fallback));
   };
-  const labelOf = value => {
+  const keyNorm = value => String(value??"").toLowerCase().replace(/[\s_.-]+/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه");
+  const looksLikeBubbleId = value => /^\d{10,}x\d+$/i.test(String(value||"")) || /^\d{13,}$/.test(String(value||""));
+  function labelOf(value){
     value = first(value);
     if(value == null) return "";
-    if(typeof value === "string" || typeof value === "number") return String(value);
-    return String(pick(value,["Full Name","full_name","Dep. Name","School Name","school name","name","Name","title","Title","label","display","اسم","الاسم","school_name","اسم المدرسة"],""));
-  };
+    if(typeof value === "string" || typeof value === "number"){
+      const text=String(value).trim();
+      return looksLikeBubbleId(text)?"":text;
+    }
+    if(typeof value !== "object") return "";
+    const preferred=[
+      "Full Name","full_name","Dep. Name","Department Name","department name",
+      "School Name","school name","SchoolName","schoolName","School_Name","school_name",
+      "Complex Name","complex name","Campus Name","campus name","اسم المجمع","المجمع","مجمع",
+      "Arabic Name","arabic name","Name","name","Title","title","label","Label","display","Display",
+      "اسم","الاسم","اسم المدرسة","School","school"
+    ];
+    for(const key of preferred){
+      const raw=value?.[key];
+      if(raw===undefined||raw===null||raw==="")continue;
+      const text=(typeof raw==="object")?labelOf(raw):String(raw).trim();
+      if(text&&!looksLikeBubbleId(text))return text;
+    }
+    let best="",score=-1;
+    const blocked=/^(id|_id|uniqueid|createddate|modifieddate|createdby|slug|createdat|updatedat)$/;
+    for(const [key,raw] of Object.entries(value)){
+      const nk=keyNorm(key);
+      if(blocked.test(nk))continue;
+      if(typeof raw!=="string"&&typeof raw!=="number")continue;
+      const text=String(raw).trim();
+      if(!text||looksLikeBubbleId(text)||/^https?:\/\//i.test(text))continue;
+      let s=1;
+      if(nk.includes("school")&&nk.includes("name"))s=100;
+      else if(nk.includes("مجمع")||nk.includes("campus")||nk.includes("complex"))s=95;
+      else if(nk.includes("name")||nk.includes("اسم"))s=90;
+      else if(nk.includes("title")||nk.includes("label")||nk.includes("display"))s=80;
+      else if(nk==="school")s=70;
+      if(s>score){best=text;score=s;}
+    }
+    return best;
+  }
   const boolOf = value => value === true || value === 1 || ["true","yes","نعم","1"].includes(String(value).trim().toLowerCase());
   const activeOf = (raw, fallback=true) => {
     for(const key of ["Active","active","is_active"]){
@@ -220,6 +255,8 @@
     const schoolIds=new Set((c.assignedSchoolIds||[]).map(String)),schoolNames=new Set((c.assignedSchoolNames||[]).map(norm));
     const stageIds=new Set((c.assignedStageIds||[]).map(String)),stageNames=new Set((c.assignedStageNames||[]).map(norm));
     const gradeIds=new Set((c.assignedGradeIds||[]).map(String)),gradeNames=new Set((c.assignedGradeNames||[]).map(norm));
+    // SECURITY: School scope is mandatory. Never show a stage-wide student list if Schools is unavailable.
+    if(!schoolIds.size&&!schoolNames.size)return [];
     const match=(id,name,ids,names)=>{
       if(!ids.size&&!names.size)return true;
       if(id&&ids.has(String(id)))return true;
@@ -289,6 +326,11 @@
       schoolScopeApplied:true,
       employees:snapshot.employees.length
     };
+    try{
+      global.MishkatSchoolContext?.build?.();
+      global.MishkatSchoolContext?.applyDocument?.(document);
+      global.dispatchEvent(new CustomEvent("mishkat:directory-loaded",{detail:snapshot.connection}));
+    }catch(_error){}
     return snapshot;
   }
   function currentAcademicYear(){
