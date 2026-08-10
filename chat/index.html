@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.0.18.1">
+  <link rel="stylesheet" href="styles.css?v=1.0.47">
 </head>
 <body>
   <main class="chat-page">
@@ -16,7 +16,7 @@
       <div>
         <span class="eyebrow">التواصل الداخلي</span>
         <h1>شات التوجيه الطلابي</h1>
-        <p>محادثات جماعية بين فريق التوجيه، أو محادثة فردية مع مستخدم محدد من النظام.</p>
+        <p>محادثة جماعية لكل الموجهين الطلابيين، أو محادثة فردية بالضغط على اسم أي موجه.</p>
       </div>
       <div class="hero-context">
         <span><b id="ctxUser">—</b><small>المستخدم</small></span>
@@ -27,25 +27,37 @@
 
     <section class="chat-shell">
       <aside class="chat-sidebar">
-        <div class="mode-switch" role="tablist" aria-label="نوع المحادثة">
-          <button id="groupModeBtn" class="mode-btn active" type="button" data-mode="group"><span>👥</span><b>شات جماعي</b><small>فريق التوجيه</small></button>
-          <button id="directModeBtn" class="mode-btn" type="button" data-mode="direct"><span>💬</span><b>شات فردي</b><small>اختيار مستخدم</small></button>
+        <div class="contacts-head">
+          <div>
+            <span>قائمة المستخدمين</span>
+            <h2>الموجهون الطلابيون</h2>
+          </div>
+          <b id="counselorCount">0</b>
         </div>
 
-        <div id="groupInfo" class="group-info">
-          <div class="group-avatar">ت</div>
-          <div><b>مجموعة التوجيه الطلابي</b><span>مساحة مشتركة للموجهين والمشرفين</span></div>
-        </div>
+        <div class="direct-picker">
+          <label for="contactSearch">بحث في الموجهين الطلابيين</label>
+          <div class="search-wrap"><span>⌕</span><input id="contactSearch" type="search" placeholder="اكتب اسم الموجه أو المدرسة..."></div>
 
-        <div id="directPicker" class="direct-picker" hidden>
-          <label for="contactSearch">ابحث عن مستخدم</label>
-          <div class="search-wrap"><span>⌕</span><input id="contactSearch" type="search" placeholder="اكتب اسم المستخدم أو المسمى..."></div>
+          <button id="groupChatItem" class="group-chat-item active" type="button">
+            <span class="group-avatar">م</span>
+            <span class="group-chat-copy">
+              <b>مجموعة الموجهين الطلابيين</b>
+              <small><span id="groupCounselorCount">0</span> موجه · محادثة جماعية</small>
+            </span>
+            <strong>👥</strong>
+          </button>
+
+          <div class="contacts-section-label">
+            <span>محادثات فردية</span>
+            <small>اضغط على أي اسم لبدء محادثة خاصة</small>
+          </div>
           <div id="contactList" class="contact-list"></div>
         </div>
 
         <div class="chat-side-note">
-          <b>الهوية تلقائية</b>
-          <p>الاسم والمسمى والمدرسة تأتي من <code>Users Data</code> ولا يتم إدخالها يدويًا.</p>
+          <b>قائمة تلقائية</b>
+          <p>تظهر هنا فقط الحسابات التي المسمى الوظيفي الحالي لها هو «موجه طلابي».</p>
         </div>
       </aside>
 
@@ -53,7 +65,7 @@
         <header class="conversation-head">
           <div class="conversation-title">
             <div id="conversationAvatar" class="conversation-avatar">ت</div>
-            <div><h2 id="conversationName">مجموعة التوجيه الطلابي</h2><p id="conversationMeta">الشات الجماعي لفريق التوجيه</p></div>
+            <div><h2 id="conversationName">مجموعة الموجهين الطلابيين</h2><p id="conversationMeta">المحادثة الجماعية لكل الموجهين الطلابيين</p></div>
           </div>
           <div class="conversation-tools">
             <span id="connectionState" class="connection-state">جاهز</span>
@@ -75,12 +87,12 @@
     </section>
   </main>
 
-  <script src="../bubble-schema.js?v=school-1.0.44"></script>
-  <script src="../bubble-config.js?v=school-1.0.44"></script>
-  <script src="../school-context.js?v=school-1.0.44"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.44"></script>
-  <script src="../school-directory.js?v=school-1.0.44"></script>
-  <script src="app.js?v=1.0.18.1"></script>
-  <script src="../global-shell.js?v=school-1.0.44"></script>
+  <script src="../bubble-schema.js?v=school-1.0.47"></script>
+  <script src="../bubble-config.js?v=school-1.0.47"></script>
+  <script src="../school-context.js?v=school-1.0.47"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.47"></script>
+  <script src="../school-directory.js?v=school-1.0.47"></script>
+  <script src="app.js?v=1.0.47"></script>
+  <script src="../global-shell.js?v=school-1.0.47"></script>
 </body>
 </html>
