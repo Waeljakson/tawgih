@@ -366,3 +366,10 @@
 - الحفاظ على الشات الجماعي والفردي دون تغيير في منطق البيانات.
 - إبقاء الهيدر أكثر نظافة: بوابة المنصات، الرئيسية، التنبيهات، الدعم.
 - إضافة cache-busting للهيدر لتفادي ظهور التصميم القديم من المتصفح.
+
+## V1.0.23 — School scope / records reliability
+- School is treated as the campus/complex for the school deployment.
+- Visible students are strictly filtered by Schools + Dep list + Grades.
+- `User Student` is used by its exact Bubble field name.
+- Records catalog renders before Bubble/archive network calls so all 16 digital records remain visible.
+- All 16 record definitions now have a Bubble persistence mapping using confirmed existing types/fields; aggregate lateness/absence tracking is preserved in `Guidance_Log` details.

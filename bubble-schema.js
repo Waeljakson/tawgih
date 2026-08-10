@@ -6,7 +6,7 @@
  */
 (function(global){
   global.MISHKAT_BUBBLE_SCHEMA = Object.freeze({
-    version: "2026-08-08-r5",
+    version: "2026-08-10-r6-school-scope",
     dataTypes: {
       academicYear:"academic year", usersData:"Users Data", students:"Students", terms:"terms", school:"School",
       department:"Department", grades:"Grades", class:"Class", jobTitle:"Job Title",
@@ -26,7 +26,7 @@
     },
     fields: {
       academicYear:{active:"Active",end:"End",start:"start",title:"title"},
-      usersData:{active:"Active",activitySchools:"activity schools",currentJob:"Current Job",dep:"Dep",depList:"Dep list",dob:"DOB",email:"Email",employeeCode:"Employee Code",enName:"En Name",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",gender:"Gender",grades:"Grades",idNumber:"ID Number",isRegistered:"Is Registered",jobTitle:"Job Title",joinDate:"join Date",phoneNumber:"Phone Number",profilePic:"Profile Pic",schools:"Schools",secondName:"Second Name",students:"Students",user:"User",userType:"User Type",thirdName:"Third Name"},
+      usersData:{active:"Active",activitySchools:"activity schools",currentJob:"Current Job",dep:"Dep",depList:"Dep list",dob:"DOB",email:"Email",employeeCode:"Employee Code",enName:"En Name",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",gender:"Gender",grades:"Grades",idNumber:"ID Number",isRegistered:"Is Registered",jobTitle:"Job Title",joinDate:"join Date",phoneNumber:"Phone Number",profilePic:"Profile Pic",schools:"Schools",secondName:"Second Name",students:"User Student",userStudent:"User Student",user:"User",userType:"User Type",thirdName:"Third Name"},
       department:{depName:"Dep. Name",grade:"Grade",order:"Order",schools:"Schools",studentDepartment:"stu dep",type:"type"},
       students:{active:"Active",class:"Class",code:"code",dep:"Dep",enrollment:"enrollment",familyName:"Family Name",firstName:"First Name",fullName:"Full Name",grade:"grade",localId:"local id",nationalId:"National ID",parentPhone:"Parent phone",parents:"parents",school:"School",secondName:"Second Name",thirdName:"Third Name",user:"user"},
 

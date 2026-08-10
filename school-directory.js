@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.15
+ * Mishkat School Platform - Bubble directory adapter V1.0.23
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -132,7 +132,8 @@
     const depRaw = resolveRef(pick(raw,["Dep","Department","department","stage","المرحلة"],""),lookup.departments);
     const gradeRaw = resolveRef(pick(raw,["grade","Grade","Grades","الصف"],""),lookup.grades);
     const classRaw = resolveRef(pick(raw,["Class","class","class_name","classroom","الفصل"],""),lookup.classes);
-    const campusRaw = pick(schoolRaw||{},["campus","Campus","complex","Complex","school_complex","المجمع"],"");
+    // Bubble School is the campus/complex (المجمع) in this deployment.
+    const campusRaw = schoolRaw;
     return {
       id,
       name: String(pick(raw,["Full Name","full_name","name","Name","Student Name","اسم الطالب","الاسم"],"")),
@@ -140,7 +141,7 @@
       code: String(pick(raw,["code"],"")),
       nationalId: String(pick(raw,["National ID","national_id"],"")),
       schoolName: labelOf(schoolRaw), schoolId: idOf(schoolRaw),
-      campus: labelOf(campusRaw) || labelOf(schoolRaw), campusId: idOf(campusRaw) || idOf(schoolRaw),
+      campus: labelOf(schoolRaw), campusId: idOf(schoolRaw),
       stage: labelOf(depRaw), stageId: idOf(depRaw),
       grade: labelOf(gradeRaw), gradeId: idOf(gradeRaw),
       className: labelOf(classRaw), classId: idOf(classRaw),
@@ -164,7 +165,7 @@
       employeeCode: String(pick(raw,["Employee Code","employee_code"],"")),
       phone: String(pick(raw,["Phone Number","phone","mobile"],"")),
       schoolName: labelOf(schoolRaw), schoolId:idOf(schoolRaw),
-      campus: labelOf(pick(schoolRaw||{},["campus","Campus","complex","Complex","المجمع"],"")) || labelOf(schoolRaw),
+      campus: labelOf(schoolRaw), campusId:idOf(schoolRaw),
       stage: labelOf(depRaw), stageId:idOf(depRaw),
       active: activeOf(raw,true), userId:idOf(pick(raw,["User","user"],"")), raw
     };
@@ -196,7 +197,7 @@
       employees:employees.map((x,i)=>normalizeEmployee(x,i,lookup)).filter(x=>x.name&&x.active),
       academicYears:(years.length?years:FALLBACK.academicYears).map(normalizeAcademicYear).filter(x=>x.name),
       terms:terms.map((x,i)=>normalizeSimple(x,i,"term")).filter(x=>x.name&&x.active),
-      campuses:listFrom(src,["campuses","complexes"]).map((x,i)=>normalizeSimple(x,i,"campus")).filter(x=>x.name&&x.active),
+      campuses:listFrom(src,["campuses","complexes","schools","Schools","School"]).map((x,i)=>normalizeSimple(x,i,"campus")).filter(x=>x.name&&x.active),
       stages:listFrom(src,["stages","departments","Departments","Department"]).map((x,i)=>normalizeSimple(x,i,"stage")).filter(x=>x.name&&x.active),
       grades:listFrom(src,["grades","Grades"]).map((x,i)=>normalizeSimple(x,i,"grade")).filter(x=>x.name&&x.active),
       classes:listFrom(src,["classes","Classes","Class"]).map((x,i)=>normalizeSimple(x,i,"class")).filter(x=>x.name&&x.active),
@@ -212,6 +213,24 @@
       guidanceObserv:listFrom(src,["guidanceObserv","Guidance_observ"]).map((x,i)=>normalizeLookup(x,i,"observ",["Title","title","name","Name"])).filter(x=>x.name&&x.active),
       raw:src
     };
+  }
+
+  function scopeStudentsToCurrentUser(rows=[]){
+    const c=global.MishkatSchoolContext?.getContext?.()||{};
+    const schoolIds=new Set((c.assignedSchoolIds||[]).map(String)),schoolNames=new Set((c.assignedSchoolNames||[]).map(norm));
+    const stageIds=new Set((c.assignedStageIds||[]).map(String)),stageNames=new Set((c.assignedStageNames||[]).map(norm));
+    const gradeIds=new Set((c.assignedGradeIds||[]).map(String)),gradeNames=new Set((c.assignedGradeNames||[]).map(norm));
+    const match=(id,name,ids,names)=>{
+      if(!ids.size&&!names.size)return true;
+      if(id&&ids.has(String(id)))return true;
+      if(name&&names.has(norm(name)))return true;
+      return false;
+    };
+    return (rows||[]).filter(student=>
+      match(student.schoolId,student.schoolName,schoolIds,schoolNames)&&
+      match(student.stageId,student.stage,stageIds,stageNames)&&
+      match(student.gradeId,student.grade,gradeIds,gradeNames)
+    );
   }
 
   let snapshot=normalize(FALLBACK);
@@ -259,11 +278,15 @@
       try{global.MishkatSchoolContext?.build?.();global.MishkatSchoolContext?.applyDocument?.(document);}catch(_error){}
     }
     snapshot=normalize(incoming||FALLBACK);
+    const beforeScope=snapshot.students.length;
+    snapshot.students=scopeStudentsToCurrentUser(snapshot.students);
     snapshot.connection={
       authenticated:Boolean(global.MishkatBubbleAuth?.isAuthenticated?.()),
       bootstrapLoaded,
       rawStudents:listFrom(incoming||{},["students","Students","schoolStudents","school_students"]).length,
       normalizedStudents:snapshot.students.length,
+      studentsBeforeSchoolScope:beforeScope,
+      schoolScopeApplied:true,
       employees:snapshot.employees.length
     };
     return snapshot;
@@ -295,8 +318,8 @@
     if(formData.incident_date||formData.SituationDate)payload.SituationDate=formData.incident_date||formData.SituationDate;
     if(student?.id)payload.Student=student.id;
     if(source?.id)payload.Source=source.id;
-    if(context.stageId||student?.stageId)payload.Department=context.stageId||student.stageId;
-    if(context.schoolId||student?.schoolId)payload.school=context.schoolId||student.schoolId;
+    if(student?.stageId||context.stageId)payload.Department=student?.stageId||context.stageId;
+    if(student?.schoolId||context.schoolId)payload.school=student?.schoolId||context.schoolId;
     if(student?.gradeId)payload.grade=student.gradeId;
     if(context.termId||term?.id)payload.Terms=context.termId||term.id;
     if(student?.guardianPhone)payload.Phone=student.guardianPhone;

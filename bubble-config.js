@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.21 TEST BRIDGE
+ * Mishkat School Platform — Bubble connection settings V1.0.23 SCHOOL-SCOPED TEST BRIDGE
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -52,13 +52,16 @@
         "Schools":out.schools,
         "Dep list":out.departments,
         "Grades":out.grades,
+        "User Student":out.students,
         "Students":out.students,
         "User":storage.get(USER_KEY)||""
       };
     }
     out.__mishkatScope={
       source:"guidance_bootstrap",
-      authoritativeStudents:true,
+      authoritativeStudents:false,
+      studentsFromUserStudent:true,
+      enforceSchoolIntersection:true,
       assignedSchools:true,
       assignedDepartments:true,
       assignedGrades:true
