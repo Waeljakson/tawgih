@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.37";
+const SCHOOL_SCHEMA_VERSION="1.0.38";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -600,16 +600,19 @@ function updateDailyIncidentCategoryControls({clearInactive=false}={}){
 }
 async function hydrateSelectedStudentClass(student,select,rowClassInput=null){
   if(!student)return student;
-  if(student.className){
+  if(student.className&&student.guardianPhone){
     if(rowClassInput)rowClassInput.value=student.className;
-    else setLinkedValue("class_name",student.className);
+    else{
+      setLinkedValue("class_name",student.className);
+      setLinkedValue("guardian_phone",student.guardianPhone);
+    }
     return student;
   }
 
-  if(rowClassInput)rowClassInput.value="جارٍ تحميل الفصل...";
-  else{
-    const classInput=el.dynamicRecordForm.querySelector('[data-field="class_name"]');
-    if(classInput)classInput.value="جارٍ تحميل الفصل...";
+  const classInput=!rowClassInput?el.dynamicRecordForm.querySelector('[data-field="class_name"]'):null;
+  if(!student.className){
+    if(rowClassInput)rowClassInput.value="جارٍ تحميل الفصل...";
+    else if(classInput)classInput.value="جارٍ تحميل الفصل...";
   }
 
   try{
@@ -617,17 +620,18 @@ async function hydrateSelectedStudentClass(student,select,rowClassInput=null){
     if(!hydrated)return student;
     if(select&&select.value&&![hydrated.id,hydrated.name].includes(select.value))return hydrated;
 
-    if(rowClassInput)rowClassInput.value=hydrated.className||"";
-    else{
+    if(rowClassInput){
+      rowClassInput.value=hydrated.className||"";
+      const row=select?.closest?.("tr");
+      const phone=row?.querySelector?.('[data-col="guardian_phone"]');
+      if(phone)phone.value=hydrated.guardianPhone||"";
+    }else{
       Object.entries(STUDENT_LINK_MAP).forEach(([fieldKey,studentKey])=>setLinkedValue(fieldKey,hydrated[studentKey]||""));
-      const box=ensureStudentSummary(select);
-      if(box){box.innerHTML=studentSummaryMarkup(hydrated);box.hidden=!box.innerHTML;}
     }
     return hydrated;
   }catch(error){
-    console.warn("Mishkat: Student Class hydration failed.",error);
+    console.warn("Mishkat: Student details hydration failed.",error);
     if(rowClassInput&&rowClassInput.value==="جارٍ تحميل الفصل...")rowClassInput.value="";
-    const classInput=el.dynamicRecordForm.querySelector('[data-field="class_name"]');
     if(classInput&&classInput.value==="جارٍ تحميل الفصل...")classInput.value="";
     return student;
   }
@@ -644,10 +648,8 @@ function studentSummaryMarkup(student){
   return items.map(([,label,value])=>`<span><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</span>`).join("");
 }
 function ensureStudentSummary(select){
-  if(!select || select.hasAttribute("data-col"))return null;
-  const label=select.closest("label");if(!label)return null;
-  let box=label.nextElementSibling?.matches?.("[data-student-summary]")?label.nextElementSibling:null;
-  if(!box){box=document.createElement("div");box.className="student-auto-summary";box.dataset.studentSummary="";box.hidden=true;label.insertAdjacentElement("afterend",box);}return box;
+  // بيانات الطالب تظهر في حقول النموذج نفسها؛ لا نضيف صفًا إضافيًا يغيّر أحجام الحقول.
+  return null;
 }
 function applyStudentToForm(student,select){
   const box=ensureStudentSummary(select);
@@ -655,7 +657,7 @@ function applyStudentToForm(student,select){
   setSchoolContextFromStudent(student);
   Object.entries(STUDENT_LINK_MAP).forEach(([fieldKey,studentKey])=>setLinkedValue(fieldKey,student[studentKey]||""));
   if(box){box.innerHTML=studentSummaryMarkup(student);box.hidden=!box.innerHTML;}
-  if(!student.className)hydrateSelectedStudentClass(student,select);
+  if(!student.className||!student.guardianPhone)hydrateSelectedStudentClass(student,select);
 }
 function refreshAllStudentSummaries(){
   el.dynamicRecordForm.querySelectorAll('input[data-source="students"]:not([data-col])').forEach(input=>{
@@ -685,7 +687,7 @@ function handleRepeaterStudent(input){
   input.value=student.name;
   if(cls)cls.value=student.className||"";
   if(phone)phone.value=student.guardianPhone||"";
-  if(student&&!student.className)hydrateSelectedStudentClass(student,input,cls);
+  if(student&&(!student.className||!student.guardianPhone))hydrateSelectedStudentClass(student,input,cls);
 
   // في الإرشاد الجمعي نملأ بيانات الجلسة من أول طالب مختار دون فرضها على باقي المشاركين.
   if(state.currentType==="group_guidance"){
@@ -713,6 +715,7 @@ const CATEGORY_ORDER = ["الكل","الجلسات الإرشادية","المو
 const state = {
   user: null, account: null, packageAccess: false, entitlements: [], currentView: "dashboard", currentType: null, currentRecordId: null,
   pendingSchoolLogo: null, records: [], archiveLoaded: false, catalogCategory: "الكل", directory: null,
+  studentReportStudents: [], studentReportRecords: [], studentReportsReady: false, studentReportsLoading: null,
   supportThread: null, supportMessages: [], supportPoll: null, adminUsers: [], adminRequests: [], adminEntitlements: [],
   adminSupportThreads: [], adminSelectedThread: null
 };
@@ -797,7 +800,7 @@ function setView(view){
   window.scrollTo({top:0,behavior:"smooth"});
   if(view==="archive")loadArchive();
   if(view==="studentReports"){
-    refreshDirectoryForNewRecord().catch(()=>{}).then(()=>loadArchive(true)).then(()=>refreshStudentReportIndex());
+    prepareStudentReportsView(false);
   }
   if(view==="recordReport")renderCurrentRecordReport();
   if(view==="admin"&&state.account?.is_system_admin)loadAdminData();
@@ -1005,7 +1008,7 @@ function renderField(field){
   if(field.type==="note")return `<div class="static-note">${escapeHtml(field.text||field.label)}</div>`;
   const value=field.value??"";
   const cls=`${spanClass(field)}${field.linkedReadonly?" linked-school-field":""}`;
-  if(field.type==="textarea")return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
+  if(field.type==="textarea")return `<details class="${cls} collapsible-textarea"${cleanText(value)?" open":""}><summary><span>${escapeHtml(field.label)}</span><small>${cleanText(value)?"تم إدخال بيانات — اضغط للعرض":"اضغط للكتابة"}</small></summary><div class="collapsible-textarea-body"><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</div></details>`;
   if(field.type==="student-search")return `<label class="${cls} student-search-field"><span>${escapeHtml(field.label)}</span><input type="search" list="studentDirectoryList" autocomplete="off" ${inputAttrs(field)} value="${escapeHtml(studentDisplayValue(value))}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
   if(field.type==="select"){const options=field.source?sourceOptions(field.source,value):(field.options||[]).map(opt=>`<option value="${escapeHtml(opt)}"${opt===value?" selected":""}>${escapeHtml(opt)}</option>`).join("");return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><select ${inputAttrs(field)}>${options}</select>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;}
   return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><input type="${escapeHtml(field.type||"text")}" ${inputAttrs(field)} value="${escapeHtml(value)}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
@@ -1160,7 +1163,7 @@ function openRecord(type,record=null){
   const def=RECORDS[type];if(!def)return;
   state.currentType=type;state.currentRecordId=record?.id||null;
   el.recordTitle.textContent=def.title;el.recordDescription.textContent=def.description;el.recordCategoryBadge.textContent=def.category;el.confidentialBadge.hidden=!def.confidential;
-  el.metaTitle.value=record?.title||def.title;
+  el.metaTitle.value=def.title;el.metaTitle.readOnly=true;el.metaTitle.setAttribute("aria-readonly","true");
   el.metaDate.value=(record?.record_date||todayISO()).slice(0,10);
   fillAcademicMeta(record?.academic_year||"",record?.academic_term||record?.form_data?.academic_term||"");
   fillSchoolContextMeta(record?.campus||record?.form_data?.campus||record?.form_data?.complex||"",record?.stage||record?.form_data?.stage||"");
@@ -1181,9 +1184,11 @@ async function saveCurrentRecord(){
   if(!state.currentType||!state.user)return;
   const def=RECORDS[state.currentType],formData=collectFormData();
   const requiredInputs=Array.from(el.dynamicRecordForm.querySelectorAll("[required]"));
-  const missing=requiredInputs.find(i=>!cleanText(i.value));if(missing){missing.focus();showToast("أكمل الحقول المطلوبة قبل الحفظ.",true);return;}
+  const missing=requiredInputs.find(i=>!cleanText(i.value));if(missing){const details=missing.closest("details");if(details)details.open=true;missing.focus();showToast("أكمل الحقول المطلوبة قبل الحفظ.",true);return;}
+  const invalidStudent=Array.from(el.dynamicRecordForm.querySelectorAll('input[data-source="students"],input[data-student-select]')).find(i=>cleanText(i.value)&&!selectedStudent(i.value));
+  if(invalidStudent){invalidStudent.focus();showToast("اكتب اسم الطالب ثم اختره من نتائج البحث.",true);return;}
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
-  const payload={user_id:state.user.id,record_type:state.currentType,title:cleanText(el.metaTitle.value)||def.title,student_name:def.studentKey?cleanText(formData[def.studentKey]):null,class_name:def.classKey?cleanText(formData[def.classKey]):null,record_date:el.metaDate.value||null,academic_year:cleanText(el.metaAcademicYear.value)||ctx.academicYear||null,academic_term:cleanText(el.metaAcademicTerm?.value)||ctx.term||null,campus:ctx.campus||null,stage:ctx.stage||null,status:el.metaStatus.value,is_confidential:!!def.confidential,form_data:formData,schema_version:SCHOOL_SCHEMA_VERSION};
+  const payload={user_id:state.user.id,record_type:state.currentType,title:def.title,student_name:def.studentKey?cleanText(formData[def.studentKey]):null,class_name:def.classKey?cleanText(formData[def.classKey]):null,record_date:el.metaDate.value||null,academic_year:cleanText(el.metaAcademicYear.value)||ctx.academicYear||null,academic_term:cleanText(el.metaAcademicTerm?.value)||ctx.term||null,campus:ctx.campus||null,stage:ctx.stage||null,status:el.metaStatus.value,is_confidential:!!def.confidential,form_data:formData,schema_version:SCHOOL_SCHEMA_VERSION};
   el.saveRecordButton.disabled=true;el.saveRecordButton.textContent="جارٍ الحفظ...";
   try{
     if(SCHOOL_EDITION){
@@ -1292,6 +1297,33 @@ function refreshStudentReportIndex(){
   el.studentReportAvailableCount.textContent=state.studentReportStudents.length;
   updateStudentReportClassOptions();
 }
+async function prepareStudentReportsView(force=false){
+  if(state.studentReportsLoading)return state.studentReportsLoading;
+  if(state.studentReportsReady&&!force){refreshStudentReportIndex();return true;}
+
+  state.studentReportsLoading=(async()=>{
+    state.studentReportsReady=false;
+    if(el.generateStudentReportButton)el.generateStudentReportButton.disabled=true;
+    showBox(el.studentReportStatus,"جارٍ تجهيز بيانات الطلاب والسجلات...");
+    try{
+      await refreshDirectoryForNewRecord();
+      await loadArchive(true);
+      refreshStudentReportIndex();
+      state.studentReportsReady=true;
+      hideBox(el.studentReportStatus);
+      return true;
+    }catch(error){
+      console.warn("Mishkat: student reports preparation failed.",error);
+      showBox(el.studentReportStatus,"تعذر تجهيز التقارير الآن. حاول مرة أخرى.",true);
+      return false;
+    }finally{
+      if(el.generateStudentReportButton)el.generateStudentReportButton.disabled=false;
+      state.studentReportsLoading=null;
+    }
+  })();
+  return state.studentReportsLoading;
+}
+
 function selectedStudentIndexEntry(){
   const key=normalizeStudentName(el.studentReportName?.value);
   return state.studentReportStudents.find(item=>item.key===key)||null;
@@ -1385,55 +1417,83 @@ function reportPeriodLabel(records,from,to){
   const dates=records.map(reportRecordDate).filter(Boolean).sort();
   return dates.length?`${formatDate(dates[0])} — ${formatDate(dates.at(-1))}`:"—";
 }
-function generateStudentReport(){
+async function generateStudentReport(){
   if(!isPremiumAccess()){showPaymentModal();return;}
-  const studentName=cleanText(el.studentReportName.value);const studentKey=normalizeStudentName(studentName);
-  if(!studentKey)return showBox(el.studentReportStatus,"اختر اسم الطالب أولًا.",true);
-  const known=selectedStudentIndexEntry();
-  if(!known)return showBox(el.studentReportStatus,"لم يتم العثور على هذا الطالب في السجلات المحفوظة.",true);
-  const classFilter=el.studentReportClass.value;const typeFilter=el.studentReportType.value;
-  const statusFilter=el.studentReportStatusFilter.value;const from=el.studentReportFrom.value;const to=el.studentReportTo.value;
-  const includeConfidential=el.studentReportIncludeConfidential.checked;
-  let records=(state.records||[]).filter(record=>{
-    if(!recordMatchesReportStudent(record,studentKey,classFilter))return false;
-    if(typeFilter&&record.record_type!==typeFilter)return false;
-    if(statusFilter&&record.status!==statusFilter)return false;
-    if(!includeConfidential&&record.is_confidential)return false;
-    const date=reportRecordDate(record);
-    if(from&&date&&date<from)return false;if(to&&date&&date>to)return false;
-    return true;
-  }).sort((a,b)=>reportRecordDate(b).localeCompare(reportRecordDate(a))||String(b.created_at).localeCompare(String(a.created_at)));
-  state.studentReportRecords=records;
-  if(!records.length){
-    el.studentReportDocument.hidden=true;el.printStudentReportButton.disabled=true;
-    return showBox(el.studentReportStatus,"لا توجد سجلات مطابقة للاختيارات الحالية.",true);
+  if(!state.studentReportsReady){
+    const ready=await prepareStudentReportsView(false);
+    if(!ready)return;
   }
+
+  const studentName=cleanText(el.studentReportName.value);
+  const studentKey=normalizeStudentName(studentName);
+  if(!studentKey)return showBox(el.studentReportStatus,"اختر اسم الطالب أولًا.",true);
+
+  let known=selectedStudentIndexEntry();
+  if(!known){
+    refreshStudentReportIndex();
+    known=selectedStudentIndexEntry();
+  }
+  if(!known)return showBox(el.studentReportStatus,"اختر الطالب من نتائج البحث.",true);
+
+  // التقرير دائمًا يشمل كل السجلات المرتبطة بالطالب المحدد.
+  const records=(state.records||[]).filter(record=>
+    recordMatchesReportStudent(record,studentKey,"")
+  ).sort((a,b)=>reportRecordDate(b).localeCompare(reportRecordDate(a))||String(b.created_at||"").localeCompare(String(a.created_at||"")));
+
+  state.studentReportRecords=records;
+  const displayName=known.name||studentName;
+
+  if(!records.length){
+    el.studentReportDocument.hidden=true;
+    el.printStudentReportButton.disabled=true;
+    return showBox(el.studentReportStatus,`لا يوجد سجلات للطالب ${displayName}.`);
+  }
+
   hideBox(el.studentReportStatus);
-  const classes=new Set();records.forEach(record=>recordStudentReferences(record).filter(ref=>normalizeStudentName(ref.name)===studentKey).forEach(ref=>{if(ref.className)classes.add(ref.className)}));
-  const displayName=known.name||studentName;const period=reportPeriodLabel(records,from,to);
+  const classes=new Set();
+  records.forEach(record=>recordStudentReferences(record)
+    .filter(ref=>normalizeStudentName(ref.name)===studentKey)
+    .forEach(ref=>{if(ref.className)classes.add(ref.className)}));
+
+  const period=reportPeriodLabel(records,"","");
   el.studentReportSchoolName.textContent=state.account?.school_name||"اسم المدرسة";
-  el.studentReportStudentName.textContent=displayName;el.studentReportProfileName.textContent=displayName;
-  el.studentReportProfileClasses.textContent=[...classes].join("، ")||classFilter||"غير محدد";
-  el.studentReportProfilePeriod.textContent=period;el.studentReportGeneratedAt.textContent=new Date().toLocaleDateString("ar-SA");
-  el.studentReportScope.textContent=`${records.length} سجل — ${typeFilter?(RECORDS[typeFilter]?.title||typeFilter):"جميع أنواع السجلات"} — ${period}`;
+  el.studentReportStudentName.textContent=displayName;
+  el.studentReportProfileName.textContent=displayName;
+  el.studentReportProfileClasses.textContent=[...classes].join("، ")||known.classes?.values?.().next?.().value||"غير محدد";
+  el.studentReportProfilePeriod.textContent=period;
+  el.studentReportGeneratedAt.textContent=new Date().toLocaleDateString("ar-SA");
+  el.studentReportScope.textContent=`${records.length} سجل — جميع السجلات المرتبطة بالطالب — ${period}`;
   el.studentReportCounselor.textContent=state.account?.full_name||state.user?.email||"—";
-  el.studentReportFooterCount.textContent=records.length;el.studentReportReference.textContent=buildStudentReportReference(displayName);
+  el.studentReportFooterCount.textContent=records.length;
+  el.studentReportReference.textContent=buildStudentReportReference(displayName);
+
   const logo=state.pendingSchoolLogo||state.account?.school_logo_data;
-  if(logo){el.studentReportSchoolLogo.src=logo;el.studentReportSchoolLogo.hidden=false;el.studentReportLogoPlaceholder.hidden=true}else{el.studentReportSchoolLogo.hidden=true;el.studentReportLogoPlaceholder.hidden=false}
+  if(logo){
+    el.studentReportSchoolLogo.src=logo;el.studentReportSchoolLogo.hidden=false;el.studentReportLogoPlaceholder.hidden=true;
+  }else{
+    el.studentReportSchoolLogo.hidden=true;el.studentReportLogoPlaceholder.hidden=false;
+  }
+
   el.studentReportTotal.textContent=records.length;
   el.studentReportIncidents.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.incidents.has(r.record_type)).length;
   el.studentReportGuidance.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.guidance.has(r.record_type)).length;
   el.studentReportAttendance.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.attendance.has(r.record_type)).length;
   el.studentReportCases.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.cases.has(r.record_type)).length;
-  const typeCounts=new Map();records.forEach(record=>typeCounts.set(record.record_type,(typeCounts.get(record.record_type)||0)+1));
-  el.studentReportTypeBreakdown.innerHTML=[...typeCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([type,count])=>{const def=RECORDS[type]||{title:type,icon:"▤"};return `<div class="report-type-chip"><span>${def.icon}</span><div><strong>${escapeHtml(def.title)}</strong><small>${count} سجل</small></div></div>`}).join("");
+
+  const typeCounts=new Map();
+  records.forEach(record=>typeCounts.set(record.record_type,(typeCounts.get(record.record_type)||0)+1));
+  el.studentReportTypeBreakdown.innerHTML=[...typeCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([type,count])=>{
+    const def=RECORDS[type]||{title:type,icon:"▤"};
+    return `<div class="report-type-chip"><span>${def.icon}</span><div><strong>${escapeHtml(def.title)}</strong><small>${count} سجل</small></div></div>`;
+  }).join("");
+
   el.studentReportTimeline.innerHTML=records.map((record,index)=>{
     const def=RECORDS[record.record_type]||{title:record.record_type,icon:"▤",category:"سجل"};
     return `<article class="student-report-event${record.is_confidential?" confidential":""}">
       <div class="student-report-marker"><span>${def.icon}</span><i></i></div>
       <div class="student-report-event-card">
         <header>
-          <div><span>${escapeHtml(def.category||"سجل")}</span><h3>${escapeHtml(record.title||def.title)}</h3><p>${escapeHtml(reportRecordSummary(record))}</p></div>
+          <div><span>${escapeHtml(def.category||"سجل")}</span><h3>${escapeHtml(def.title)}</h3><p>${escapeHtml(reportRecordSummary(record))}</p></div>
           <div class="report-event-meta"><strong>${formatDate(reportRecordDate(record))}</strong><small>${escapeHtml(record.class_name||"الفصل غير محدد")}</small><em class="status-badge ${escapeHtml(record.status)}">${reportStatusLabel(record.status)}</em>${record.is_confidential?'<b>سري</b>':""}</div>
         </header>
         <details class="report-record-details"${index===0?" open":""}>
@@ -1444,7 +1504,9 @@ function generateStudentReport(){
       </div>
     </article>`;
   }).join("");
-  el.studentReportDocument.hidden=false;el.printStudentReportButton.disabled=false;
+
+  el.studentReportDocument.hidden=false;
+  el.printStudentReportButton.disabled=false;
   el.studentReportDocument.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function resetStudentReport(){
@@ -1666,10 +1728,10 @@ function bindEvents(){
   el.dynamicRecordForm.addEventListener("change",handleSchoolBubbleChange);
   el.archiveSearch.addEventListener("input",debounce(renderArchive));el.archiveTypeFilter.addEventListener("change",renderArchive);el.archiveStatusFilter.addEventListener("change",renderArchive);el.refreshArchiveButton.addEventListener("click",()=>loadArchive(true));
   el.archiveList.addEventListener("click",e=>{const edit=e.target.closest("[data-edit-record]");if(edit)return openSavedRecord(edit.dataset.editRecord);const print=e.target.closest("[data-print-saved]");if(print)return openSavedRecord(print.dataset.printSaved,true);const report=e.target.closest("[data-student-report]");if(report)return openStudentReportForName(report.dataset.studentReport);const del=e.target.closest("[data-delete-record]");if(del)return deleteRecord(del.dataset.deleteRecord);});
-  if(el.studentReportName){el.studentReportName.addEventListener("change",updateStudentReportClassOptions);}
+  if(el.studentReportName){el.studentReportName.addEventListener("input",debounce(updateStudentReportClassOptions,120));el.studentReportName.addEventListener("change",updateStudentReportClassOptions);}
   if(el.generateStudentReportButton)el.generateStudentReportButton.addEventListener("click",generateStudentReport);
   if(el.resetStudentReportButton)el.resetStudentReportButton.addEventListener("click",resetStudentReport);
-  if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",()=>refreshDirectoryForNewRecord().catch(()=>{}).then(()=>loadArchive(true)).then(()=>{refreshStudentReportIndex();showToast("تم تحديث بيانات تقارير الطلاب.");}));
+  if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",async()=>{const ok=await prepareStudentReportsView(true);if(ok)showToast("تم تحديث بيانات تقارير الطلاب.");});
   if(el.printStudentReportButton)el.printStudentReportButton.addEventListener("click",printStudentReport);
   if(el.studentReportTimeline)el.studentReportTimeline.addEventListener("click",e=>{const open=e.target.closest("[data-open-report-record]");if(open)openSavedRecord(open.dataset.openReportRecord);});
   window.addEventListener("afterprint",restoreStudentReportPrintState);

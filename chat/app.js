@@ -59,7 +59,7 @@
         const peer=state.selectedEmployee?.id,me=currentUserId();
         if(!peer){rows=[];}else rows=rows.filter(r=>{const from=idOf(r?.Guide||r?.guide),to=idOf(r?.RecipientEmployee||r?.recipientEmployee);return(from===me&&to===peer)||(from===peer&&to===me);});
       }
-      state.messages=rows;renderMessages();setConn(s.remoteEnabled?.()?"متصل بـ Bubble":"وضع محلي");
+      state.messages=rows;renderMessages();setConn(s.remoteEnabled?.()?"متصل":"وضع محلي");
     }catch(err){console.error(err);state.messages=[];renderMessages();setConn("تعذر التحديث","error");}
     finally{state.loading=false;}
   }
