@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.32
+ * Mishkat School Platform - Bubble directory adapter V1.0.33
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -95,6 +95,21 @@
         return row&&typeof row==="object"?{...full,...row}:full;
       });
     };
+    const studentNameOf=row=>norm(String(pick(row||{},["Full Name","full_name","Student Name","student_name","Name","name","اسم الطالب","الاسم"],"")));
+    const hydrateStudentRefs=(refs,fullRows)=>{
+      const byId=new Map((fullRows||[]).map(row=>[idOf(row),row]).filter(([id])=>id));
+      const byName=new Map();
+      (fullRows||[]).forEach(row=>{const name=studentNameOf(row);if(!name)return;const list=byName.get(name)||[];list.push(row);byName.set(name,list);});
+      return (refs||[]).map(row=>{
+        const id=idOf(row);let full=id?byId.get(id):null;
+        if(!full&&row&&typeof row==="object"){
+          const name=studentNameOf(row),matches=name?(byName.get(name)||[]):[];
+          if(matches.length===1)full=matches[0];
+        }
+        if(!full)return row;
+        return row&&typeof row==="object"?{...full,...row}:full;
+      });
+    };
     const hydrateScoped=(p,e,{allowExtraFallback=true}={})=>{
       if(!p.length)return allowExtraFallback?e:[];
       return hydrateRefs(p,e);
@@ -150,7 +165,7 @@
       scopedStudentRefs=intersected.length?intersected:actualUserStudents;
     }
     const fullStudents=listFrom(extra,["students","Students","schoolStudents","school_students"]);
-    out.students=hydrateRefs(scopedStudentRefs,fullStudents);
+    out.students=hydrateStudentRefs(scopedStudentRefs,fullStudents);
 
     // Employee selectors use Users Data. Keep the full employee directory available here;
     // the records UI scopes it to Current User's Schools.
@@ -401,10 +416,14 @@
     return snapshot;
   }
 
-  async function load(){
-    if(activeLoadPromise)return activeLoadPromise;
+  async function load(options={}){
+    const force=Boolean(options?.force);
+    if(activeLoadPromise){
+      if(!force)return activeLoadPromise;
+      try{await activeLoadPromise;}catch(_e){}
+    }
     activeLoadPromise=(async()=>{
-      let incoming=global.MISHKAT_BUBBLE_DATA||null;
+      let incoming=force?null:(global.MISHKAT_BUBBLE_DATA||null);
       const config=global.MISHKAT_BUBBLE_CONFIG||{};
       let bootstrapLoaded=false;
 
@@ -412,7 +431,7 @@
       if(config.directoryEndpoint){
         try{
           if(typeof config.fetchDirectorySnapshot==="function"){
-            incoming=await config.fetchDirectorySnapshot();
+            incoming=await config.fetchDirectorySnapshot({force});
           }else if(!incoming){
             const response=await fetch(config.directoryEndpoint,{credentials:config.credentials||"include",headers:{"Accept":"application/json",...(config.headers||{})},cache:"no-store"});
             if(!response.ok)throw new Error(`HTTP ${response.status}`);
@@ -472,7 +491,7 @@
       const store=global.MishkatBubbleStore;
       let fullStudent=student.raw||{};
       try{
-        if(store?.get && student.id){
+        if(store?.get && student.id && looksLikeBubbleId(student.id)){
           const remote=await store.get("Students",student.id);
           if(remote&&typeof remote==="object")fullStudent={...fullStudent,...remote};
         }
@@ -551,5 +570,5 @@
     if(formData.situ_id)payload.situ=formData.situ_id;
     return payload;
   }
-  global.MishkatBubbleDirectory={load,getSnapshot,setSnapshot,currentAcademicYear,currentTerm,findStudent,hydrateStudentClass,findEmployee,findLookup,normalize,buildGuidanceSituationPayload,schema};global.MishkatSchoolDirectory=global.MishkatBubbleDirectory;
+  global.MishkatBubbleDirectory={load,refresh:()=>load({force:true}),getSnapshot,setSnapshot,currentAcademicYear,currentTerm,findStudent,hydrateStudentClass,findEmployee,findLookup,normalize,buildGuidanceSituationPayload,schema};global.MishkatSchoolDirectory=global.MishkatBubbleDirectory;
 })(window);
