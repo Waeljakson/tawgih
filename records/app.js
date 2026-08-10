@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.32";
+const SCHOOL_SCHEMA_VERSION="1.0.33";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -301,7 +301,7 @@ const RECORDS = {
         f("incident_details","الموقف","textarea",{span:12,rows:5,required:true,placeholder:"اكتب وصف الموقف كما حدث"}),
         f("action_codes","الإجراءات المتخذة","checklist",{options:DAILY_ACTION_CODES}),
         f("action_details","الإجراء","textarea",{span:12,rows:3,placeholder:"أضف تفاصيل الإجراء أو أي إجراء غير موجود بالقائمة"}),
-        f("referral_source","مصدر الإحالة","select",{span:6,options:[""],help:"يتم تحميل أسماء الموظفين من جدول الموظفين في Bubble، ويظهر اسم الموظف فقط."}),
+        f("referral_source","مصدر الإحالة","select",{span:6,options:[""],help:"يتم تحميل موظفي نفس المجمع ونفس المرحلة فقط من Users Data، ويظهر اسم الموظف فقط."}),
         f("notes","ملاحظات","textarea",{span:12,rows:4})
       ]),
       section("المتابعة الأسبوعية", [
@@ -406,12 +406,18 @@ function directoryItems(source){
     );
   }
   if(source==="employees"){
-    // مصدر الإحالة = Users Data، مع دعم الموظف الموزع على أكثر من School.
-    if(!schoolIds.size&&!schoolNames.size)return [];
+    // مصدر الإحالة = Users Data داخل نفس المجمع ونفس المرحلة فقط.
+    const stageIds=new Set((ctx.assignedStageIds||[]).map(String));
+    const stageNames=new Set((ctx.assignedStageNames||[]).map(normScope));
+    if((!schoolIds.size&&!schoolNames.size)||(!stageIds.size&&!stageNames.size))return [];
     return items.filter(emp=>{
-      const ids=(emp.schoolIds?.length?emp.schoolIds:[emp.schoolId]).filter(Boolean).map(String);
-      const names=(emp.schoolNames?.length?emp.schoolNames:[emp.schoolName]).filter(Boolean).map(normScope);
-      return ids.some(id=>schoolIds.has(id))||names.some(name=>schoolNames.has(name));
+      const empSchoolIds=(emp.schoolIds?.length?emp.schoolIds:[emp.schoolId]).filter(Boolean).map(String);
+      const empSchoolNames=(emp.schoolNames?.length?emp.schoolNames:[emp.schoolName]).filter(Boolean).map(normScope);
+      const empStageIds=(emp.stageIds?.length?emp.stageIds:[emp.stageId]).filter(Boolean).map(String);
+      const empStageNames=(emp.stageNames?.length?emp.stageNames:[emp.stage]).filter(Boolean).map(normScope);
+      const schoolMatch=empSchoolIds.some(id=>schoolIds.has(id))||empSchoolNames.some(name=>schoolNames.has(name));
+      const stageMatch=empStageIds.some(id=>stageIds.has(id))||empStageNames.some(name=>stageNames.has(name));
+      return schoolMatch&&stageMatch;
     });
   }
   if(source==="campuses"){
@@ -1005,6 +1011,51 @@ function updateRecordIdentity(){
   if(logo){el.recordSchoolLogo.src=logo;el.recordSchoolLogo.hidden=false;el.recordLogoPlaceholder.hidden=true;}else{el.recordSchoolLogo.hidden=true;el.recordLogoPlaceholder.hidden=false;}
 }
 
+function showNewRecordDataLoader(message="جارٍ تجهيز بيانات السجل..."){
+  let wrap=document.getElementById("newRecordDataLoader");
+  if(!wrap){
+    wrap=document.createElement("div");wrap.id="newRecordDataLoader";wrap.className="new-record-data-loader";
+    wrap.setAttribute("role","status");wrap.setAttribute("aria-live","polite");
+    wrap.innerHTML=`<div class="nrdl-card">
+      <div class="nrdl-logo" aria-hidden="true"><img src="../assets/school-logo.png" alt=""><span class="nrdl-fill"><img src="../assets/school-logo.png" alt=""></span></div>
+      <strong>جارٍ تحميل بيانات السجل</strong><small data-nrdl-message></small>
+      <div class="nrdl-bar" aria-hidden="true"><i></i></div>
+    </div>`;
+    document.body.appendChild(wrap);
+  }
+  const msg=wrap.querySelector("[data-nrdl-message]");if(msg)msg.textContent=message;
+  wrap.classList.remove("done","complete");wrap.hidden=false;
+  requestAnimationFrame(()=>wrap.classList.add("visible"));
+  return wrap;
+}
+function hideNewRecordDataLoader(){
+  const wrap=document.getElementById("newRecordDataLoader");if(!wrap)return;
+  wrap.classList.add("complete");
+  const msg=wrap.querySelector("[data-nrdl-message]");if(msg)msg.textContent="تم تحميل الطلاب والفصول والموظفين";
+  setTimeout(()=>{wrap.classList.add("done");wrap.classList.remove("visible");setTimeout(()=>{wrap.hidden=true;},260);},260);
+}
+async function refreshDirectoryForNewRecord(){
+  const directory=window.MishkatBubbleDirectory;
+  if(!directory?.load)return state.directory;
+  const next=await directory.load({force:true});
+  if(next&&typeof next==="object")state.directory=next;
+  fillAcademicMeta(el.metaAcademicYear?.value||"",el.metaAcademicTerm?.value||"");
+  fillSchoolContextMeta(el.metaCampus?.value||"",el.metaStage?.value||"");
+  return state.directory;
+}
+async function openNewRecordWithFreshData(type){
+  if(!type)return;
+  showNewRecordDataLoader("يتم جلب الطلاب والفصول وموظفي المرحلة من Bubble");
+  try{
+    await refreshDirectoryForNewRecord();
+    openRecord(type,null);
+  }catch(error){
+    console.warn("Mishkat: fresh record directory load failed; opening with last available data.",error);
+    showToast("تعذر تحديث بعض البيانات الآن؛ تم فتح السجل بآخر بيانات متاحة.",true);
+    openRecord(type,null);
+  }finally{hideNewRecordDataLoader();}
+}
+
 function openRecord(type,record=null){
   const def=RECORDS[type];if(!def)return;
   state.currentType=type;state.currentRecordId=record?.id||null;
@@ -1019,7 +1070,7 @@ function openRecord(type,record=null){
   updateRecordIdentity();setView("editor");
 }
 
-function clearCurrentRecord(){if(state.currentType)openRecord(state.currentType,null);}
+function clearCurrentRecord(){if(state.currentType)openNewRecordWithFreshData(state.currentType);}
 
 const SCHOOL_RECORDS_KEY="mishkat_school_records_local_v3";
 function readLocalSchoolRecords(){try{return JSON.parse(localStorage.getItem(SCHOOL_RECORDS_KEY)||"[]")||[]}catch(_e){return[]}}
@@ -1492,7 +1543,7 @@ function bindEvents(){
   el.recordsCatalog.addEventListener("click",e=>{const b=e.target.closest("[data-open-record]");if(b)openRecordReport(b.dataset.openRecord);});
   el.backToDashboardButton.addEventListener("click",returnToCurrentRecordReport);el.newRecordButton.addEventListener("click",clearCurrentRecord);el.saveRecordButton.addEventListener("click",saveCurrentRecord);el.printRecordButton.addEventListener("click",printCurrentRecord);
   if(el.recordReportBackButton)el.recordReportBackButton.addEventListener("click",()=>setView("dashboard"));
-  if(el.recordReportNewButton)el.recordReportNewButton.addEventListener("click",()=>{if(state.currentType)openRecord(state.currentType,null);});
+  if(el.recordReportNewButton)el.recordReportNewButton.addEventListener("click",()=>{if(state.currentType)openNewRecordWithFreshData(state.currentType);});
   if(el.recordReportSearch)el.recordReportSearch.addEventListener("input",debounce(renderCurrentRecordReport,120));
   if(el.recordReportYear)el.recordReportYear.addEventListener("change",renderCurrentRecordReport);
   if(el.recordReportTerm)el.recordReportTerm.addEventListener("change",renderCurrentRecordReport);

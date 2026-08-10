@@ -158,6 +158,17 @@
 @media(max-width:620px){.record-report-heading{flex-direction:column}.record-new-cta{width:100%}.record-report-title-group{width:100%;flex-direction:column}.record-report-filters{grid-template-columns:1fr}.record-report-search{grid-column:auto}.record-report-count{min-height:58px}.record-report-panel{border-radius:16px}.record-report-table-shell{padding:6px}}
 @media print{#recordReportView{display:none!important}}
 
-/* V1.0.32 — Daily incident conditional dropdowns */
+/* V1.0.33 — Daily incident conditional dropdowns */
 .incident-field-disabled{opacity:.52;transition:opacity .18s ease}
 .incident-field-disabled select{background:#f1f5f7!important;color:#8b99a1!important;cursor:not-allowed}
+
+/* V1.0.33 — New Record fresh-data loader */
+.new-record-data-loader[hidden]{display:none!important}
+.new-record-data-loader{position:fixed;inset:0;z-index:2147482600;display:grid;place-items:center;background:rgba(247,251,249,.96);backdrop-filter:blur(6px);opacity:0;transition:opacity .22s ease;direction:rtl}
+.new-record-data-loader.visible{opacity:1}.new-record-data-loader.done{opacity:0;pointer-events:none}
+.nrdl-card{display:grid;place-items:center;gap:12px;padding:24px 30px;text-align:center;font-family:Cairo,Tahoma,sans-serif}
+.nrdl-logo{position:relative;width:118px;height:118px}.nrdl-logo>img,.nrdl-fill img{position:absolute;inset:0;width:118px;height:118px;object-fit:contain}
+.nrdl-logo>img{filter:grayscale(1);opacity:.18}.nrdl-fill{position:absolute;left:0;right:0;bottom:0;height:5%;overflow:hidden;animation:nrdlFill 1.55s ease-in-out infinite}.nrdl-fill img{top:auto;bottom:0}
+.new-record-data-loader.complete .nrdl-fill{animation:none;height:100%;transition:height .25s ease}.nrdl-card strong{color:#244b31;font-weight:900}.nrdl-card small{color:#6d7e74;font-size:.76rem;font-weight:700}
+.nrdl-bar{width:180px;height:5px;background:#dfe9e2;border-radius:99px;overflow:hidden}.nrdl-bar i{display:block;width:38%;height:100%;background:#3c7c48;border-radius:inherit;animation:nrdlBar 1.05s ease-in-out infinite}
+@keyframes nrdlFill{0%{height:4%}75%{height:94%}100%{height:99%}}@keyframes nrdlBar{0%{transform:translateX(210%)}100%{transform:translateX(-310%)}}
