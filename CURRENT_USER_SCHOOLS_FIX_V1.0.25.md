@@ -1,4 +1,4 @@
-# V1.0.25 — Current User Schools scope
+# V1.0.26 — Current User Schools scope
 
 المجمع مصدره الوحيد في الواجهة هو `guidance_bootstrap.schools`، والذي يجب أن تكون قيمته في Bubble: `Current User's user data's Schools`.
 

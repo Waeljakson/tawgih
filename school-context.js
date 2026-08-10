@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.25
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.26
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -131,7 +131,7 @@
     const src=source();const stored=storedContext();const lookup=createLookup(src);const rawUser=resolveUsersData(src,lookup,stored);const user=flattenUser(rawUser,lookup);
     const employees=lookup.usersData.map((x,i)=>normalizeEmployee(x,i,lookup)).filter(e=>e.name&&e.active);
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
-    const year=currentAcademicYearOf(years),term=currentOf(terms);const manager=autoManager(user,employees,src,lookup);const schoolType=user.schoolType||"boys";
+    const year=currentAcademicYearOf(years),term=currentOf(terms);
     const roleKey=roleKeyOf(user.counselorRole||"");
     // AUTHORITATIVE DISTRIBUTION SCOPE FROM BUBBLE:
     // guidance_bootstrap.schools == Current User's user data's Schools
@@ -152,11 +152,36 @@
     const assignedGradeNames=[...new Set(assignedGradeRows.map(text).filter(Boolean))];
     const primarySchool=assignedSchoolRows[0]||null;
     const primaryStage=assignedStageRows[0]||null;
+    // المجمع مصدره الوحيد هنا هو Current User's user data's Schools عبر guidance_bootstrap.schools.
     const resolvedSchoolName=text(primarySchool)||assignedSchoolNames[0]||"";
     const resolvedSchoolId=idOf(primarySchool)||assignedSchoolIds[0]||"";
-    const resolvedCampusName=assignedSchoolNames.length?assignedSchoolNames.join("، "):resolvedSchoolName;
-    const resolvedStage=user.stage||text(primaryStage)||assignedStageNames[0]||stored.stage||"";
-    const resolvedStageId=user.stageId||idOf(primaryStage)||assignedStageIds[0]||stored.stageId||"";
+    const resolvedCampusName=assignedSchoolNames.join("، ");
+    // المرحلة مصدرها Current User's user data's Dep list عبر guidance_bootstrap.departments.
+    const resolvedStage=assignedStageNames.length?assignedStageNames.join("، "):(text(primaryStage)||user.stage||stored.stage||"");
+    const resolvedStageId=idOf(primaryStage)||assignedStageIds[0]||user.stageId||stored.stageId||"";
+
+    // نوع المدرسة يؤخذ من Thing المدرسة/المجمع إن كان الحقل متاحًا، وإلا من اسم المجمع، ثم افتراضي بنين.
+    const schoolTypeValue=pick(primarySchool||{},["school_type","schoolType","type","gender","audience_type","school_gender","نوع المدرسة","نوع_المدرسة","النوع"],"");
+    const girlsFlag=pick(primarySchool||{},["is_girls_school","girls_school","isGirlsSchool","مدرسة بنات"],null);
+    const schoolType=girlsFlag===true?"girls":girlsFlag===false?"boys":schoolTypeOf(schoolTypeValue,primarySchool,resolvedCampusName,user.schoolType);
+
+    // مدير المدرسة: أولًا العلاقة الموجودة على School نفسها، ثم موظف بدور مدير ومطابق لنفس School فقط.
+    let manager=null;
+    const managerRef=pick(primarySchool||{},["schoolManager","school_manager","school_manager_name","principal","principal_name","school_principal","manager","manager_name","director","director_name","مدير المدرسة","مديرة المدرسة"],null);
+    if(managerRef){
+      const d=resolveRef(managerRef,makeIndex(lookup.usersData));
+      const directName=text(d);const directId=idOf(d);
+      manager=employees.find(e=>(directId&&e.id===directId)||(directName&&same(e.name,directName)))||(directName?{id:directId,name:directName,role:text(roleValue(d||{},lookup)),raw:d}:null);
+    }
+    if(!manager&&assignedSchoolIds.length){
+      const candidates=employees.filter(e=>e.active&&isManagerRole(e.role)&&assignedSchoolIds.includes(e.schoolId));
+      const ranked=candidates.map(e=>({e,score:(assignedStageIds.includes(e.stageId)?8:0)+(assignedStageNames.some(n=>same(n,e.stage))?4:0)})).sort((a,b)=>b.score-a.score);
+      manager=ranked[0]?.e||null;
+    }
+    if(!manager&&assignedSchoolNames.length){
+      const candidates=employees.filter(e=>e.active&&isManagerRole(e.role)&&assignedSchoolNames.some(n=>same(n,e.schoolName)||same(n,e.campus)));
+      manager=candidates[0]||null;
+    }
     const canViewSchoolStats=["school_manager","counselor"].includes(roleKey);
     const canViewSupervisionStats=["general_supervisor","complexes_director","complex_supervisor"].includes(roleKey);
     const context={
@@ -211,7 +236,7 @@
   const originals=new WeakMap();
   function genderizeString(value,c){if(c.schoolType!=="girls")return value;return String(value).replace(/الموجه الطلابي/g,c.counselorTitle||"الموجهة الطلابية").replace(/مدير المدرسة/g,c.managerTitle||"مديرة المدرسة").replace(/مدرسة بنين/g,"مدرسة بنات").replace(/صياغات الطلاب/g,"صياغات الطالبات").replace(/شهادات الطلاب/g,"شهادات الطالبات").replace(/تقارير الطلاب/g,"تقارير الطالبات").replace(/نوع الطلاب/g,"نوع الطالبات").replace(/الطلاب/g,"الطالبات").replace(/طلاب/g,"طالبات").replace(/اسم الطالب(?!ة)/g,"اسم الطالبة").replace(/بيانات الطالب(?!ة)/g,"بيانات الطالبة").replace(/ولي أمر الطالب(?!ة)/g,"ولي أمر الطالبة").replace(/ابنكم/g,"ابنتكم").replace(/الطالب(?!ات|ة)/g,"الطالبة");}
   function applyGenderLanguage(root,c){if(!root?.querySelectorAll)return;document.documentElement.dataset.schoolType=c.schoolType;document.body?.setAttribute("data-school-type",c.schoolType);const nodes=[];const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(node){const p=node.parentElement;if(!p||["SCRIPT","STYLE","TEXTAREA","OPTION"].includes(p.tagName))return NodeFilter.FILTER_REJECT;return node.nodeValue?.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;}});while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{if(!originals.has(node))originals.set(node,node.nodeValue);const next=genderizeString(originals.get(node),c);if(node.nodeValue!==next)node.nodeValue=next;});root.querySelectorAll("input[placeholder],textarea[placeholder]").forEach(el=>{if(!el.dataset.originalPlaceholder)el.dataset.originalPlaceholder=el.getAttribute("placeholder")||"";el.setAttribute("placeholder",genderizeString(el.dataset.originalPlaceholder,c));});}
-  function applyDocument(root=document){const c=getContext();const ids={counselorName:["counselorName","counselorInput","profileFullName"],schoolName:["schoolName","schoolInput","schoolProfileName"],managerName:["directorInput","principalName","supervisorInput","profileManagerName"],stage:["schoolStage","stageSelect","stageFilter","metaStage","profileStageName"],campus:["metaCampus","campusInput","complexInput","profileCampusName"],schoolTypeLabel:["profileSchoolType"],academicYear:["yearInput","metaAcademicYear"],term:["termSelect","metaAcademicTerm"]};Object.entries(ids).forEach(([key,list])=>list.forEach(id=>setControl(document.getElementById(id),c[key]||"")));root.querySelectorAll?.('[data-field="counselor_name"],[data-field="counselor5"]').forEach(el=>setControl(el,c.counselorName));root.querySelectorAll?.('[data-field="principal_name"]').forEach(el=>setControl(el,c.managerName));root.querySelectorAll?.('[data-field="stage"]').forEach(el=>setControl(el,c.stage));root.querySelectorAll?.('[data-field="campus"],[data-field="complex"]').forEach(el=>setControl(el,c.campus));setText("headerUserName",c.counselorName);setText("userName",c.counselorName);setText("recordCounselorName",c.counselorName);setText("headerSchoolName",c.schoolName);setText("recordSchoolName",c.schoolName);setText("profileAssignedCampus",c.campus||"—");setText("profileAssignedStage",c.stage||"—");setText("profileAssignedUser",c.counselorName||"—");setText("profileAssignedSchool",c.schoolName||"—");setText("profileAssignedSchoolType",c.schoolTypeLabel);setText("profileAssignedManager",c.managerName||"—");root.querySelectorAll?.('[data-school-context-display]').forEach(el=>{const key=el.dataset.schoolContextDisplay;const value=c[key]||"—";if(el.textContent!==value)el.textContent=value;});const audience=document.getElementById("audienceBadge");if(audience&&/^(—|صياغات|شهادات|تقارير)/.test(audience.textContent.trim()))audience.textContent=c.schoolTypeLabel;const executor=document.getElementById("executorInput");if(executor&&c.schoolType==="girls"&&/الموجه الطلابي/.test(executor.value||""))executor.value=(executor.value||"").replace(/الموجه الطلابي/g,c.counselorTitle||"الموجهة الطلابية").replace(/العاملين/g,"العاملات");const planTitle=document.getElementById("planTitle");if(planTitle&&c.schoolType==="girls"&&/للموجه الطلابي/.test(planTitle.value||""))planTitle.value=(planTitle.value||"").replace(/للموجه الطلابي/g,"للموجهة الطلابية");applyGenderLanguage(root,c);}
+  function applyDocument(root=document){const c=getContext();const ids={counselorName:["counselorName","counselorInput","profileFullName"],schoolName:["schoolName","schoolInput"],managerName:["directorInput","principalName","supervisorInput","profileManagerName"],stage:["schoolStage","stageSelect","stageFilter","metaStage","profileStageName"],campus:["metaCampus","campusInput","complexInput","profileCampusName"],schoolTypeLabel:["profileSchoolType"],academicYear:["yearInput","metaAcademicYear"],term:["termSelect","metaAcademicTerm"]};Object.entries(ids).forEach(([key,list])=>list.forEach(id=>setControl(document.getElementById(id),c[key]||"")));root.querySelectorAll?.('[data-field="counselor_name"],[data-field="counselor5"]').forEach(el=>setControl(el,c.counselorName));root.querySelectorAll?.('[data-field="principal_name"]').forEach(el=>setControl(el,c.managerName));root.querySelectorAll?.('[data-field="stage"]').forEach(el=>setControl(el,c.stage));root.querySelectorAll?.('[data-field="campus"],[data-field="complex"]').forEach(el=>setControl(el,c.campus));setText("headerUserName",c.counselorName);setText("userName",c.counselorName);setText("recordCounselorName",c.counselorName);setText("headerSchoolName",c.schoolName);setText("recordSchoolName",c.schoolName);setText("profileAssignedCampus",c.campus||"—");setText("profileAssignedStage",c.stage||"—");setText("profileAssignedUser",c.counselorName||"—");setText("profileAssignedSchool",c.schoolName||"—");setText("profileAssignedSchoolType",c.schoolTypeLabel);setText("profileAssignedManager",c.managerName||"—");root.querySelectorAll?.('[data-school-context-display]').forEach(el=>{const key=el.dataset.schoolContextDisplay;const value=c[key]||"—";if(el.textContent!==value)el.textContent=value;});const audience=document.getElementById("audienceBadge");if(audience&&/^(—|صياغات|شهادات|تقارير)/.test(audience.textContent.trim()))audience.textContent=c.schoolTypeLabel;const executor=document.getElementById("executorInput");if(executor&&c.schoolType==="girls"&&/الموجه الطلابي/.test(executor.value||""))executor.value=(executor.value||"").replace(/الموجه الطلابي/g,c.counselorTitle||"الموجهة الطلابية").replace(/العاملين/g,"العاملات");const planTitle=document.getElementById("planTitle");if(planTitle&&c.schoolType==="girls"&&/للموجه الطلابي/.test(planTitle.value||""))planTitle.value=(planTitle.value||"").replace(/للموجه الطلابي/g,"للموجهة الطلابية");applyGenderLanguage(root,c);}
   async function refreshFromEndpoint(){const cfg=global.MISHKAT_BUBBLE_CONFIG||{};if(!cfg.directoryEndpoint||global.MISHKAT_BUBBLE_DATA)return;try{const response=await fetch(cfg.directoryEndpoint,{credentials:cfg.credentials||"include",headers:{"Accept":"application/json",...(cfg.headers||{})},cache:"no-store"});if(!response.ok)throw new Error(`HTTP ${response.status}`);const payload=await response.json();global.MISHKAT_BUBBLE_DATA=typeof cfg.normalizeDirectoryPayload==="function"?cfg.normalizeDirectoryPayload(payload):(payload?.response||payload?.data||payload);state.loaded=false;build();applyDocument(document);global.dispatchEvent(new CustomEvent("mishkat:school-context-changed",{detail:getContext()}));}catch(error){console.warn("School context endpoint unavailable; using current/local data.",error);}}
   function boot(){build();applyDocument(document);refreshFromEndpoint();let scheduled=false;const scheduleApply=()=>{if(scheduled)return;scheduled=true;setTimeout(()=>{scheduled=false;applyDocument(document)},0);};const observer=new MutationObserver(mutations=>{if(mutations.some(m=>m.addedNodes&&m.addedNodes.length))scheduleApply();});observer.observe(document.documentElement,{childList:true,subtree:true});let rounds=0;const timer=setInterval(()=>{applyDocument(document);if(++rounds>=4)clearInterval(timer)},400);global.addEventListener("focus",scheduleApply);global.dispatchEvent(new CustomEvent("mishkat:school-context-ready",{detail:getContext()}));}
   global.MishkatSchoolContext={build,getContext,getEmployees,getStudents,setManager,applyDocument,schoolTypeOf,roleKeyOf,schema};
