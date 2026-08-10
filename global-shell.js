@@ -1,6 +1,6 @@
 "use strict";
 (function(global){
-  if(global.__MishkatGlobalShellV1200)return;global.__MishkatGlobalShellV1200=true;
+  if(global.__MishkatGlobalShellV1320)return;global.__MishkatGlobalShellV1320=true;
   const script=document.currentScript;const baseHref=script?.src||((location.href&&!location.href.startsWith('about:'))?location.href:'http://localhost/global-shell.js');const ROOT=new URL('./',baseHref);
   const A=(p)=>new URL(p,ROOT).href;
   const platforms=[
@@ -31,9 +31,78 @@
   function link(x){return `<a class="mgs-link ${currentKey()===x.key?'active':''}" href="${A(x.href)}"><i>${x.icon}</i><strong>${esc(x.title)}</strong></a>`}
   function ensureCss(href,id){if(document.getElementById(id))return;const l=document.createElement('link');l.id=id;l.rel='stylesheet';l.href=href;document.head.appendChild(l)}
   function loadScript(src,id){return new Promise(resolve=>{if(global[id])return resolve();const exists=[...document.scripts].find(s=>s.src===src);if(exists){exists.addEventListener('load',resolve,{once:true});return resolve()}const s=document.createElement('script');s.src=src;s.async=false;s.onload=resolve;s.onerror=resolve;document.head.appendChild(s)})}
+  function dataAlreadyReady(){
+    const snap=global.MishkatBubbleDirectory?.getSnapshot?.();
+    const phase=snap?.connection?.phase||"";
+    return Boolean(phase&&phase!=="fallback"&&(snap?.students?.length||snap?.employees?.length||snap?.campuses?.length||snap?.stages?.length));
+  }
+  function ensureDataLoader(){
+    if(document.getElementById("mishkatDataLoader"))return;
+    if(global.MishkatBubbleAuth?.isAuthenticated&&!global.MishkatBubbleAuth.isAuthenticated())return;
+    if(dataAlreadyReady())return;
+
+    const style=document.createElement("style");
+    style.id="mishkatDataLoaderStyle";
+    style.textContent=`
+      .mishkat-data-loader{position:fixed;inset:0;z-index:2147482500;display:grid;place-items:center;background:rgba(247,251,249,.97);backdrop-filter:blur(5px);font-family:Cairo,Tahoma,sans-serif;direction:rtl;transition:opacity .28s ease}
+      .mishkat-data-loader.done{opacity:0;pointer-events:none}
+      .mdl-card{display:grid;place-items:center;gap:13px;text-align:center;padding:24px 30px}
+      .mdl-logo{position:relative;width:118px;height:118px}
+      .mdl-logo>img,.mdl-fill img{position:absolute;inset:0;width:118px;height:118px;object-fit:contain}
+      .mdl-logo>img{filter:grayscale(1);opacity:.18}
+      .mdl-fill{position:absolute;left:0;right:0;bottom:0;height:7%;overflow:hidden;animation:mishkatLogoFill 1.65s cubic-bezier(.35,.02,.25,1) infinite}
+      .mdl-fill img{top:auto;bottom:0;filter:none;opacity:1}
+      .mishkat-data-loader.complete .mdl-fill{animation:none;height:100%;transition:height .32s ease}
+      .mdl-card strong{font-size:15px;color:#244b31;font-weight:900}
+      .mdl-card small{font-size:11px;color:#718078;font-weight:700}
+      .mdl-progress{width:170px;height:5px;border-radius:99px;background:#dfe9e2;overflow:hidden}
+      .mdl-progress i{display:block;width:38%;height:100%;border-radius:inherit;background:#3c7c48;animation:mishkatProgress 1.15s ease-in-out infinite}
+      @keyframes mishkatLogoFill{0%{height:5%}72%{height:92%}100%{height:99%}}
+      @keyframes mishkatProgress{0%{transform:translateX(210%)}100%{transform:translateX(-310%)}}
+      @media(prefers-reduced-motion:reduce){.mdl-fill,.mdl-progress i{animation-duration:3s}}
+    `;
+    document.head.appendChild(style);
+
+    const wrap=document.createElement("div");
+    wrap.id="mishkatDataLoader";
+    wrap.className="mishkat-data-loader";
+    wrap.setAttribute("role","status");
+    wrap.setAttribute("aria-live","polite");
+    wrap.innerHTML=`
+      <div class="mdl-card">
+        <div class="mdl-logo" aria-hidden="true">
+          <img src="${A('assets/school-logo.png')}" alt="">
+          <span class="mdl-fill"><img src="${A('assets/school-logo.png')}" alt=""></span>
+        </div>
+        <strong>جارٍ جلب بيانات مدارس المشكاة</strong>
+        <small id="mishkatDataLoaderText">الطلاب والفصول والموظفون وبيانات التوزيع</small>
+        <span class="mdl-progress" aria-hidden="true"><i></i></span>
+      </div>`;
+    document.body.appendChild(wrap);
+
+    let finished=false;
+    const finish=()=>{
+      if(finished)return;finished=true;
+      wrap.classList.add("complete");
+      const txt=wrap.querySelector("#mishkatDataLoaderText");
+      if(txt)txt.textContent="تم تحميل البيانات";
+      setTimeout(()=>{wrap.classList.add("done");setTimeout(()=>wrap.remove(),320)},320);
+    };
+    global.addEventListener("mishkat:directory-loaded",finish,{once:true});
+    global.addEventListener("mishkat:directory-ready",finish,{once:true});
+    setTimeout(()=>{if(dataAlreadyReady())finish()},80);
+    setTimeout(()=>{
+      if(!finished){
+        const txt=wrap.querySelector("#mishkatDataLoaderText");
+        if(txt)txt.textContent="يتم فتح المنصة بالبيانات المتاحة";
+        finish();
+      }
+    },18000);
+  }
+
   function build(){
     if(document.getElementById('mishkatGlobalShell'))return;
-    ensureCss(A('global-shell.css?v=1.0.24'),'mgsGlobalCss');
+    ensureCss(A('global-shell.css?v=1.0.32'),'mgsGlobalCss');
     const pageKey=currentPageKey();
     document.body.classList.add('mishkat-global-shell-loaded');
     document.body.classList.add(pageKey?'mishkat-inner-shell':'mishkat-home-shell');
@@ -101,17 +170,17 @@
   function updateContext(){const c=global.MishkatSchoolContext?.getContext?.()||{};const line=document.getElementById('mgsContextLine');if(line){const bits=[c.schoolName||'مدارس المشكاة الأهلية',c.stageName||c.departmentName,c.counselorName].filter(Boolean);line.textContent=bits.join(' · ')||'مدارس المشكاة الأهلية · جميع الخدمات في مكان واحد'}}
   function syncBadge(){const src=document.getElementById('smartReminderBadge'),dst=document.getElementById('mgsNotifyBadge');if(!dst)return;const n=Number(src?.textContent||0);dst.hidden=!n;dst.textContent=String(Math.min(99,n))}
   async function loadServices(){
-    ensureCss(A('smart-reminders.css?v=1.0.24'),'mgsReminderCss');ensureCss(A('support-widget.css?v=1.0.24'),'mgsSupportCss');
-    await loadScript(A('bubble-schema.js?v=1.0.24'),'MISHKAT_BUBBLE_SCHEMA');
-    await loadScript(A('bubble-config.js?v=1.0.24'),'MISHKAT_BUBBLE_CONFIG');
-    await loadScript(A('school-context.js?v=1.0.24'),'MishkatSchoolContext');
-    await loadScript(A('bubble-persistence.js?v=1.0.24'),'MishkatBubbleStore');
-    await loadScript(A('school-directory.js?v=1.0.24'),'MishkatBubbleDirectory');
-    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.24'),'__guidanceSmartRemindersLoaded');
-    if(!global.__unifiedSupportWidgetLoaded)await loadScript(A('support-widget-rest.js?v=1.0.24'),'__unifiedSupportWidgetLoaded');
+    ensureCss(A('smart-reminders.css?v=1.0.32'),'mgsReminderCss');ensureCss(A('support-widget.css?v=1.0.32'),'mgsSupportCss');
+    await loadScript(A('bubble-schema.js?v=1.0.32'),'MISHKAT_BUBBLE_SCHEMA');
+    await loadScript(A('bubble-config.js?v=1.0.32'),'MISHKAT_BUBBLE_CONFIG');
+    await loadScript(A('school-context.js?v=1.0.32'),'MishkatSchoolContext');
+    await loadScript(A('bubble-persistence.js?v=1.0.32'),'MishkatBubbleStore');
+    await loadScript(A('school-directory.js?v=1.0.32'),'MishkatBubbleDirectory');
+    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.32'),'__guidanceSmartRemindersLoaded');
+    if(!global.__unifiedSupportWidgetLoaded)await loadScript(A('support-widget-rest.js?v=1.0.32'),'__unifiedSupportWidgetLoaded');
     setTimeout(syncBadge,500);setInterval(syncBadge,1200);
   }
   function reorderHome(){if(!/\/index\.html$|\/$/.test(location.pathname))return;const grid=document.getElementById('activePlatformGrid');if(!grid)return;const order=['records','counselor-plan','smart-calendar','messages','analysis','reports','certificates','presentations'];order.forEach((cls,i)=>{const card=grid.querySelector('.'+cls);if(card){grid.appendChild(card);const n=card.querySelector('.platform-number');if(n)n.textContent=String(i+1).padStart(2,'0')}})}
-  async function init(){build();normalizePageChrome();reorderHome();loadServices().catch(()=>{});const shell=document.getElementById('mishkatGlobalShell');if(shell&&'ResizeObserver'in window)new ResizeObserver(setShellHeight).observe(shell);addEventListener('resize',setShellHeight,{passive:true});setTimeout(setShellHeight,120);}
+  async function init(){ensureDataLoader();build();normalizePageChrome();reorderHome();loadServices().catch(()=>{});const shell=document.getElementById('mishkatGlobalShell');if(shell&&'ResizeObserver'in window)new ResizeObserver(setShellHeight).observe(shell);addEventListener('resize',setShellHeight,{passive:true});setTimeout(setShellHeight,120);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })(window);

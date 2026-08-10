@@ -1,4 +1,4 @@
-# V1.0.31 — Stable Bubble directory loading
+# V1.0.32 — Stable Bubble directory loading
 
 Fixes intermittent student/employee dropdown loading.
 

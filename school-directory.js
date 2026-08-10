@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.31
+ * Mishkat School Platform - Bubble directory adapter V1.0.32
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -461,6 +461,58 @@
     try{return await activeLoadPromise;}
     finally{activeLoadPromise=null;}
   }
+  const classHydrationPromises=new Map();
+  async function hydrateStudentClass(idOrName){
+    const student=findStudent(idOrName);
+    if(!student)return null;
+    if(student.className)return student;
+    if(classHydrationPromises.has(student.id))return classHydrationPromises.get(student.id);
+
+    const job=(async()=>{
+      const store=global.MishkatBubbleStore;
+      let fullStudent=student.raw||{};
+      try{
+        if(store?.get && student.id){
+          const remote=await store.get("Students",student.id);
+          if(remote&&typeof remote==="object")fullStudent={...fullStudent,...remote};
+        }
+      }catch(error){console.warn("Mishkat: could not hydrate Student for Class.",error);}
+
+      let classRef=pick(fullStudent,[
+        "Class","class","Classes","class_name","Class Name","classroom",
+        "section","Section","الفصل","اسم الفصل"
+      ],"");
+      let classThing=classRef;
+      let classId=idOf(classRef);
+
+      if(classId && store?.get){
+        try{
+          const remoteClass=await store.get("Class",classId);
+          if(remoteClass&&typeof remoteClass==="object")classThing=remoteClass;
+        }catch(error){console.warn("Mishkat: could not hydrate Students -> Class relation.",error);}
+      }
+
+      const className=classLabelOf(classThing,fullStudent)||classLabelOf(classRef,fullStudent);
+      const resolvedId=idOf(classThing)||classId;
+      student.raw=fullStudent;
+      if(className)student.className=className;
+      if(resolvedId)student.classId=resolvedId;
+
+      if(student.className){
+        try{
+          global.dispatchEvent(new CustomEvent("mishkat:student-class-ready",{
+            detail:{studentId:student.id,classId:student.classId||"",className:student.className}
+          }));
+        }catch(_e){}
+      }
+      return student;
+    })();
+
+    classHydrationPromises.set(student.id,job);
+    try{return await job;}
+    finally{classHydrationPromises.delete(student.id);}
+  }
+
   function currentAcademicYear(){
     const active=snapshot.academicYears.filter(x=>x.isCurrent);
     const pool=active.length?active:snapshot.academicYears;
@@ -499,5 +551,5 @@
     if(formData.situ_id)payload.situ=formData.situ_id;
     return payload;
   }
-  global.MishkatBubbleDirectory={load,getSnapshot,setSnapshot,currentAcademicYear,currentTerm,findStudent,findEmployee,findLookup,normalize,buildGuidanceSituationPayload,schema};global.MishkatSchoolDirectory=global.MishkatBubbleDirectory;
+  global.MishkatBubbleDirectory={load,getSnapshot,setSnapshot,currentAcademicYear,currentTerm,findStudent,hydrateStudentClass,findEmployee,findLookup,normalize,buildGuidanceSituationPayload,schema};global.MishkatSchoolDirectory=global.MishkatBubbleDirectory;
 })(window);
