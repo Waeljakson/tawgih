@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.15";
+const SCHOOL_SCHEMA_VERSION="1.0.31";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -451,7 +451,16 @@ function refreshPersonSelectors(){
   el.dynamicRecordForm.querySelectorAll('select[data-employee-select]').forEach(select=>{
     const current=select.value;select.innerHTML=sourceOptions("employees",current);if(current&&[...select.options].some(o=>o.value===current))select.value=current;
   });
+  // Re-apply the selected student after Bubble hydration so linked fields such as Students -> Class
+  // are filled even when the Class thing arrived after the initial student list.
   refreshAllStudentSummaries();
+  el.dynamicRecordForm.querySelectorAll("select[data-student-select]").forEach(select=>{
+    const wrapper=select.closest("[data-repeat-key]"),row=select.closest("tr");
+    if(!wrapper||!row||!select.value)return;
+    const student=selectedStudent(select.value);
+    const cls=row.querySelector('[data-col="class_name"]');
+    if(cls)cls.value=student?.className||"";
+  });
   el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);
 }
 function fillAcademicMeta(year="",term=""){
