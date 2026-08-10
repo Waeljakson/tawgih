@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.39
+ * Mishkat School Platform - Bubble directory adapter V1.0.40
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -76,6 +76,36 @@
     return fallback;
   };
   const norm = v => String(v??"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/\s+/g," ").trim();
+
+  function normalizePhoneDisplay(value){
+    const text=String(value??"").trim();
+    if(!text)return "";
+
+    // Bubble data may contain phone numbers imported from spreadsheets as text such as 9.66506E+11.
+    // Expand scientific notation without converting ordinary phone strings to Number,
+    // so leading zeroes in correctly stored phone numbers stay untouched.
+    const m=text.match(/^([+-]?)(\d+)(?:\.(\d+))?[eE]([+-]?\d+)$/);
+    if(!m)return text;
+
+    const sign=m[1]==="-"?"-":"";
+    const whole=m[2]||"";
+    const frac=m[3]||"";
+    const exp=Number(m[4]);
+    if(!Number.isFinite(exp))return text;
+
+    const digits=(whole+frac).replace(/^0+(?=\d)/,"");
+    const decimalPos=whole.length+exp;
+
+    if(decimalPos<=0){
+      return sign+"0"+"0".repeat(Math.abs(decimalPos))+(digits||"0");
+    }
+    if(decimalPos>=digits.length){
+      return sign+(digits||"0")+"0".repeat(decimalPos-digits.length);
+    }
+    // A phone value should be an integer. If the stored scientific value still contains
+    // fractional digits, preserve the expanded text rather than silently rounding it.
+    return sign+digits.slice(0,decimalPos)+"."+digits.slice(decimalPos);
+  }
 
   const unwrapIncoming=(value)=>{
     const cfg=global.MISHKAT_BUBBLE_CONFIG||{};
@@ -260,7 +290,7 @@
       grade: labelOf(gradeRaw), gradeId: idOf(gradeRaw),
       className: classLabelOf(classRaw,raw), classId: idOf(classRaw),
       guardianName: String(pick(raw,["guardian_name","parent_name","father_name","Guardian Name","ولي الأمر","اسم ولي الأمر"],"")),
-      guardianPhone: String(pick(raw,["Parent phone","Parent Phone","parent phone","parent_phone","guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر","رقم جوال ولي الأمر"],"")),
+      guardianPhone: normalizePhoneDisplay(pick(raw,["Parent phone","Parent Phone","parent phone","parent_phone","guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر","رقم جوال ولي الأمر"],"")),
       birthDate: String(pick(raw,["birth_date","date_of_birth","DOB","تاريخ الميلاد"],"")).slice(0,10),
       previousSchool: String(pick(raw,["previous_school","Previous School","المدرسة السابقة"],"")),
       active: activeOf(raw,true), userId:idOf(pick(raw,["user","User"],"")), raw
@@ -538,10 +568,10 @@
         : "";
       const className=exactTitel||classLabelOf(classThing,fullStudent)||classLabelOf(classRef,fullStudent);
       const resolvedId=idOf(classThing)||classId;
-      const parentPhone=String(pick(fullStudent,[
+      const parentPhone=normalizePhoneDisplay(pick(fullStudent,[
         "Parent phone","Parent Phone","parent phone","parent_phone",
         "guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر","رقم جوال ولي الأمر"
-      ],student.guardianPhone||"")||"").trim();
+      ],student.guardianPhone||""));
 
       student.raw=fullStudent;
       if(className)student.className=className;
