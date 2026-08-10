@@ -387,15 +387,31 @@ function prepareSchoolBubbleDefinitions(){
 function directoryItems(source){
   const items=state.directory?.[source]||[];
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
-  // students returned by guidance_bootstrap come directly from
-  // Current User -> user data -> User Student. Do NOT apply a second single-school
-  // filter here; that was hiding valid students for users assigned to multiple schools/stages.
-  if(source==="students")return items;
+  const normScope=v=>cleanText(v).toLowerCase();
+  const match=(id,name,ids,names)=>{
+    if(!ids.size&&!names.size)return true;
+    if(id&&ids.has(String(id)))return true;
+    if(name&&names.has(normScope(name)))return true;
+    return false;
+  };
+  const schoolIds=new Set((ctx.assignedSchoolIds||[]).map(String));
+  const schoolNames=new Set((ctx.assignedSchoolNames||[]).map(normScope));
+  if(source==="students"){
+    const stageIds=new Set((ctx.assignedStageIds||[]).map(String)),stageNames=new Set((ctx.assignedStageNames||[]).map(normScope));
+    const gradeIds=new Set((ctx.assignedGradeIds||[]).map(String)),gradeNames=new Set((ctx.assignedGradeNames||[]).map(normScope));
+    return items.filter(student=>
+      match(student.schoolId,student.schoolName,schoolIds,schoolNames)&&
+      match(student.stageId,student.stage,stageIds,stageNames)&&
+      match(student.gradeId,student.grade,gradeIds,gradeNames)
+    );
+  }
   if(source==="employees"){
-    const ids=new Set((ctx.assignedSchoolIds||[]).map(String));
-    const names=new Set((ctx.assignedSchoolNames||[]).map(v=>cleanText(v).toLowerCase()));
-    if(!ids.size&&!names.size)return items;
-    return items.filter(emp=>!emp.schoolId&&!emp.schoolName||ids.has(String(emp.schoolId||""))||names.has(cleanText(emp.schoolName).toLowerCase()));
+    return items.filter(emp=>match(emp.schoolId,emp.schoolName,schoolIds,schoolNames));
+  }
+  if(source==="campuses"){
+    // The Bubble School Data Type is the campus/complex in this school deployment.
+    const scoped=items.filter(item=>match(item.id,item.name,schoolIds,schoolNames));
+    return scoped.length?scoped:items;
   }
   return items;
 }
@@ -436,16 +452,16 @@ function fillDirectorySelect(select,source,selected,label){
 }
 function fillSchoolContextMeta(campus="",stage=""){
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
-  const assignedCampus=ctx.campus||campus||"";
-  const assignedStage=ctx.stage||stage||"";
+  const assignedCampus=campus||ctx.campus||ctx.schoolName||"";
+  const assignedStage=stage||ctx.stage||"";
   fillDirectorySelect(el.metaCampus,"campuses",assignedCampus,"المجمع حسب توزيع المستخدم");
   fillDirectorySelect(el.metaStage,"stages",assignedStage,"المرحلة حسب توزيع المستخدم");
   if(el.metaCampus){el.metaCampus.disabled=true;el.metaCampus.title="يظهر تلقائيًا حسب توزيع المستخدم";}
   if(el.metaStage){el.metaStage.disabled=true;el.metaStage.title="يظهر تلقائيًا حسب توزيع المستخدم";}
 }
 function setSchoolContextFromStudent(student){
-  // المجمع والمرحلة مرتبطان بتوزيع المستخدم، وليس باختيار يدوي داخل السجل.
-  fillSchoolContextMeta();
+  // School in Bubble is the campus/complex. When a student is chosen, show the exact School/Dep linked to that student.
+  fillSchoolContextMeta(student?.campus||student?.schoolName||"",student?.stage||"");
 }
 function selectedStudent(value){return window.MishkatBubbleDirectory?.findStudent?.(value)||null;}
 function selectedEmployee(value){return window.MishkatBubbleDirectory?.findEmployee?.(value)||null;}
@@ -1429,21 +1445,31 @@ async function handleSession(session){
 }
 
 async function init(){
-  // School edition: open immediately. Bubble auth/data will be connected later.
+  // Render the 16-record catalog immediately; Bubble/API availability must never hide the digital records UI.
   if(el.loginPage)el.loginPage.hidden=true;
   if(el.appShell)el.appShell.hidden=false;
   state.user={id:"mishkat-school-local",email:"school@mishkat.local"};
   state.account={user_id:state.user.id,full_name:"مستخدم المدرسة",school_name:"مدارس المشكاة الأهلية",school_logo_data:"../assets/school-logo.png",is_system_admin:false,is_active:true};
   state.packageAccess=true;state.entitlements=[];
+  prepareSchoolBubbleDefinitions();
+  bindEvents();
+  renderCatalog();
+  setView("dashboard");
+  if(el.metaDate)el.metaDate.value=todayISO();
+  el.archiveTypeFilter.innerHTML=`<option value="">كل السجلات</option>${Object.entries(RECORDS).map(([k,def])=>`<option value="${k}">${escapeHtml(def.title)}</option>`).join("")}`;
+  if(el.studentReportType)el.studentReportType.innerHTML=`<option value="">كل أنواع السجلات</option>${Object.entries(RECORDS).map(([k,def])=>`<option value="${k}">${escapeHtml(def.title)}</option>`).join("")}`;
   try{
-    prepareSchoolBubbleDefinitions();await loadSchoolBubbleDirectory();
-    const ctx=window.MishkatSchoolContext?.getContext?.()||{};state.user={id:ctx.id||"mishkat-school-local",email:ctx.email||""};state.account={...state.account,user_id:state.user.id,full_name:ctx.counselorName||"مستخدم المدرسة",school_name:ctx.schoolName||"مدارس المشكاة الأهلية",school_logo_data:"../assets/school-logo.png"};
-    bindEvents();renderCatalog();el.metaDate.value=todayISO();fillAcademicMeta();fillSchoolContextMeta();
-    applyAccountUI();renderUnifiedPlatformSwitcher();renderCatalog();
-    el.archiveTypeFilter.innerHTML=`<option value="">كل السجلات</option>${Object.entries(RECORDS).map(([k,def])=>`<option value="${k}">${escapeHtml(def.title)}</option>`).join("")}`;
-    if(el.studentReportType)el.studentReportType.innerHTML=`<option value="">كل أنواع السجلات</option>${Object.entries(RECORDS).map(([k,def])=>`<option value="${k}">${escapeHtml(def.title)}</option>`).join("")}`;
-    await loadArchive(true);setView("dashboard");
-  }catch(error){console.error("Mishkat records init error",error);showToast("تم فتح منصة السجلات، لكن توجد وظيفة اختيارية لم تكتمل بعد.",true);}
+    await loadSchoolBubbleDirectory();
+    const ctx=window.MishkatSchoolContext?.getContext?.()||{};
+    state.user={id:ctx.id||"mishkat-school-local",email:ctx.email||""};
+    state.account={...state.account,user_id:state.user.id,full_name:ctx.counselorName||"مستخدم المدرسة",school_name:ctx.schoolName||ctx.campus||"مدارس المشكاة الأهلية",school_logo_data:"../assets/school-logo.png"};
+    fillAcademicMeta();fillSchoolContextMeta();applyAccountUI();renderUnifiedPlatformSwitcher();renderCatalog();refreshStudentReportIndex();
+  }catch(error){
+    console.error("Mishkat Bubble directory init error",error);
+    showToast("السجلات ظاهرة، لكن تعذر تحديث بيانات Bubble الآن.",true);
+  }
+  try{await loadArchive(true);}catch(error){console.warn("Mishkat archive load failed",error);}
+  setView("dashboard");
 }
 
 window.addEventListener("mishkat:directory-ready",event=>{
