@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.27
+ * Mishkat School Platform - Bubble directory adapter V1.0.31
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -38,6 +38,7 @@
     if(typeof value !== "object") return "";
     const preferred=[
       "Full Name","full_name","Dep. Name","Department Name","department name",
+      "Class Name","class name","ClassName","className","Class_Name","class_name","اسم الفصل","الفصل","section","Section",
       "School Name","school name","SchoolName","schoolName","School_Name","school_name",
       "Complex Name","complex name","Campus Name","campus name","اسم المجمع","المجمع","مجمع",
       "Arabic Name","arabic name","Name","name","Title","title","label","Label","display","Display",
@@ -84,26 +85,33 @@
   const hasList=(obj,keys)=>keys.some(k=>Array.isArray(obj?.[k])&&obj[k].length);
   const mergeDirectorySources=(primary={},extra={})=>{
     const out={...extra,...primary};
-    const hydrateScoped=(p,e)=>{
-      if(!p.length)return e;
-      const map=new Map(e.map(row=>[idOf(row),row]).filter(([id])=>id));
-      return p.map(row=>{
+    const toArray=value=>Array.isArray(value)?value:(value!==undefined&&value!==null&&value!==""?[value]:[]);
+    const relationList=(obj,keys)=>toArray(pick(obj||{},keys,[])).filter(Boolean);
+    const hydrateRefs=(refs,fullRows)=>{
+      const map=new Map((fullRows||[]).map(row=>[idOf(row),row]).filter(([id])=>id));
+      return (refs||[]).map(row=>{
         const id=idOf(row);const full=id?map.get(id):null;
         if(!full)return row;
         return row&&typeof row==="object"?{...full,...row}:full;
       });
     };
+    const hydrateScoped=(p,e,{allowExtraFallback=true}={})=>{
+      if(!p.length)return allowExtraFallback?e:[];
+      return hydrateRefs(p,e);
+    };
+
+    // Distribution lists come from guidance_bootstrap (Current User -> user data).
     const scopedGroups=[
-      ["schools",["schools","Schools","School"]],
+      ["schools",["schools","school","Schools","School"]],
       ["departments",["departments","Departments","Department"]],
-      ["grades",["grades","Grades"]],
+      ["grades",["grades","Grade","Grades"]],
       ["academicYears",["academicYears","academic_years","academic year","years"]],
-      ["terms",["terms","academicTerms","academic_terms","semesters"]],
-      ["students",["students","Students","schoolStudents","school_students"]]
+      ["terms",["terms","academicTerms","academic_terms","semesters"]]
     ];
     for(const [canonical,keys] of scopedGroups){
       out[canonical]=hydrateScoped(listFrom(primary,keys),listFrom(extra,keys));
     }
+
     const supplementalGroups=[
       ["classes",["classes","Classes","Class"]],
       ["jobTitles",["jobTitles","job_titles","Job Titles","Job Title"]],
@@ -122,12 +130,32 @@
     for(const [canonical,keys] of supplementalGroups){
       const p=listFrom(primary,keys),e=listFrom(extra,keys);out[canonical]=p.length?p:e;
     }
+
+    // Resolve the exact logged-in Users Data row from the Bubble user relation.
     const scopedUser=primary.currentUsersData||primary.current_users_data||null;
     const userId=String(global.MishkatBubbleAuth?.getUserId?.()||"");
     const userRows=listFrom(out,["usersData","users_data","Users Data","employees","staff"]);
     const currentFull=userId?userRows.find(row=>idOf(pick(row,["User","user"],""))===userId):null;
     if(scopedUser||currentFull)out.currentUsersData={...(currentFull||{}),...(scopedUser||{})};
-    out.__mishkatScope=primary.__mishkatScope||extra.__mishkatScope||{};
+
+    // Students MUST remain the exact Current User's user data's Students list.
+    // Never replace the scoped Users Data list with the full Students Data API table.
+    const primaryStudents=listFrom(primary,["students","student","Students","schoolStudents","school_students"]);
+    const actualUserStudents=currentFull?relationList(currentFull,["Students"]):[];
+    let scopedStudentRefs=primaryStudents.length?primaryStudents:actualUserStudents;
+    if(primaryStudents.length&&actualUserStudents.length){
+      const allowed=new Set(actualUserStudents.map(idOf).filter(Boolean));
+      const intersected=primaryStudents.filter(row=>allowed.has(idOf(row)));
+      // Current User's user data's Students is authoritative when both sources are available.
+      scopedStudentRefs=intersected.length?intersected:actualUserStudents;
+    }
+    const fullStudents=listFrom(extra,["students","Students","schoolStudents","school_students"]);
+    out.students=hydrateRefs(scopedStudentRefs,fullStudents);
+
+    // Employee selectors use Users Data. Keep the full employee directory available here;
+    // the records UI scopes it to Current User's Schools.
+    out.employees=listFrom(out,["employees","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
+    out.__mishkatScope={...(primary.__mishkatScope||extra.__mishkatScope||{}),studentsFromUsersData:true,authoritativeStudents:true};
     return out;
   };
 
@@ -140,9 +168,9 @@
   }
   function createLookup(src){
     const groups = {
-      schools:listFrom(src,["schools","Schools","School"]),
+      schools:listFrom(src,["schools","school","Schools","School"]),
       departments:listFrom(src,["departments","Departments","Department"]),
-      grades:listFrom(src,["grades","Grades"]),
+      grades:listFrom(src,["grades","Grade","Grades"]),
       classes:listFrom(src,["classes","Classes","Class"]),
       jobTitles:listFrom(src,["jobTitles","job_titles","Job Titles","Job Title"])
     };
@@ -161,12 +189,44 @@
     return map?.get?.(String(value)) || value;
   }
 
+  function classLabelOf(value,rawStudent={}){
+    value=first(value);
+    // If Bubble returned a populated Class thing, prefer its explicit display fields.
+    if(value && typeof value==="object"){
+      const direct=pick(value,[
+        "Class Name","class name","ClassName","className","Class_Name","class_name",
+        "اسم الفصل","الفصل","Section Name","section name","section","Section",
+        "Name","name","Title","title","label","Label","display","Display"
+      ],"");
+      const text=direct && typeof direct!=="object" ? String(direct).trim() : labelOf(direct||value);
+      if(text && !looksLikeBubbleId(text))return text;
+      // Some Bubble Class tables use slug as the human-readable section code.
+      const slug=String(value?.slug||"").trim();
+      if(slug && !looksLikeBubbleId(slug))return slug;
+    }
+    // If Class is stored directly as text on Students, use it.
+    if(typeof value==="string"||typeof value==="number"){
+      const text=String(value).trim();
+      if(text && !looksLikeBubbleId(text))return text;
+    }
+    // Last fallback: denormalized class/section text fields on the Student thing.
+    const fallback=pick(rawStudent,[
+      "Class Name","class name","ClassName","className","class_name",
+      "Section","section","Section Name","section name","اسم الفصل","الفصل"
+    ],"");
+    if(fallback && typeof fallback!=="object"){
+      const text=String(fallback).trim();
+      if(text && !looksLikeBubbleId(text))return text;
+    }
+    return "";
+  }
+
   function normalizeStudent(raw, index, lookup){
     const id = idOf(raw, `student-${index+1}`);
     const schoolRaw = resolveRef(pick(raw,["School","school","المدرسة"],""),lookup.schools);
     const depRaw = resolveRef(pick(raw,["Dep","Department","department","stage","المرحلة"],""),lookup.departments);
     const gradeRaw = resolveRef(pick(raw,["grade","Grade","Grades","الصف"],""),lookup.grades);
-    const classRaw = resolveRef(pick(raw,["Class","class","class_name","classroom","الفصل"],""),lookup.classes);
+    const classRaw = resolveRef(pick(raw,["Class","class","Classes","class_name","Class Name","classroom","section","Section","الفصل","اسم الفصل"],""),lookup.classes);
     // Bubble School is the campus/complex (المجمع) in this deployment.
     const campusRaw = schoolRaw;
     return {
@@ -179,7 +239,7 @@
       campus: labelOf(schoolRaw), campusId: idOf(schoolRaw),
       stage: labelOf(depRaw), stageId: idOf(depRaw),
       grade: labelOf(gradeRaw), gradeId: idOf(gradeRaw),
-      className: labelOf(classRaw), classId: idOf(classRaw),
+      className: classLabelOf(classRaw,raw), classId: idOf(classRaw),
       guardianName: String(pick(raw,["guardian_name","parent_name","father_name","Guardian Name","ولي الأمر","اسم ولي الأمر"],"")),
       guardianPhone: String(pick(raw,["Parent phone","parent_phone","guardian_phone","phone","mobile","Guardian Phone","رقم ولي الأمر"],"")),
       birthDate: String(pick(raw,["birth_date","date_of_birth","DOB","تاريخ الميلاد"],"")).slice(0,10),
@@ -190,18 +250,23 @@
 
   function normalizeEmployee(raw, index, lookup){
     const id = idOf(raw, `employee-${index+1}`);
-    const schoolRaw = resolveRef(first(pick(raw,["activity schools","activity_schools","Schools","schools","School","school"],"")),lookup.schools);
-    const depRaw = resolveRef(first(pick(raw,["Dep","Dep list","dep","departments","Department","stage"],"")),lookup.departments);
+    const toArray=value=>Array.isArray(value)?value:(value!==undefined&&value!==null&&value!==""?[value]:[]);
+    const schoolValues=toArray(pick(raw,["activity schools","activity_schools","Schools","schools","School","school"],[])).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
+    const depValues=toArray(pick(raw,["Dep","Dep list","dep","departments","Department","stage"],[])).map(v=>resolveRef(v,lookup.departments)).filter(Boolean);
     const currentJob = resolveRef(first(pick(raw,["Current Job","current_job","Job Title","job_title","role","position","title"],"")),lookup.jobTitles);
+    const schoolIds=[...new Set(schoolValues.map(idOf).filter(Boolean))];
+    const schoolNames=[...new Set(schoolValues.map(labelOf).filter(Boolean))];
+    const stageIds=[...new Set(depValues.map(idOf).filter(Boolean))];
+    const stageNames=[...new Set(depValues.map(labelOf).filter(Boolean))];
     return {
       id,
       name: String(pick(raw,["Full Name","full_name","name","employee_name","Name","Employee Name","اسم الموظف","الاسم"],"")),
       role: labelOf(currentJob),
       employeeCode: String(pick(raw,["Employee Code","employee_code"],"")),
       phone: String(pick(raw,["Phone Number","phone","mobile"],"")),
-      schoolName: labelOf(schoolRaw), schoolId:idOf(schoolRaw),
-      campus: labelOf(schoolRaw), campusId:idOf(schoolRaw),
-      stage: labelOf(depRaw), stageId:idOf(depRaw),
+      schoolName:schoolNames[0]||"", schoolId:schoolIds[0]||"", schoolNames, schoolIds,
+      campus:schoolNames[0]||"", campusId:schoolIds[0]||"",
+      stage:stageNames[0]||"", stageId:stageIds[0]||"", stageNames, stageIds,
       active: activeOf(raw,true), userId:idOf(pick(raw,["User","user"],"")), raw
     };
   }
@@ -223,8 +288,8 @@
   function normalize(snapshot={}){
     const src={...FALLBACK,...snapshot};
     const lookup=createLookup(src);
-    const students=listFrom(src,["students","Students","schoolStudents","school_students"]);
-    const employees=listFrom(src,["employees","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
+    const students=listFrom(src,["students","student","Students","schoolStudents","school_students"]);
+    const employees=listFrom(src,["employees","employee","usersData","users_data","Users Data","staff","schoolEmployees","school_employees"]);
     const years=listFrom(src,["academicYears","academic_years","academic year","years"]);
     const terms=listFrom(src,["terms","academicTerms","academic_terms","semesters"]);
     return {
@@ -232,9 +297,9 @@
       employees:employees.map((x,i)=>normalizeEmployee(x,i,lookup)).filter(x=>x.name&&x.active),
       academicYears:(years.length?years:FALLBACK.academicYears).map(normalizeAcademicYear).filter(x=>x.name),
       terms:terms.map((x,i)=>normalizeSimple(x,i,"term")).filter(x=>x.name&&x.active),
-      campuses:listFrom(src,["campuses","complexes","schools","Schools","School"]).map((x,i)=>normalizeSimple(x,i,"campus")).filter(x=>x.name&&x.active),
+      campuses:listFrom(src,["campuses","complexes","schools","school","Schools","School"]).map((x,i)=>normalizeSimple(x,i,"campus")).filter(x=>x.name&&x.active),
       stages:listFrom(src,["stages","departments","Departments","Department"]).map((x,i)=>normalizeSimple(x,i,"stage")).filter(x=>x.name&&x.active),
-      grades:listFrom(src,["grades","Grades"]).map((x,i)=>normalizeSimple(x,i,"grade")).filter(x=>x.name&&x.active),
+      grades:listFrom(src,["grades","Grade","Grades"]).map((x,i)=>normalizeSimple(x,i,"grade")).filter(x=>x.name&&x.active),
       classes:listFrom(src,["classes","Classes","Class"]).map((x,i)=>normalizeSimple(x,i,"class")).filter(x=>x.name&&x.active),
       guidanceActions:listFrom(src,["guidanceActions","Guidance_Action"]).map((x,i)=>normalizeLookup(x,i,"action",["Action_Description","Title","title","name","Name"])).filter(x=>x.name&&x.active),
       guidanceWays:listFrom(src,["guidanceWays","Guidance_Way"]).map((x,i)=>normalizeLookup(x,i,"way",["Title","title","name","Name"])).filter(x=>x.name&&x.active),
@@ -283,55 +348,118 @@
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
     ];
-    const src={};let success=0;
-    for(const type of typeNames){
-      try{const rows=await store.list(type,[],{sortField:"Modified Date",descending:false});src[type]=Array.isArray(rows)?rows:[];success++;}catch(error){console.warn(`Bubble directory type unavailable: ${type}`,error);}
-    }
+    const src={};
+    const results=await Promise.allSettled(typeNames.map(async type=>{
+      const rows=await store.list(type,[],{sortField:"Modified Date",descending:false});
+      return [type,Array.isArray(rows)?rows:[]];
+    }));
+    let success=0;
+    results.forEach((result,index)=>{
+      const type=typeNames[index];
+      if(result.status==="fulfilled"){
+        src[type]=result.value[1];success++;
+      }else{
+        console.warn(`Bubble directory type unavailable: ${type}`,result.reason);
+      }
+    });
     return success?src:null;
   }
-  async function load(){
-    let incoming=global.MISHKAT_BUBBLE_DATA||null;const config=global.MISHKAT_BUBBLE_CONFIG||{};
-    let bootstrapLoaded=false;
-    if(!incoming&&config.directoryEndpoint){
-      try{
-        const response=await fetch(config.directoryEndpoint,{credentials:config.credentials||"include",headers:{"Accept":"application/json",...(config.headers||{})},cache:"no-store"});
-        if(!response.ok)throw new Error(`HTTP ${response.status}`);
-        incoming=unwrapIncoming(await response.json());bootstrapLoaded=true;
-      }catch(error){console.warn("Bubble directory endpoint unavailable; trying Data API/local snapshot.",error);}
-    }else if(incoming){incoming=unwrapIncoming(incoming);bootstrapLoaded=Boolean(incoming?.__mishkatScope?.authoritativeStudents);}
+  let activeLoadPromise=null;
 
-    if(incoming){
-      // guidance_bootstrap is authoritative for the current user's schools/departments/grades/students.
-      // Data API only supplements lookup tables and employee directory; it never replaces scoped students.
-      const supplement=await loadFromDataApi({supplementOnly:true}).catch(()=>null);
-      if(supplement)incoming=mergeDirectorySources(incoming,supplement);
-    }else incoming=await loadFromDataApi();
+  function publishDirectory(incoming,bootstrapLoaded,phase="bootstrap"){
+    if(!incoming||typeof incoming!=="object")return snapshot;
+    incoming=unwrapIncoming(incoming);
+    global.MISHKAT_BUBBLE_DATA=incoming;
+    try{localStorage.setItem("mishkat_bubble_directory_snapshot_v1",JSON.stringify(incoming));}catch(_error){}
+    try{global.MishkatSchoolContext?.build?.();global.MishkatSchoolContext?.applyDocument?.(document);}catch(_error){}
 
-    if(!incoming){try{incoming=JSON.parse(localStorage.getItem("mishkat_bubble_directory_snapshot_v1")||"null");}catch(_error){}}
-    if(incoming&&Object.keys(incoming).length){
-      incoming=unwrapIncoming(incoming);
-      global.MISHKAT_BUBBLE_DATA=incoming;
-      try{localStorage.setItem("mishkat_bubble_directory_snapshot_v1",JSON.stringify(incoming));}catch(_error){}
-      try{global.MishkatSchoolContext?.build?.();global.MishkatSchoolContext?.applyDocument?.(document);}catch(_error){}
+    const next=normalize(incoming||FALLBACK);
+    const beforeScope=next.students.length;
+    next.students=scopeStudentsToCurrentUser(next.students);
+
+    // Never erase a previously loaded good student list because of a late empty response.
+    if(snapshot?.students?.length && !next.students.length && phase!=="initial-empty"){
+      next.students=snapshot.students;
     }
-    snapshot=normalize(incoming||FALLBACK);
-    const beforeScope=snapshot.students.length;
-    snapshot.students=scopeStudentsToCurrentUser(snapshot.students);
-    snapshot.connection={
+    next.connection={
       authenticated:Boolean(global.MishkatBubbleAuth?.isAuthenticated?.()),
-      bootstrapLoaded,
-      rawStudents:listFrom(incoming||{},["students","Students","schoolStudents","school_students"]).length,
-      normalizedStudents:snapshot.students.length,
+      bootstrapLoaded:Boolean(bootstrapLoaded),
+      phase,
+      rawStudents:listFrom(incoming||{},["students","student","Students","schoolStudents","school_students"]).length,
+      normalizedStudents:next.students.length,
       studentsBeforeSchoolScope:beforeScope,
       schoolScopeApplied:true,
-      employees:snapshot.employees.length
+      employees:next.employees.length
     };
+    snapshot=next;
     try{
       global.MishkatSchoolContext?.build?.();
       global.MishkatSchoolContext?.applyDocument?.(document);
-      global.dispatchEvent(new CustomEvent("mishkat:directory-loaded",{detail:snapshot.connection}));
+      global.dispatchEvent(new CustomEvent("mishkat:directory-loaded",{detail:snapshot}));
+      global.dispatchEvent(new CustomEvent("mishkat:directory-ready",{detail:snapshot}));
     }catch(_error){}
     return snapshot;
+  }
+
+  async function load(){
+    if(activeLoadPromise)return activeLoadPromise;
+    activeLoadPromise=(async()=>{
+      let incoming=global.MISHKAT_BUBBLE_DATA||null;
+      const config=global.MISHKAT_BUBBLE_CONFIG||{};
+      let bootstrapLoaded=false;
+
+      // 1) Load the user-scoped bootstrap once, with retry/cache handled by bubble-config.
+      if(config.directoryEndpoint){
+        try{
+          if(typeof config.fetchDirectorySnapshot==="function"){
+            incoming=await config.fetchDirectorySnapshot();
+          }else if(!incoming){
+            const response=await fetch(config.directoryEndpoint,{credentials:config.credentials||"include",headers:{"Accept":"application/json",...(config.headers||{})},cache:"no-store"});
+            if(!response.ok)throw new Error(`HTTP ${response.status}`);
+            incoming=unwrapIncoming(await response.json());
+          }
+          bootstrapLoaded=Boolean(incoming);
+        }catch(error){
+          console.warn("Bubble directory bootstrap unavailable; keeping last good snapshot if present.",error);
+        }
+      }else if(incoming){
+        incoming=unwrapIncoming(incoming);
+        bootstrapLoaded=true;
+      }
+
+      if(!incoming){
+        try{incoming=JSON.parse(localStorage.getItem("mishkat_bubble_directory_snapshot_v1")||"null");}catch(_error){}
+      }
+
+      // 2) Publish students/scope immediately. Do not wait for Users Data and lookup tables.
+      if(incoming&&Object.keys(incoming).length){
+        publishDirectory(incoming,bootstrapLoaded,"bootstrap");
+      }
+
+      // 3) Load supplementary tables in PARALLEL. This is mainly for employees / names / lookup hydration.
+      const supplement=await loadFromDataApi({supplementOnly:true}).catch(error=>{
+        console.warn("Bubble directory supplement unavailable.",error);return null;
+      });
+
+      if(supplement){
+        const merged=incoming?mergeDirectorySources(incoming,supplement):supplement;
+        publishDirectory(merged,bootstrapLoaded,"supplement");
+        incoming=merged;
+      }else if(!incoming){
+        const all=await loadFromDataApi().catch(()=>null);
+        if(all){incoming=all;publishDirectory(all,false,"data-api");}
+      }
+
+      // If every remote source failed, keep the already loaded last-good snapshot rather than replacing it with FALLBACK.
+      if(!incoming && !snapshot.students.length && !snapshot.employees.length){
+        snapshot=normalize(FALLBACK);
+        snapshot.connection={authenticated:Boolean(global.MishkatBubbleAuth?.isAuthenticated?.()),bootstrapLoaded:false,phase:"fallback",rawStudents:0,normalizedStudents:0,studentsBeforeSchoolScope:0,schoolScopeApplied:true,employees:0};
+      }
+      return snapshot;
+    })();
+
+    try{return await activeLoadPromise;}
+    finally{activeLoadPromise=null;}
   }
   function currentAcademicYear(){
     const active=snapshot.academicYears.filter(x=>x.isCurrent);

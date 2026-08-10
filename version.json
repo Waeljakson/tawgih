@@ -1,10 +1,10 @@
 {
-  "version": "1.0.22",
+  "version": "1.0.31",
   "edition": "Mishkat School Platform",
   "date": "2026-08-08",
   "features": [
     "Fixed Bubble student dropdowns in digital records",
-    "Current User -> user data -> User Student is authoritative for visible students",
+    "Current User -> user data -> Students is authoritative for visible students",
     "Multi-school/multi-stage assignments no longer hide valid students",
     "Bubble bootstrap payload normalized into platform directory schema",
     "Scoped IDs can be safely hydrated from Data API without broadening student access",

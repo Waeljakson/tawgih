@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.27
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.31
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -67,9 +67,9 @@
   function listFrom(src,keys){let empty=[];for(const key of keys){if(Array.isArray(src?.[key])){if(src[key].length)return src[key];empty=src[key];}}return empty;}
   function makeIndex(rows){const m=new Map();(rows||[]).forEach(row=>{const id=idOf(row);if(id)m.set(id,row);});return m;}
   function createLookup(src){return {
-    schools:makeIndex(listFrom(src,["schools","Schools","School"])),
+    schools:makeIndex(listFrom(src,["schools","school","Schools","School"])),
     departments:makeIndex(listFrom(src,["departments","Departments","Department"])),
-    grades:makeIndex(listFrom(src,["grades","Grades"])),
+    grades:makeIndex(listFrom(src,["grades","Grade","Grades"])),
     jobTitles:makeIndex(listFrom(src,["jobTitles","job_titles","Job Titles","Job Title"])),
     usersData:listFrom(src,["usersData","users_data","Users Data","employees","staff","schoolEmployees","school_employees"])
   };}
@@ -191,9 +191,9 @@
     // guidance_bootstrap.departments == Current User's user data's Dep list
     // guidance_bootstrap.grades == Current User's user data's Grades
     // Do NOT infer the campus from Student.School or from a generic School search.
-    const bootstrapSchoolRows=listFrom(src,["schools"]).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
+    const bootstrapSchoolRows=listFrom(src,["schools","school","Schools","School"]).map(v=>resolveRef(v,lookup.schools)).filter(Boolean);
     const bootstrapStageRows=listFrom(src,["departments"]).map(v=>resolveRef(v,lookup.departments)).filter(Boolean);
-    const bootstrapGradeRows=listFrom(src,["grades"]).map(v=>resolveRef(v,lookup.grades)).filter(Boolean);
+    const bootstrapGradeRows=listFrom(src,["grades","Grade","Grades"]).map(v=>resolveRef(v,lookup.grades)).filter(Boolean);
     let assignedSchoolRows=bootstrapSchoolRows.length?bootstrapSchoolRows:relationArray(rawUser,["Schools"],lookup.schools);
     let assignedStageRows=bootstrapStageRows.length?bootstrapStageRows:relationArray(rawUser,["Dep list"],lookup.departments);
     let assignedGradeRows=bootstrapGradeRows.length?bootstrapGradeRows:relationArray(rawUser,["Grades"],lookup.grades);
@@ -293,7 +293,31 @@
     const legacyAssigned=document.getElementById("profileAssignedSchool");if(legacyAssigned){const box=legacyAssigned.closest(".status-box")||legacyAssigned.parentElement;if(box)box.remove();}
     const legacyInput=document.getElementById("schoolProfileName");if(legacyInput){const label=legacyInput.closest("label");if(label&&legacyInput.type!=="hidden")label.remove();else if(legacyInput.type==="hidden")legacyInput.remove();}
     const ids={counselorName:["counselorName","counselorInput","profileFullName"],schoolName:["schoolName","schoolInput"],managerName:["directorInput","principalName","supervisorInput","profileManagerName"],stage:["schoolStage","stageSelect","stageFilter","metaStage","profileStageName"],campus:["metaCampus","campusInput","complexInput","profileCampusName"],schoolTypeLabel:["profileSchoolType"],academicYear:["yearInput","metaAcademicYear"],term:["termSelect","metaAcademicTerm"]};Object.entries(ids).forEach(([key,list])=>list.forEach(id=>setControl(document.getElementById(id),c[key]||"")));root.querySelectorAll?.('[data-field="counselor_name"],[data-field="counselor5"]').forEach(el=>setControl(el,c.counselorName));root.querySelectorAll?.('[data-field="principal_name"]').forEach(el=>setControl(el,c.managerName));root.querySelectorAll?.('[data-field="stage"]').forEach(el=>setControl(el,c.stage));root.querySelectorAll?.('[data-field="campus"],[data-field="complex"]').forEach(el=>setControl(el,c.campus));setText("headerUserName",c.counselorName);setText("userName",c.counselorName);setText("recordCounselorName",c.counselorName);setText("headerSchoolName",c.schoolName);setText("recordSchoolName",c.schoolName);setText("profileAssignedCampus",c.campus||"—");setText("profileAssignedStage",c.stage||"—");setText("profileAssignedUser",c.counselorName||"—");setText("profileAssignedSchoolType",c.schoolTypeLabel);setText("profileAssignedManager",c.managerName||"—");root.querySelectorAll?.('[data-school-context-display]').forEach(el=>{const key=el.dataset.schoolContextDisplay;const value=c[key]||"—";if(el.textContent!==value)el.textContent=value;});const audience=document.getElementById("audienceBadge");if(audience&&/^(—|صياغات|شهادات|تقارير)/.test(audience.textContent.trim()))audience.textContent=c.schoolTypeLabel;const executor=document.getElementById("executorInput");if(executor&&c.schoolType==="girls"&&/الموجه الطلابي/.test(executor.value||""))executor.value=(executor.value||"").replace(/الموجه الطلابي/g,c.counselorTitle||"الموجهة الطلابية").replace(/العاملين/g,"العاملات");const planTitle=document.getElementById("planTitle");if(planTitle&&c.schoolType==="girls"&&/للموجه الطلابي/.test(planTitle.value||""))planTitle.value=(planTitle.value||"").replace(/للموجه الطلابي/g,"للموجهة الطلابية");applyGenderLanguage(root,c);}
-  async function refreshFromEndpoint(){const cfg=global.MISHKAT_BUBBLE_CONFIG||{};if(!cfg.directoryEndpoint||global.MISHKAT_BUBBLE_DATA)return;try{const response=await fetch(cfg.directoryEndpoint,{credentials:cfg.credentials||"include",headers:{"Accept":"application/json",...(cfg.headers||{})},cache:"no-store"});if(!response.ok)throw new Error(`HTTP ${response.status}`);const payload=await response.json();global.MISHKAT_BUBBLE_DATA=typeof cfg.normalizeDirectoryPayload==="function"?cfg.normalizeDirectoryPayload(payload):(payload?.response||payload?.data||payload);state.loaded=false;build();applyDocument(document);global.dispatchEvent(new CustomEvent("mishkat:school-context-changed",{detail:getContext()}));}catch(error){console.warn("School context endpoint unavailable; using current/local data.",error);}}
+  async function refreshFromEndpoint(){
+    const cfg=global.MISHKAT_BUBBLE_CONFIG||{};
+    if(!cfg.directoryEndpoint)return;
+    try{
+      let normalized;
+      if(typeof cfg.fetchDirectorySnapshot==="function"){
+        normalized=await cfg.fetchDirectorySnapshot();
+      }else{
+        const response=await fetch(cfg.directoryEndpoint,{credentials:cfg.credentials||"include",headers:{"Accept":"application/json",...(cfg.headers||{})},cache:"no-store"});
+        if(!response.ok)throw new Error(`HTTP ${response.status}`);
+        const payload=await response.json();
+        normalized=typeof cfg.normalizeDirectoryPayload==="function"?cfg.normalizeDirectoryPayload(payload):(payload?.response||payload?.data||payload);
+      }
+      const useful=["schools","departments","students"].some(key=>Array.isArray(normalized?.[key])&&normalized[key].length);
+      const existingUseful=["schools","departments","students"].some(key=>Array.isArray(global.MISHKAT_BUBBLE_DATA?.[key])&&global.MISHKAT_BUBBLE_DATA[key].length);
+      if(!useful&&existingUseful)return;
+      global.MISHKAT_BUBBLE_DATA=normalized||global.MISHKAT_BUBBLE_DATA||{};
+      state.loaded=false;
+      build();
+      applyDocument(document);
+      global.dispatchEvent(new CustomEvent("mishkat:school-context-changed",{detail:getContext()}));
+    }catch(error){
+      console.warn("School context endpoint unavailable; keeping last valid context.",error);
+    }
+  }
   function boot(){build();applyDocument(document);refreshFromEndpoint();let scheduled=false;const scheduleApply=()=>{if(scheduled)return;scheduled=true;setTimeout(()=>{scheduled=false;state.loaded=false;build();applyDocument(document)},0);};const observer=new MutationObserver(mutations=>{if(mutations.some(m=>m.addedNodes&&m.addedNodes.length))scheduleApply();});observer.observe(document.documentElement,{childList:true,subtree:true});let rounds=0;const timer=setInterval(()=>{state.loaded=false;build();applyDocument(document);if(++rounds>=6)clearInterval(timer)},450);global.addEventListener("focus",scheduleApply);global.addEventListener("mishkat:directory-loaded",scheduleApply);global.dispatchEvent(new CustomEvent("mishkat:school-context-ready",{detail:getContext()}));}
   global.MishkatSchoolContext={build,getContext,getEmployees,getStudents,setManager,applyDocument,schoolTypeOf,roleKeyOf,schema};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();

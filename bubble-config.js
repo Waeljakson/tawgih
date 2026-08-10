@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.27 SCHOOL-SCOPED TEST BRIDGE
+ * Mishkat School Platform — Bubble connection settings V1.0.31 STABLE DIRECTORY LOADING
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -23,16 +23,75 @@
 
   const getToken=()=>storage.get(TOKEN_KEY);
 
+  const LAST_DIRECTORY_KEY="mishkat_last_good_bootstrap_v1";
+  let directoryRequestPromise=null;
+
+  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const hasUsefulDirectory=data=>{
+    if(!data||typeof data!=="object")return false;
+    const list=key=>Array.isArray(data?.[key])?data[key]:[];
+    // A logged-in school user should normally have at least a school or department.
+    // Students may legitimately be empty, so they are not the sole validity signal.
+    return list("schools").length>0 || list("departments").length>0 || list("students").length>0;
+  };
+  const readLastGoodDirectory=()=>{
+    try{
+      const raw=sessionStorage.getItem(LAST_DIRECTORY_KEY);
+      return raw?JSON.parse(raw):null;
+    }catch(_e){return null;}
+  };
+  const saveLastGoodDirectory=data=>{
+    if(!hasUsefulDirectory(data))return;
+    try{sessionStorage.setItem(LAST_DIRECTORY_KEY,JSON.stringify(data));}catch(_e){}
+  };
+
+  async function fetchDirectorySnapshot({force=false,retries=3}={}){
+    if(!force && directoryRequestPromise)return directoryRequestPromise;
+    directoryRequestPromise=(async()=>{
+      let lastError=null;
+      for(let attempt=1;attempt<=Math.max(1,retries);attempt++){
+        try{
+          const token=getToken();
+          if(!token)throw new Error("bubble_user_token_missing");
+          const response=await fetch(directoryEndpoint,{
+            method:"GET",
+            credentials:"omit",
+            headers:{Accept:"application/json",Authorization:`Bearer ${token}`},
+            cache:"no-store"
+          });
+          if(!response.ok)throw new Error(`HTTP ${response.status}`);
+          const payload=await response.json();
+          const normalized=normalizeDirectoryPayload(payload);
+          if(!hasUsefulDirectory(normalized))throw new Error("bootstrap_scope_empty");
+          saveLastGoodDirectory(normalized);
+          return normalized;
+        }catch(error){
+          lastError=error;
+          if(attempt<retries)await sleep(250*attempt);
+        }
+      }
+      const cached=readLastGoodDirectory();
+      if(hasUsefulDirectory(cached)){
+        console.warn("Mishkat: using last good Bubble bootstrap snapshot after transient failure.",lastError);
+        return cached;
+      }
+      throw lastError||new Error("guidance_bootstrap_failed");
+    })();
+    try{return await directoryRequestPromise;}
+    finally{directoryRequestPromise=null;}
+  }
+
   function normalizeDirectoryPayload(payload){
     let data=payload?.response??payload?.data??payload??{};
     if(data?.response && typeof data.response==="object" && !Array.isArray(data.response))data=data.response;
     if(!data || typeof data!=="object" || Array.isArray(data))data={};
     const out={...data};
     const arr=(...keys)=>{for(const key of keys){if(Array.isArray(data?.[key]))return data[key];}return [];};
-    out.schools=arr("schools","Schools","School");
+    out.schools=arr("schools","school","Schools","School");
     out.departments=arr("departments","Departments","Department","Dep list","dep_list");
-    out.grades=arr("grades","Grades");
-    out.students=arr("students","Students","User Student","user_students","schoolStudents","school_students");
+    out.grades=arr("grades","Grade","Grades");
+    out.students=arr("students","student","Students","schoolStudents","school_students");
+    out.employees=arr("employees","employee","Users Data","usersData","users_data","staff","schoolEmployees","school_employees");
     out.academicYears=arr("academicYears","academic_years","academic year","years");
     out.terms=arr("terms","academicTerms","academic_terms","semesters");
     const currentYear=data.current_academic_year||data.currentAcademicYear||data["current academic year"]||null;
@@ -52,7 +111,6 @@
         "Schools":out.schools,
         "Dep list":out.departments,
         "Grades":out.grades,
-        "User Student":out.students,
         "Students":out.students,
         "User":storage.get(USER_KEY)||""
       };
@@ -60,7 +118,7 @@
     out.__mishkatScope={
       source:"guidance_bootstrap",
       authoritativeStudents:true,
-      studentsFromUserStudent:true,
+      studentsFromUsersData:true,
       enforceSchoolIntersection:true,
       assignedSchools:true,
       assignedDepartments:true,
@@ -110,6 +168,7 @@
       localStorage.removeItem("mishkat_school_user_context_v4");
       localStorage.removeItem("mishkat_school_user_context_v3");
       localStorage.removeItem("mishkat_school_user_context_v2");
+      sessionStorage.removeItem(LAST_DIRECTORY_KEY);
     }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:true}}));
     return payload;
@@ -122,6 +181,7 @@
       localStorage.removeItem("mishkat_school_user_context_v4");
       localStorage.removeItem("mishkat_school_user_context_v3");
       localStorage.removeItem("mishkat_school_user_context_v2");
+      sessionStorage.removeItem(LAST_DIRECTORY_KEY);
     }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:false}}));
   }
@@ -187,6 +247,7 @@
     headers:authHeaders,
     tokenProvider:async()=>getToken(),
     normalizeDirectoryPayload,
+    fetchDirectorySnapshot,
     typeApiNames:{
       "academic year":"academic year","Users Data":"Users Data","Students":"Students","terms":"terms","School":"School","Department":"Department","Grades":"Grades","Class":"Class","Job Title":"Job Title",
       "Guidance_Attandance":"Guidance_Attandance","Guidance_Cases":"Guidance_Cases","Guidance_Collective":"Guidance_Collective","Guidance_Contact":"Guidance_Contact","guidance_Fail":"guidance_Fail","Guidance_FailType":"Guidance_FailType","Guidance_Late":"Guidance_Late","Guidance_Log":"Guidance_Log","Guidance_Mettings":"Guidance_Mettings","Guidance_observ":"Guidance_observ","Guidance_Observation":"Guidance_Observation","Guidance_Periodic":"Guidance_Periodic","Guidance_ProblemBehav":"Guidance_ProblemBehav","Guidance_ProblemEdu":"Guidance_ProblemEdu","Guidance_Project":"Guidance_Project","Guidance_Project_Progress":"Guidance_Project_Progress","Guidance_Reason":"Guidance_Reason","Guidance_Situ":"Guidance_Situ","Guidance_Situation":"Guidance_Situation","Guidance_Skills":"Guidance_Skills","Guidance_Statistics":"Guidance_Statistics","guidance_Studentnotice":"guidance_Studentnotice","Guidance_SubCollective":"Guidance_SubCollective","Guidance_Way":"Guidance_Way","Guidance_Action":"Guidance_Action","Guidance_Behav":"Guidance_Behav","Guidance_Edu":"Guidance_Edu",

@@ -12,4 +12,4 @@ Changes:
 - Added robust Bubble Thing label detection so School names are resolved even when the display field has a non-standard name.
 - Data API only hydrates the scoped Schools returned by `guidance_bootstrap`; it does not broaden user scope.
 - Student lists fail closed when no School scope is available.
-- Core scripts use cache-busting version `school-1.0.27`.
+- Core scripts use cache-busting version `school-1.0.28`.
