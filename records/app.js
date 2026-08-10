@@ -406,7 +406,13 @@ function directoryItems(source){
     );
   }
   if(source==="employees"){
-    return items.filter(emp=>match(emp.schoolId,emp.schoolName,schoolIds,schoolNames));
+    // مصدر الإحالة = Users Data، مع دعم الموظف الموزع على أكثر من School.
+    if(!schoolIds.size&&!schoolNames.size)return [];
+    return items.filter(emp=>{
+      const ids=(emp.schoolIds?.length?emp.schoolIds:[emp.schoolId]).filter(Boolean).map(String);
+      const names=(emp.schoolNames?.length?emp.schoolNames:[emp.schoolName]).filter(Boolean).map(normScope);
+      return ids.some(id=>schoolIds.has(id))||names.some(name=>schoolNames.has(name));
+    });
   }
   if(source==="campuses"){
     // The Bubble School Data Type is the campus/complex in this school deployment.
@@ -431,6 +437,22 @@ async function loadSchoolBubbleDirectory(){
   state.directory=await window.MishkatBubbleDirectory?.load?.()||{students:[],employees:[],academicYears:[],terms:[],campuses:[],stages:[],grades:[],classes:[]};
   const info=state.directory?.connection||{};
   console.info("Mishkat Bubble directory",{students:state.directory?.students?.length||0,employees:state.directory?.employees?.length||0,academicYears:state.directory?.academicYears?.length||0,terms:state.directory?.terms?.length||0,...info});
+}
+function refreshPersonSelectors(){
+  if(!el.dynamicRecordForm)return;
+  el.dynamicRecordForm.querySelectorAll('select[data-source="students"],select[data-source="employees"]').forEach(select=>{
+    const source=select.dataset.source,current=select.value;
+    select.innerHTML=sourceOptions(source,current);
+    if(current&&[...select.options].some(o=>o.value===current))select.value=current;
+  });
+  el.dynamicRecordForm.querySelectorAll('select[data-student-select]').forEach(select=>{
+    const current=select.value;select.innerHTML=sourceOptions("students",current);if(current&&[...select.options].some(o=>o.value===current))select.value=current;
+  });
+  el.dynamicRecordForm.querySelectorAll('select[data-employee-select]').forEach(select=>{
+    const current=select.value;select.innerHTML=sourceOptions("employees",current);if(current&&[...select.options].some(o=>o.value===current))select.value=current;
+  });
+  refreshAllStudentSummaries();
+  el.dynamicRecordForm.querySelectorAll("[data-repeat-key]").forEach(refreshUniqueStudents);
 }
 function fillAcademicMeta(year="",term=""){
   if(el.metaAcademicYear){
@@ -1473,20 +1495,16 @@ async function init(){
   setView("dashboard");
 }
 
-window.addEventListener("mishkat:directory-ready",event=>{
+function handleDirectoryUpdate(event){
   const next=event?.detail;
-  if(next&&typeof next==="object"){
+  if(next&&typeof next==="object"&&Array.isArray(next.students)){
     state.directory=next;
     fillAcademicMeta(el.metaAcademicYear?.value||"",el.metaAcademicTerm?.value||"");
-    if(state.currentType&&state.currentView==="editor"){
-      const selected={};
-      el.dynamicRecordForm?.querySelectorAll?.('select[data-source="students"],select[data-source="employees"],select[data-student-select],select[data-employee-select]').forEach(node=>selected[node.dataset.field||node.dataset.col||Math.random()]=node.value);
-      // Re-open only if directory was initially empty; this repaints Bubble-backed selectors.
-      if((state.directory?.students?.length||0)>0 && el.dynamicRecordForm?.querySelector?.('select[data-source="students"] option')?.textContent?.includes("لم يتم تحميل")){
-        openRecord(state.currentType,state.currentRecordId?state.records.find(r=>r.id===state.currentRecordId)||null:null);
-      }
-    }
+    fillSchoolContextMeta(el.metaCampus?.value||"",el.metaStage?.value||"");
+    if(state.currentType&&state.currentView==="editor")refreshPersonSelectors();
     refreshStudentReportIndex();
   }
-});
+}
+window.addEventListener("mishkat:directory-ready",handleDirectoryUpdate);
+window.addEventListener("mishkat:directory-loaded",handleDirectoryUpdate);
 init();
