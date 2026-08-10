@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - automatic Bubble school/user context V1.0.36
+ * Mishkat School Platform - automatic Bubble school/user context V1.0.37
  * Uses the existing Bubble schema: Users Data / Students / academic year / School / Department.
  * No school settings are required. Never embed a Bubble admin token here.
  */
@@ -284,7 +284,7 @@
   }
   async function setManager(){console.info("Mishkat: school manager is automatic from Users Data/School; manual changes are disabled.");return getContext();}
   function optionMatch(select,label){if(!select||!label)return "";const n=norm(label);const aliases={"المرحله المتوسطه":["المتوسطه","middle"],"المتوسطه":["المرحله المتوسطه","middle"],"المرحله الثانويه":["الثانويه","secondary"],"الثانويه":["المرحله الثانويه","secondary"],"الابتدائيه":["primary","المرحله الابتدائيه","upper_primary","lower_primary"]};const choices=[n,...(aliases[n]||[])];const o=[...select.options].find(x=>choices.some(c=>norm(x.textContent)===norm(c)||norm(x.value)===norm(c)||norm(x.textContent).includes(norm(c))));return o?.value||"";}
-  function setControl(el,value,{lock=true}={}){if(!el||value===undefined||value===null||String(value)==="")return;if(el.tagName==="SELECT"){let v=optionMatch(el,value)||String(value);if(![...el.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=String(value);o.textContent=String(value);el.appendChild(o);v=String(value);}if(el.value!==v)el.value=v;if(lock)el.disabled=true;}else if("value" in el){if(el.value!==String(value))el.value=String(value);if(lock){el.readOnly=true;el.setAttribute("aria-readonly","true");}}el.dataset.autoContext="true";el.title="يتم تعبئته تلقائيًا من توزيع المستخدم في Bubble";}
+  function setControl(el,value,{lock=true}={}){if(!el||value===undefined||value===null||String(value)==="")return;if(el.tagName==="SELECT"){let v=optionMatch(el,value)||String(value);if(![...el.options].some(o=>o.value===v)){const o=document.createElement("option");o.value=String(value);o.textContent=String(value);el.appendChild(o);v=String(value);}if(el.value!==v)el.value=v;if(lock)el.disabled=true;}else if("value" in el){if(el.value!==String(value))el.value=String(value);if(lock){el.readOnly=true;el.setAttribute("aria-readonly","true");}}el.dataset.autoContext="true";el.title="يتم تعبئته تلقائيًا من توزيع المستخدم";}
   function setText(id,value){const el=document.getElementById(id);if(el&&value&&el.textContent!==value)el.textContent=value;}
   const originals=new WeakMap();
   function genderizeString(value,c){if(c.schoolType!=="girls")return value;return String(value).replace(/الموجه الطلابي/g,c.counselorTitle||"الموجهة الطلابية").replace(/مدير المدرسة/g,c.managerTitle||"مديرة المدرسة").replace(/مدرسة بنين/g,"مدرسة بنات").replace(/صياغات الطلاب/g,"صياغات الطالبات").replace(/شهادات الطلاب/g,"شهادات الطالبات").replace(/تقارير الطلاب/g,"تقارير الطالبات").replace(/نوع الطلاب/g,"نوع الطالبات").replace(/الطلاب/g,"الطالبات").replace(/طلاب/g,"طالبات").replace(/اسم الطالب(?!ة)/g,"اسم الطالبة").replace(/بيانات الطالب(?!ة)/g,"بيانات الطالبة").replace(/ولي أمر الطالب(?!ة)/g,"ولي أمر الطالبة").replace(/ابنكم/g,"ابنتكم").replace(/الطالب(?!ات|ة)/g,"الطالبة");}

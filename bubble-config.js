@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.36 STABLE DIRECTORY LOADING
+ * Mishkat School Platform — Bubble connection settings V1.0.37 STABLE DIRECTORY LOADING
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -160,7 +160,7 @@
     try{payload=text?JSON.parse(text):{}}catch(_e){payload={message:text}}
     if(!response.ok)throw new Error(payload?.message||payload?.error||`فشل تسجيل الدخول (${response.status})`);
     const token=String(findDeep(payload,"token")||"");
-    if(!token)throw new Error("تم تنفيذ تسجيل الدخول لكن Bubble لم يرجع token. راجع Log the user in في guidance_login_test.");
+    if(!token)throw new Error("تم تسجيل الدخول لكن تعذر إنشاء جلسة المستخدم. راجع إعداد تسجيل الدخول.");
     storage.set(TOKEN_KEY,token);
     storage.set(USER_KEY,findDeep(payload,"user_id")||findDeep(payload,"userId")||"");
     storage.set(EXPIRES_KEY,findDeep(payload,"expires")||"");
@@ -210,12 +210,12 @@
     wrap.innerHTML=`<form class="mbtl-card" id="mishkatBubbleTestLoginForm" autocomplete="on">
       <div class="mbtl-head"><b>دخول تجريبي — التوجيه الطلابي</b><span>اختبار الربط مع قاعدة بيانات مدارس المشكاة</span></div>
       <div class="mbtl-body">
-        <div class="mbtl-note">استخدم نفس حساب المستخدم الموجود في Bubble. بيانات الدخول لا تُحفظ داخل ملفات GitHub، ويتم الاحتفاظ بالـ token داخل جلسة المتصفح فقط.</div>
+        <div class="mbtl-note">استخدم نفس حساب المستخدم الموجود في النظام. بيانات الدخول لا تُحفظ، ويتم الاحتفاظ بجلسة الدخول داخل المتصفح فقط.</div>
         <label class="mbtl-field"><span>البريد الإلكتروني</span><input id="mbtlEmail" type="email" autocomplete="username" required></label>
         <label class="mbtl-field"><span>كلمة المرور</span><input id="mbtlPassword" type="password" autocomplete="current-password" required></label>
         <button class="mbtl-submit" id="mbtlSubmit" type="submit">دخول واختبار بياناتي</button>
         <div class="mbtl-error" id="mbtlError"></div>
-        <div class="mbtl-foot">بيئة الاختبار: Bubble version-test</div>
+        <div class="mbtl-foot">بيئة الاختبار</div>
       </div>
     </form>`;
     document.body.appendChild(wrap);
