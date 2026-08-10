@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.44
+ * Mishkat School Platform - Bubble directory adapter V1.0.47
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -41,7 +41,7 @@
       "Class Name","class name","ClassName","className","Class_Name","class_name","اسم الفصل","الفصل","section","Section",
       "School Name","school name","SchoolName","schoolName","School_Name","school_name",
       "Complex Name","complex name","Campus Name","campus name","اسم المجمع","المجمع","مجمع",
-      "Arabic Name","arabic name","Titel","titel","Titel","titel","Name","name","Title","title","label","Label","display","Display",
+      "Arabic Name","arabic name","Job Titel","job titel","JobTitel","jobTitel","Titel","titel","Name","name","Title","title","label","Label","display","Display",
       "اسم","الاسم","اسم المدرسة","School","school"
     ];
     for(const key of preferred){
@@ -183,7 +183,7 @@
 
     const supplementalGroups=[
       ["classes",["classes","Classes","Class"]],
-      ["jobTitles",["jobTitles","job_titles","Job Titles","Job Title"]],
+      ["jobTitles",["jobTitles","job_titles","Job Titels","Job Titles","Job Titel","Job Title"]],
       ["usersData",["usersData","users_data","Users Data","employees","staff","schoolEmployees","school_employees"]],
       ["guidanceActions",["guidanceActions","Guidance_Action"]],
       ["guidanceWays",["guidanceWays","Guidance_Way"]],
@@ -253,7 +253,7 @@
       departments:listFrom(src,["departments","Departments","Department"]),
       grades:listFrom(src,["grades","Grade","Grades"]),
       classes:listFrom(src,["classes","Classes","Class"]),
-      jobTitles:listFrom(src,["jobTitles","job_titles","Job Titles","Job Title"])
+      jobTitles:listFrom(src,["jobTitles","job_titles","Job Titels","Job Titles","Job Titel","Job Title"])
     };
     const indexes={};
     Object.entries(groups).forEach(([key,rows])=>{
@@ -339,10 +339,19 @@
     const schoolNames=[...new Set(schoolValues.map(labelOf).filter(Boolean))];
     const stageIds=[...new Set(depValues.map(idOf).filter(Boolean))];
     const stageNames=[...new Set(depValues.map(labelOf).filter(Boolean))];
+    const fullName=String(pick(raw,["Full Name","full_name"],"")).trim();
+    const currentJobRaw=pick(raw,["Current Job","current_job","Job Title","job_title","role","position","title"],"");
+    const currentJobName=labelOf(currentJob)||labelOf(currentJobRaw)||String(
+      pick(raw,["Current Job Name","current_job_name","Job Title Name","job_title_name"],"")
+    ).trim();
+
     return {
       id,
-      name: String(pick(raw,["Full Name","full_name","name","employee_name","Name","Employee Name","اسم الموظف","الاسم"],"")),
-      role: labelOf(currentJob),
+      fullName,
+      name: fullName || String(pick(raw,["name","employee_name","Name","Employee Name","اسم الموظف","الاسم"],"")).trim(),
+      role: currentJobName,
+      currentJobName,
+      currentJobId:idOf(first(currentJobRaw)),
       employeeCode: String(pick(raw,["Employee Code","employee_code"],"")),
       phone: String(pick(raw,["Phone Number","phone","mobile"],"")),
       schoolName:schoolNames[0]||"", schoolId:schoolIds[0]||"", schoolNames, schoolIds,
@@ -450,11 +459,11 @@
     const store=global.MishkatBubbleStore,config=global.MISHKAT_BUBBLE_CONFIG||{};
     if(!store?.remoteEnabled?.() && !config.dataApiBase && !config.objectApiBase)return null;
     const typeNames=supplementOnly?[
-      "School","Department","Grades","Class","Job Title","academic year","terms","Users Data","Students",
+      "School","Department","Grades","Class","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
     ]:[
-      "School","Department","Grades","Class","Job Title","academic year","terms","Users Data","Students",
+      "School","Department","Grades","Class","Job Titels","job_titles","Job Title","academic year","terms","Users Data","Students",
       "Guidance_Action","Guidance_Way","Guidance_Reason","Guidance_Situ","Guidance_FailType",
       "Guidance_ProblemBehav","Guidance_ProblemEdu","Guidance_Skills","guidance_Studentnotice","Guidance_observ"
     ];
@@ -472,6 +481,19 @@
         console.warn(`Bubble directory type unavailable: ${type}`,result.reason);
       }
     });
+
+    // Bubble schema in this deployment:
+    // Data type: "Job Titels", label field: "Job Titel".
+    // Keep a canonical array so relation IDs from Users Data -> Current Job can resolve.
+    const jobCandidates=[
+      src["Job Titels"],src["job_titles"],src["Job Title"],src["Job Titles"],src.jobTitles
+    ].filter(Array.isArray);
+    const populatedJobs=jobCandidates.find(rows=>rows.length);
+    if(populatedJobs){
+      src.jobTitles=populatedJobs;
+      src["Job Titels"]=populatedJobs;
+    }
+
     return success?src:null;
   }
   let activeLoadPromise=null;
