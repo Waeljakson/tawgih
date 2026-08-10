@@ -158,11 +158,11 @@
 @media(max-width:620px){.record-report-heading{flex-direction:column}.record-new-cta{width:100%}.record-report-title-group{width:100%;flex-direction:column}.record-report-filters{grid-template-columns:1fr}.record-report-search{grid-column:auto}.record-report-count{min-height:58px}.record-report-panel{border-radius:16px}.record-report-table-shell{padding:6px}}
 @media print{#recordReportView{display:none!important}}
 
-/* V1.0.43 — Daily incident conditional dropdowns */
+/* V1.0.44 — Daily incident conditional dropdowns */
 .incident-field-disabled{opacity:.52;transition:opacity .18s ease}
 .incident-field-disabled select{background:#f1f5f7!important;color:#8b99a1!important;cursor:not-allowed}
 
-/* V1.0.43 — New Record fresh-data loader */
+/* V1.0.44 — New Record fresh-data loader */
 .new-record-data-loader[hidden]{display:none!important}
 .new-record-data-loader{position:fixed;inset:0;z-index:2147482600;display:grid;place-items:center;background:rgba(247,251,249,.96);backdrop-filter:blur(6px);opacity:0;transition:opacity .22s ease;direction:rtl}
 .new-record-data-loader.visible{opacity:1}.new-record-data-loader.done{opacity:0;pointer-events:none}
@@ -173,7 +173,7 @@
 .nrdl-bar{width:180px;height:5px;background:#dfe9e2;border-radius:99px;overflow:hidden}.nrdl-bar i{display:block;width:38%;height:100%;background:#3c7c48;border-radius:inherit;animation:nrdlBar 1.05s ease-in-out infinite}
 @keyframes nrdlFill{0%{height:4%}75%{height:94%}100%{height:99%}}@keyframes nrdlBar{0%{transform:translateX(210%)}100%{transform:translateX(-310%)}}
 
-/* V1.0.43 — searchable student selector */
+/* V1.0.44 — searchable student selector */
 .student-search-field input[type="search"]{
   padding-inline-start:42px;
   background-image:linear-gradient(transparent,transparent);
@@ -187,7 +187,7 @@
   font-weight:700;
 }
 
-/* V1.0.43 — fixed linked fields, collapsed multiline editors, student reports */
+/* V1.0.44 — fixed linked fields, collapsed multiline editors, student reports */
 .record-meta-grid #metaTitle[readonly]{
   background:#f4f8fa;
   color:#27495c;
@@ -259,7 +259,7 @@
   .collapsible-textarea-body textarea{display:block!important;min-height:45px}
 }
 
-/* V1.0.43 — compact student-linked fields + report search */
+/* V1.0.44 — compact student-linked fields + report search */
 .form-field input[data-field="grade"][readonly],
 .form-field input[data-field="class_name"][readonly],
 .form-field input[data-field="guardian_phone"][readonly]{
@@ -320,7 +320,7 @@
   font-size:.82rem;
 }
 
-/* V1.0.43 — RTL field values + compact guardian phone */
+/* V1.0.44 — RTL field values + compact guardian phone */
 .form-section input,
 .form-section select,
 .form-section textarea,
@@ -369,3 +369,26 @@
     max-width:none;
   }
 }
+
+/* V1.0.44 — Student comprehensive report drill-down */
+.student-report-type-breakdown{grid-template-columns:repeat(4,minmax(0,1fr))}
+.report-type-chip-button{appearance:none;width:100%;cursor:pointer;text-align:right;font:inherit;position:relative;transition:.16s ease}
+.report-type-chip-button:hover{transform:translateY(-1px);border-color:#b9d8e2;box-shadow:0 8px 18px rgba(26,75,96,.08)}
+.report-type-chip-button .report-type-icon,.report-type-chip-print .report-type-icon{font-size:1.25rem}
+.report-type-chip-button div{flex:1}
+.report-type-chip-button strong,.report-type-chip-print strong{font-size:1.35rem;line-height:1;color:#123f54}
+.report-type-chip-button small,.report-type-chip-print small{margin-top:5px;line-height:1.5}
+.report-type-chip-button>b{font-size:1.3rem;color:#63818f;font-weight:500}.print-only{display:none}
+.student-report-timeline{gap:10px}
+.student-report-type-group{border:1px solid #d9e7ec;border-radius:15px;background:#fff;overflow:hidden}
+.student-report-type-group>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:42px 1fr 28px;align-items:center;gap:10px;padding:13px 15px;background:linear-gradient(145deg,#fbfdfe,#f5fafb)}
+.student-report-type-group>summary::-webkit-details-marker{display:none}
+.student-report-type-group>summary .student-report-type-group-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#edf7f9;border:1px solid #d5e9ee}
+.student-report-type-group>summary strong{display:block;color:#193f52;font-size:.9rem}.student-report-type-group>summary small{display:block;color:#748993;font-size:.7rem;margin-top:2px}
+.student-report-type-group>summary>b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#eaf4f7;color:#315f72;font-size:1rem}.student-report-type-group[open]>summary>b{transform:rotate(45deg)}
+.student-report-occurrence-list{display:flex;flex-direction:column;border-top:1px solid #e1ebef}
+.student-report-occurrence{appearance:none;border:0;border-bottom:1px solid #edf2f4;background:#fff;width:100%;display:grid;grid-template-columns:112px 1fr auto;align-items:center;gap:14px;padding:12px 15px;text-align:right;font:inherit;cursor:pointer}
+.student-report-occurrence:last-child{border-bottom:0}.student-report-occurrence:hover{background:#f7fbfc}.student-report-occurrence.confidential{background:#fffafa}
+.student-report-occurrence time{color:#315b6e;font-size:.75rem;font-weight:800;white-space:nowrap}.student-report-occurrence div strong{display:block;color:#1c4356;font-size:.82rem;line-height:1.65}.student-report-occurrence div small{display:block;margin-top:3px;color:#788c95;font-size:.66rem}.student-report-occurrence>span{color:#0b628f;font-size:.7rem;font-weight:800;white-space:nowrap}
+@media(max-width:760px){.student-report-occurrence{grid-template-columns:1fr;gap:5px}.student-report-occurrence>span{justify-self:start}}
+@media print{body.printing-student-report .no-print{display:none!important}body.printing-student-report .print-only{display:flex!important}body.printing-student-report .student-report-type-group{break-inside:avoid-page;border-radius:8px;margin-bottom:5px}body.printing-student-report .student-report-type-group>summary{padding:6px 8px;grid-template-columns:28px 1fr}body.printing-student-report .student-report-type-group>summary>b{display:none}body.printing-student-report .student-report-type-group>summary .student-report-type-group-icon{width:26px;height:26px;border-radius:7px}body.printing-student-report .student-report-occurrence{grid-template-columns:80px 1fr;padding:5px 8px;gap:7px}body.printing-student-report .student-report-occurrence div strong{font-size:7.5pt}body.printing-student-report .student-report-occurrence div small,body.printing-student-report .student-report-occurrence time{font-size:6.5pt}}

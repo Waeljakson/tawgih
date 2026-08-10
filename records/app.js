@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.43";
+const SCHOOL_SCHEMA_VERSION="1.0.44";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -1299,6 +1299,27 @@ async function deleteRecord(id){if(!confirm("سيتم حذف السجل نهائ
 
 function openSavedRecord(id,printAfter=false){const record=state.records.find(r=>r.id===id);if(!record)return;openRecord(record.record_type,record);if(printAfter)setTimeout(()=>printCurrentRecord(),350);}
 
+const STUDENT_REPORT_GROUPS = {
+  incidents: new Set(["daily_incident","educational_guidance","behavioral_guidance","academic_weakness_guidance"]),
+  guidance: new Set(["group_guidance","academic_weakness_guidance","educational_guidance","behavioral_guidance","lateness_guidance","absence_guidance","individual_interview","new_student_interview","guardian_contact","guardian_invitation","observation_visit"]),
+  attendance: new Set(["lateness_guidance","absence_guidance","lateness_tracking","absence_tracking"]),
+  cases: new Set(["case_study"])
+};
+const STUDENT_REPORT_SUMMARY_KEYS = [
+  "incident_details","session_title","problem_notes","problem_description","problem_summary",
+  "referral_reason","problems","classification","causes","solutions","final_diagnosis",
+  "preliminary_diagnosis","guidance_summary","session_summary","interview_summary",
+  "purpose","communication_details","outcomes","outcome","focus","invitation_reason",
+  "follow_up_notes","student_commitment","notes"
+];
+function hasReportValue(value){
+  if(value===null||value===undefined)return false;
+  if(typeof value==="string")return cleanText(value)!=="";
+  if(Array.isArray(value))return value.some(hasReportValue);
+  if(typeof value==="object")return Object.values(value).some(hasReportValue);
+  return true;
+}
+
 function normalizeStudentName(value){
   return cleanText(value).toLowerCase()
     .replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه")
@@ -1447,6 +1468,35 @@ function reportRecordSummary(record){
   const def=RECORDS[record.record_type];
   return def?.description||"سجل مرتبط بالطالب.";
 }
+
+const STUDENT_REPORT_TYPE_LABELS = {
+  group_guidance:"جلسات الإرشاد الجمعي", academic_weakness_guidance:"جلسات إرشاد الضعف الدراسي",
+  educational_guidance:"جلسات الإرشاد للمشكلات التعليمية", behavioral_guidance:"جلسات الإرشاد للمشكلات السلوكية",
+  lateness_guidance:"جلسات إرشاد التأخر", absence_guidance:"جلسات إرشاد الغياب",
+  guardian_contact:"سجلات التواصل مع ولي الأمر", guidance_visit:"زيارات التوجيه",
+  case_study:"دراسات الحالة", guardian_invitation:"دعوات أولياء الأمور",
+  observation_visit:"زيارات الملاحظة", new_student_interview:"مقابلات الطلاب المستجدين",
+  individual_interview:"المقابلات الفردية", daily_incident:"المواقف اليومية",
+  lateness_tracking:"سجلات حصر التأخر", absence_tracking:"سجلات حصر الغياب"
+};
+const STUDENT_REPORT_OCCURRENCE_KEYS = {
+  daily_incident:["incident_details","behavior_code","education_code","notes"],
+  group_guidance:["session_title","objectives","session_flow"],
+  academic_weakness_guidance:["weak_subjects","problem_description","session_content"],
+  educational_guidance:["problems","problem_notes","session_content"],
+  behavioral_guidance:["problems","problem_notes","session_content"],
+  lateness_guidance:["causes","solutions","student_commitment"], absence_guidance:["causes","solutions","student_commitment"],
+  guardian_contact:["purpose","communication_details","notes"], guidance_visit:["topics","other_topic","visit_notes"],
+  case_study:["problem_summary","classification","final_diagnosis"], guardian_invitation:["invitation_reason","response"],
+  observation_visit:["focus","observation_notes"], new_student_interview:["counselor_notes","student_feelings","academic_background"],
+  individual_interview:["outcomes","objectives","content"], lateness_tracking:["notes","semester"], absence_tracking:["notes","semester"]
+};
+function studentReportTypeLabel(type){return STUDENT_REPORT_TYPE_LABELS[type]||RECORDS[type]?.title||type||"سجل";}
+function studentReportOccurrenceTitle(record){
+  const data=record?.form_data||{};const keys=STUDENT_REPORT_OCCURRENCE_KEYS[record?.record_type]||STUDENT_REPORT_SUMMARY_KEYS;
+  for(const key of keys)if(hasReportValue(data[key]))return truncateReportText(data[key],120);
+  const summary=reportRecordSummary(record);return truncateReportText(summary||RECORDS[record?.record_type]?.title||record?.title||"سجل الطالب",120);
+}
 function renderReportSimpleValue(field,value){
   if(Array.isArray(value)){
     return `<ul class="report-value-list">${value.filter(hasReportValue).map(item=>`<li>${escapeHtml(plainReportValue(item))}</li>`).join("")}</ul>`;
@@ -1589,29 +1639,30 @@ async function generateStudentReport(){
   el.studentReportAttendance.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.attendance.has(r.record_type)).length;
   el.studentReportCases.textContent=records.filter(r=>STUDENT_REPORT_GROUPS.cases.has(r.record_type)).length;
 
-  const typeCounts=new Map();
-  records.forEach(record=>typeCounts.set(record.record_type,(typeCounts.get(record.record_type)||0)+1));
-  el.studentReportTypeBreakdown.innerHTML=[...typeCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([type,count])=>{
-    const def=RECORDS[type]||{title:type,icon:"▤"};
-    return `<div class="report-type-chip"><span>${def.icon}</span><div><strong>${escapeHtml(def.title)}</strong><small>${count} سجل</small></div></div>`;
+  const recordsByType=new Map();
+  records.forEach(record=>{
+    if(!recordsByType.has(record.record_type))recordsByType.set(record.record_type,[]);
+    recordsByType.get(record.record_type).push(record);
+  });
+  const typeGroups=[...recordsByType.entries()].sort((a,b)=>b[1].length-a[1].length||studentReportTypeLabel(a[0]).localeCompare(studentReportTypeLabel(b[0]),"ar"));
+
+  // المستوى الأول: العدد حسب نوع السجل فقط.
+  el.studentReportTypeBreakdown.innerHTML=typeGroups.map(([type,typeRecords])=>{
+    const def=RECORDS[type]||{icon:"▤"};
+    return `<button class="report-type-chip report-type-chip-button no-print" data-report-type-jump="${escapeHtml(type)}" type="button">
+      <span class="report-type-icon">${def.icon}</span><div><strong>${typeRecords.length}</strong><small>${escapeHtml(studentReportTypeLabel(type))}</small></div><b aria-hidden="true">›</b>
+    </button><div class="report-type-chip report-type-chip-print print-only"><span class="report-type-icon">${def.icon}</span><div><strong>${typeRecords.length}</strong><small>${escapeHtml(studentReportTypeLabel(type))}</small></div></div>`;
   }).join("");
 
-  el.studentReportTimeline.innerHTML=records.map((record,index)=>{
-    const def=RECORDS[record.record_type]||{title:record.record_type,icon:"▤",category:"سجل"};
-    return `<article class="student-report-event${record.is_confidential?" confidential":""}">
-      <div class="student-report-marker"><span>${def.icon}</span><i></i></div>
-      <div class="student-report-event-card">
-        <header>
-          <div><span>${escapeHtml(def.category||"سجل")}</span><h3>${escapeHtml(def.title)}</h3><p>${escapeHtml(reportRecordSummary(record))}</p></div>
-          <div class="report-event-meta"><strong>${formatDate(reportRecordDate(record))}</strong><small>${escapeHtml(record.class_name||"الفصل غير محدد")}</small><em class="status-badge ${escapeHtml(record.status)}">${reportStatusLabel(record.status)}</em>${record.is_confidential?'<b>سري</b>':""}</div>
-        </header>
-        <details class="report-record-details"${index===0?" open":""}>
-          <summary>عرض جميع بيانات هذا السجل</summary>
-          <div class="report-record-details-body">${renderReportRecordDetails(record,studentKey)}</div>
-        </details>
-        <div class="report-event-actions no-print"><button class="secondary-button compact-button" data-open-report-record="${record.id}" type="button">فتح السجل الأصلي</button></div>
-      </div>
-    </article>`;
+  // المستوى الثاني: التواريخ + اسم الموقف/الجلسة. المستوى الثالث: فتح السجل الأصلي.
+  el.studentReportTimeline.innerHTML=typeGroups.map(([type,typeRecords])=>{
+    const def=RECORDS[type]||{title:type,icon:"▤"};
+    return `<details class="student-report-type-group" data-report-type-group="${escapeHtml(type)}">
+      <summary><span class="student-report-type-group-icon">${def.icon}</span><div><strong>${escapeHtml(studentReportTypeLabel(type))}</strong><small>${typeRecords.length} سجل</small></div><b aria-hidden="true">+</b></summary>
+      <div class="student-report-occurrence-list">${typeRecords.map(record=>`<button class="student-report-occurrence${record.is_confidential?" confidential":""}" data-open-report-record="${record.id}" type="button">
+        <time>${formatDate(reportRecordDate(record))}</time><div><strong>${escapeHtml(studentReportOccurrenceTitle(record))}</strong><small>${escapeHtml(record.class_name||"الفصل غير محدد")} · ${reportStatusLabel(record.status)}${record.is_confidential?" · سري":""}</small></div><span class="no-print">فتح السجل</span>
+      </button>`).join("")}</div>
+    </details>`;
   }).join("");
 
   el.studentReportDocument.hidden=false;
@@ -1867,6 +1918,12 @@ function bindEvents(){
   if(el.resetStudentReportButton)el.resetStudentReportButton.addEventListener("click",resetStudentReport);
   if(el.refreshStudentReportsButton)el.refreshStudentReportsButton.addEventListener("click",async()=>{const ok=await prepareStudentReportsView(true);if(ok)showToast("تم تحديث بيانات تقارير الطلاب.");});
   if(el.printStudentReportButton)el.printStudentReportButton.addEventListener("click",printStudentReport);
+  if(el.studentReportTypeBreakdown)el.studentReportTypeBreakdown.addEventListener("click",e=>{
+    const trigger=e.target.closest("[data-report-type-jump]");if(!trigger)return;
+    const type=trigger.dataset.reportTypeJump;
+    const group=el.studentReportTimeline?.querySelector(`[data-report-type-group="${CSS.escape(type)}"]`);
+    if(!group)return;group.open=!group.open;if(group.open)setTimeout(()=>group.scrollIntoView({behavior:"smooth",block:"nearest"}),40);
+  });
   if(el.studentReportTimeline)el.studentReportTimeline.addEventListener("click",e=>{const open=e.target.closest("[data-open-report-record]");if(open)openSavedRecord(open.dataset.openReportRecord);});
   window.addEventListener("afterprint",restoreStudentReportPrintState);
     if(el.schoolLogoInput)el.schoolLogoInput.addEventListener("change",()=>handleLogoUpload(el.schoolLogoInput.files?.[0]));if(el.saveSchoolProfileButton)el.saveSchoolProfileButton.addEventListener("click",saveSchoolProfile);if(el.requestPremiumButton)el.requestPremiumButton.addEventListener("click",showPaymentModal);
