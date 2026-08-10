@@ -1255,8 +1255,9 @@ async function resizeImage(file,max=900,quality=.88){
 }
 async function handleLogoUpload(file){if(!file)return;if(file.size>1.5*1024*1024)return showBox(el.settingsStatus,"حجم الشعار أكبر من 1.5 ميجابايت.",true);try{state.pendingSchoolLogo=await resizeImage(file);applyAccountUI();showBox(el.settingsStatus,"تم تجهيز الشعار. اضغط حفظ بيانات المدرسة.");}catch{showBox(el.settingsStatus,"تعذر قراءة الشعار.",true);}}
 async function saveSchoolProfile(){
-  if(!state.user)return;const schoolName=cleanText(el.schoolProfileName.value);const fullName=cleanText(el.profileFullName.value);if(!schoolName)return showBox(el.settingsStatus,"اكتب اسم المدرسة أولًا.",true);
-  el.saveSchoolProfileButton.disabled=true;try{const logo=state.pendingSchoolLogo||state.account?.school_logo_data||null;const{data,error}=await db.rpc("premium_update_school_profile",{p_full_name:fullName||state.user.email,p_school_name:schoolName,p_school_logo_data:logo});if(error)throw error;state.account={...state.account,...data};state.pendingSchoolLogo=null;applyAccountUI();showBox(el.settingsStatus,"تم حفظ اسم المدرسة وشعارها.");}catch(error){showBox(el.settingsStatus,error.message||"تعذر حفظ بيانات المدرسة.",true);}finally{el.saveSchoolProfileButton.disabled=false;}
+  // School edition: distribution identity is read-only and comes from Bubble.
+  applyAccountUI();
+  if(el.settingsStatus)showBox(el.settingsStatus,"بيانات التوزيع تُحدّث تلقائيًا من Bubble ولا تحتاج إلى حفظ يدوي.");
 }
 
 function showPaymentModal(){
