@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform - Bubble directory adapter V1.0.33
+ * Mishkat School Platform - Bubble directory adapter V1.0.34
  * Exact schema aliases are based on the existing Bubble database.
  * Do NOT place a Bubble admin token in frontend JavaScript.
  */
@@ -41,7 +41,7 @@
       "Class Name","class name","ClassName","className","Class_Name","class_name","اسم الفصل","الفصل","section","Section",
       "School Name","school name","SchoolName","schoolName","School_Name","school_name",
       "Complex Name","complex name","Campus Name","campus name","اسم المجمع","المجمع","مجمع",
-      "Arabic Name","arabic name","Name","name","Title","title","label","Label","display","Display",
+      "Arabic Name","arabic name","Titel","titel","Titel","titel","Name","name","Title","title","label","Label","display","Display",
       "اسم","الاسم","اسم المدرسة","School","school"
     ];
     for(const key of preferred){
@@ -511,7 +511,10 @@
         }catch(error){console.warn("Mishkat: could not hydrate Students -> Class relation.",error);}
       }
 
-      const className=classLabelOf(classThing,fullStudent)||classLabelOf(classRef,fullStudent);
+      const exactTitel=(classThing&&typeof classThing==="object")
+        ? String(pick(classThing,["Titel","titel"],"")||"").trim()
+        : "";
+      const className=exactTitel||classLabelOf(classThing,fullStudent)||classLabelOf(classRef,fullStudent);
       const resolvedId=idOf(classThing)||classId;
       student.raw=fullStudent;
       if(className)student.className=className;
