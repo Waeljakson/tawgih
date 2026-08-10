@@ -5,7 +5,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3C7eKHRkzE2T-OLOpfue4g_i3u4R7Ay
 const WHATSAPP_NUMBER = "966582712620";
 const CURRENT_PACKAGE_CODE = "guidance_records";
 const SCHOOL_EDITION=true;
-const SCHOOL_SCHEMA_VERSION="1.0.35";
+const SCHOOL_SCHEMA_VERSION="1.0.36";
 const UNIFIED_PLATFORM_ROUTES = {
   results_analysis: {label:"تحليل النتائج", href:"../analysis/index.html"},
   guidance_records: {label:"السجلات الرقمية", href:"../records/index.html"},
@@ -442,7 +442,7 @@ function sourceOptions(source,selected=""){
 async function loadSchoolBubbleDirectory(){
   state.directory=await window.MishkatBubbleDirectory?.load?.()||{students:[],employees:[],academicYears:[],terms:[],campuses:[],stages:[],grades:[],classes:[]};
   const info=state.directory?.connection||{};
-  console.info("Mishkat Bubble directory",{students:state.directory?.students?.length||0,employees:state.directory?.employees?.length||0,academicYears:state.directory?.academicYears?.length||0,terms:state.directory?.terms?.length||0,...info});
+  console.info("Mishkat Bubble directory",{students:state.directory?.students?.length||0,studentClassesReceived:(window.MISHKAT_BUBBLE_DATA?.studentClasses||window.MISHKAT_BUBBLE_DATA?.student_classes||[]).length||0,studentsWithClass:(state.directory?.students||[]).filter(s=>s.className).length,employees:state.directory?.employees?.length||0,academicYears:state.directory?.academicYears?.length||0,terms:state.directory?.terms?.length||0,...info});
 }
 function refreshPersonSelectors(){
   if(!el.dynamicRecordForm)return;
@@ -1134,6 +1134,12 @@ async function deleteRecord(id){if(!confirm("سيتم حذف السجل نهائ
 
 function openSavedRecord(id,printAfter=false){const record=state.records.find(r=>r.id===id);if(!record)return;openRecord(record.record_type,record);if(printAfter)setTimeout(()=>printCurrentRecord(),350);}
 
+function normalizeStudentName(value){
+  return cleanText(value).toLowerCase()
+    .replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه")
+    .replace(/[\u064B-\u065F\u0670\u0640]/g,"")
+    .replace(/[^\p{L}\p{N}]+/gu," ").trim();
+}
 function collectStudentReferences(value,refs=[],inheritedClass=""){
   if(Array.isArray(value)){value.forEach(item=>collectStudentReferences(item,refs,inheritedClass));return refs;}
   if(!value||typeof value!=="object")return refs;
