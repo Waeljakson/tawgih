@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta name="app-version" content="school-1.0.49">
+  <meta name="app-version" content="school-1.0.86">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles-v11.css?v=school-1.0.20">
+  <link rel="stylesheet" href="styles-v11.css?v=school-1.0.86">
   <style>
     .unified-platform-bar{position:sticky;top:0;z-index:10020;background:rgba(255,255,255,.96);border-bottom:1px solid rgba(8,72,102,.12);box-shadow:0 10px 32px rgba(7,63,93,.10);backdrop-filter:blur(18px);font-family:Cairo,Tahoma,sans-serif}
     .unified-platform-inner{width:min(1380px,calc(100% - 28px));margin:auto;min-height:78px;display:grid;grid-template-columns:minmax(215px,.85fr) minmax(520px,2.2fr) minmax(205px,.8fr);align-items:center;gap:18px}
@@ -52,8 +52,9 @@
   <style>
     #loginPage,#paymentModal,#requestمدارس المشكاة الأهليةButton,#supportChatToggle,#openSupportButton,#adminPanel{display:none!important}
   </style>
+  <link rel="stylesheet" href="../school-free-mode.css?v=school-1.0.86">
 </head>
-<body>
+<body data-school-free="true">
   <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
     <div class="unified-platform-inner">
       <a class="unified-brand" href="../index.html" aria-label="العودة إلى بوابة المنصات">
@@ -82,7 +83,7 @@
         <div class="login-card-head">
           <span>دخول المنصة</span>
           <h2>سجّل الدخول أو أنشئ حسابًا</h2>
-          <p>جميع وظائف السجلات متاحة لمستخدمي مدارس المشكاة الأهلية بدون باقات أو اشتراكات.</p>
+          <p>جميع وظائف السجلات متاحة مباشرة لمستخدمي مدارس المشكاة الأهلية.</p>
         </div>
         <div class="auth-grid">
           <label><span>البريد الإلكتروني</span><input id="authEmail" type="email" autocomplete="email" placeholder="name@school.edu.sa"></label>
@@ -90,10 +91,10 @@
           <label class="full-width"><span>الاسم الكامل — عند إنشاء حساب جديد</span><input id="authFullName" type="text" autocomplete="name" placeholder="اسم المستخدم"></label>
           <div class="actions full-width auth-actions">
             <button id="signInButton" class="primary-button" type="button">تسجيل الدخول</button>
-            <button id="signUpButton" class="secondary-button" type="button">إنشاء حساب تجريبي</button>
+            <button id="signUpButton" class="secondary-button" type="button">إنشاء حساب المدرسة</button>
           </div>
         </div>
-        <div class="price-strip" hidden><strong>الباقات</strong><span>السجلات: 10 شهريًا أو 50 سنويًا</span><small>الشاملة: 50 شهريًا أو 300 سنويًا — جميع المنصات</small></div>
+        <div class="price-strip" hidden><strong>الباقات</strong><span>السجلات: 10 متاحةًا أو 50 متاحةًا</span><small>الشاملة: 50 متاحةًا أو 300 متاحةًا — جميع المنصات</small></div>
         <div id="loginStatus" class="status-box" hidden></div>
       </div>
     </div>
@@ -138,7 +139,7 @@
       <section id="dashboardView" class="app-view active-view">
         <div class="welcome-strip">
           <div><span class="section-kicker">ابدأ من هنا</span><h2>اختر السجل الذي تريد تعبئته</h2><p>كل سجل يحتوي على شرح مختصر ونموذج رقمي منظم مستند إلى النماذج المرفقة.</p></div>
-          <div class="plan-chip"><span>الخطة الحالية</span><strong id="dashboardPlan">تجريبي</strong><small id="dashboardPlanExpiry">المعاينة فقط</small></div>
+          <div class="plan-chip"><span>حالة الخدمة</span><strong id="dashboardPlan">منصة المدرسة</strong><small id="dashboardPlanExpiry">جميع وظائف السجلات متاحة</small></div>
         </div>
 
         <section class="stats-grid" aria-label="إحصاءات السجلات">
@@ -394,10 +395,10 @@
 
           <article class="settings-card subscription-card" hidden>
             <span class="premium-pill">مدارس المشكاة الأهلية</span>
-            <h3>10 ريالات شهريًا أو 50 ريالًا سنويًا</h3>
+            <h3>جميع وظائف السجلات متاحة</h3>
             <p>الحفظ السحابي، تعديل السجلات، الأرشيف، والطباعة PDF متاحة للمشتركين.</p>
-            <div class="current-plan-box"><span>الخطة الحالية</span><strong id="currentUserPlan">تجريبي</strong><small id="subscriptionExpiry">المعاينة فقط</small></div>
-            <button id="requestمدارس المشكاة الأهليةButton" class="primary-button" type="button">طلب تفعيل مدارس المشكاة الأهلية</button>
+            <div class="current-plan-box"><span>حالة الخدمة</span><strong id="currentUserPlan">منصة المدرسة</strong><small id="subscriptionExpiry">جميع الوظائف متاحة</small></div>
+            <button id="requestمدارس المشكاة الأهليةButton" class="primary-button" type="button">متاحة بالكامل</button>
           </article>
 
           <article class="settings-card account-card">
@@ -410,9 +411,9 @@
       </section>
 
       <section id="adminView" class="app-view">
-        <div class="view-heading"><div><span class="section-kicker">لوحة المدير</span><h2>إدارة الاشتراكات والحسابات</h2><p>مراجعة طلبات التفعيل القادمة من جميع المنصات، وتفعيل الباقة المطلوبة فقط أو الباقة الشاملة، وتعيين المديرين.</p></div><button id="refreshAdminButton" class="secondary-button" type="button">تحديث البيانات</button></div>
+        <div class="view-heading"><div><span class="section-kicker">لوحة المدير</span><h2>إدارة الحسابات والدعم</h2><p>إدارة حسابات المدرسة والصلاحيات ومتابعة الدعم الفني.</p></div><button id="refreshAdminButton" class="secondary-button" type="button">تحديث البيانات</button></div>
         <div class="admin-grid">
-          <article class="admin-panel"><h3>طلبات الاشتراك</h3><div id="subscriptionRequestsList" class="admin-list"></div></article>
+          <article class="admin-panel" hidden><h3>طلبات التفعيل القديمة</h3><div id="subscriptionRequestsList" class="admin-list"></div></article>
           <article class="admin-panel"><h3>الحسابات والصلاحيات</h3><div id="premiumUsersList" class="admin-list"></div></article>
           <article class="admin-panel admin-support-panel"><h3>محادثات الدعم</h3><div class="admin-support-layout"><div id="adminSupportThreadsList" class="support-threads-list"></div><div class="support-thread-detail"><div class="support-thread-head"><div><strong id="adminSupportThreadTitle">اختر محادثة</strong><small id="adminSupportThreadMeta"></small></div><button id="adminSupportStatusButton" class="ghost-button" type="button" disabled>إغلاق المحادثة</button></div><div id="adminSupportMessages" class="support-messages admin-messages"></div><div class="support-compose"><textarea id="adminSupportReplyInput" rows="2" placeholder="اكتب رد الدعم"></textarea><button id="adminSupportReplyButton" class="primary-button" type="button" disabled>إرسال الرد</button></div></div></div></article>
         </div>
@@ -433,31 +434,32 @@
     <section class="modal-card payment-modal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
       <button id="closePaymentModalButton" class="modal-close" type="button">×</button>
       <span class="premium-pill">مدارس المشكاة الأهلية</span>
-      <h2 id="paymentModalTitle">اختر خطة الاشتراك</h2>
-      <p id="paymentModalDescription">اختر باقة السجلات أو الباقة الشاملة، ثم تواصل عبر واتساب وأرسل طلب التفعيل.</p>
+      <h2 id="paymentModalTitle">خدمات المدرسة</h2>
+      <p id="paymentModalDescription">جميع وظائف السجلات متاحة ضمن حساب المدرسة.</p>
       <div class="plan-options package-plan-options">
-        <label><input type="radio" name="premiumBillingPeriod" value="guidance_records_monthly"><span><em>باقة السجلات</em><strong>شهري</strong><b>10 ريالات</b><small>السجلات الرقمية فقط — شهر</small></span></label>
-        <label class="recommended"><input type="radio" name="premiumBillingPeriod" value="guidance_records_yearly" checked><span><em>باقة السجلات</em><strong>سنوي</strong><b>50 ريالًا</b><small>السجلات الرقمية فقط — سنة</small></span></label>
-        <label class="comprehensive"><input type="radio" name="premiumBillingPeriod" value="all_access_monthly"><span><em>الباقة الشاملة</em><strong>شهري شامل</strong><b>50 ريالًا</b><small>جميع المنصات — شهر</small></span></label>
-        <label class="comprehensive"><input type="radio" name="premiumBillingPeriod" value="all_access_yearly"><span><em>الباقة الشاملة</em><strong>سنوي شامل</strong><b>300 ريال</b><small>جميع المنصات — سنة</small></span></label>
+        <label><input type="radio" name="premiumBillingPeriod" value="guidance_records_monthly"><span><em>السجلات الرقمية</em><strong>متاحة</strong><b>متاحة</b><small>السجلات الرقمية فقط — ضمن المدرسة</small></span></label>
+        <label class="recommended"><input type="radio" name="premiumBillingPeriod" value="guidance_records_yearly" checked><span><em>السجلات الرقمية</em><strong>متاحة</strong><b>متاحة</b><small>السجلات الرقمية فقط — ضمن المدرسة</small></span></label>
+        <label class="comprehensive"><input type="radio" name="premiumBillingPeriod" value="all_access_monthly"><span><em>جميع الخدمات</em><strong>متاحة</strong><b>متاحة</b><small>جميع المنصات — ضمن المدرسة</small></span></label>
+        <label class="comprehensive"><input type="radio" name="premiumBillingPeriod" value="all_access_yearly"><span><em>جميع الخدمات</em><strong>متاحة</strong><b>متاحة</b><small>جميع المنصات — ضمن المدرسة</small></span></label>
       </div>
-      <a id="whatsappContactButton" class="whatsapp-button" target="_blank" rel="noopener">مراسلة واتساب لبيانات الاشتراك</a>
+      <a id="whatsappContactButton" class="whatsapp-button" target="_blank" rel="noopener">الدعم الفني</a>
       <label class="payment-confirm"><input id="paymentConfirmCheckbox" type="checkbox"><span id="paymentConfirmText">أؤكد أنني تواصلت عبر واتساب بخصوص التفعيل.</span></label>
-      <div id="paymentSecurityNote" class="payment-note">لن يتم تفعيل الاشتراك إلا بعد التواصل عبر واتساب واستكمال إجراءات الاشتراك.</div>
+      <div id="paymentSecurityNote" class="payment-note">نسخة المدرسة متاحة بالكامل.</div>
       <button id="confirmمدارس المشكاة الأهليةRequestButton" class="primary-button full-button" type="button" disabled>إرسال طلب التفعيل</button>
     </section>
   </div>
 
   <div id="trialWatermark" class="trial-watermark" aria-hidden="true" hidden></div>
-  <div id="screenShield" class="screen-shield" hidden><div><strong>المحتوى محمي في الحساب التجريبي</strong><span>تعود الشاشة عند الرجوع إلى المنصة.</span></div></div>
+  <div id="screenShield" class="screen-shield" hidden><div><strong>المحتوى محمي</strong><span>تعود الشاشة عند الرجوع إلى المنصة.</span></div></div>
 
-  <script src="../bubble-schema.js?v=school-1.0.49"></script>
-  <script src="../bubble-config.js?v=school-1.0.49"></script>
-  <script src="../school-context.js?v=school-1.0.49"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="../school-directory.js?v=school-1.0.49"></script>
-  <script src="records-bubble-adapter.js?v=school-1.0.49"></script>
-  <script src="app.js?v=school-1.0.49"></script>
-  <script src="../global-shell.js?v=school-1.0.49"></script>
+  <script src="../bubble-schema.js?v=school-1.0.86"></script>
+  <script src="../bubble-config.js?v=school-1.0.86"></script>
+  <script src="../school-context.js?v=school-1.0.86"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="../school-directory.js?v=school-1.0.86"></script>
+  <script src="records-bubble-adapter.js?v=school-1.0.86"></script>
+  <script src="app.js?v=school-1.0.86"></script>
+  <script src="../global-shell.js?v=school-1.0.86"></script>
+  <script src="../school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>

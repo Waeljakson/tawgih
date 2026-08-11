@@ -50,8 +50,9 @@
     @media print{.unified-platform-bar{display:none!important}}
   </style>
   <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
-<style>.mishkat-unified-logo{background:#fff!important;padding:4px!important;border:1px solid rgba(49,95,53,.14)!important}.mishkat-unified-logo img{width:100%;height:100%;object-fit:contain}.unified-platform-bar{border-bottom:2px solid rgba(49,95,53,.25)!important}</style></head>
-<body>
+<style>.mishkat-unified-logo{background:#fff!important;padding:4px!important;border:1px solid rgba(49,95,53,.14)!important}.mishkat-unified-logo img{width:100%;height:100%;object-fit:contain}.unified-platform-bar{border-bottom:2px solid rgba(49,95,53,.25)!important}</style>  <link rel="stylesheet" href="../school-free-mode.css?v=school-1.0.86">
+</head>
+<body data-school-free="true">
   <header id="unifiedPlatformBar" class="unified-platform-bar" hidden>
     <div class="unified-platform-inner">
       <a class="unified-brand" href="../index.html" aria-label="العودة إلى بوابة المنصات">
@@ -72,21 +73,21 @@
         </div>
         <span class="login-kicker">منصة رقمية للمدارس</span>
         <h1>تحليل النتائج التعليمية</h1>
-        <p>حوّل ملفات Excel إلى مؤشرات واضحة وتقارير احترافية، مع تجربة مجانية، وباقة تحليل نتائج مستقلة، أو باقة شاملة تفتح جميع المنصات.</p>
+        <p>حوّل ملفات Excel إلى مؤشرات واضحة وتقارير احترافية، مع الحفظ والطباعة والتصدير ضمن منصة المدرسة.</p>
         <div class="login-benefits"><span>تحليل الصفوف والفصول</span><span>ضعاف المواد</span><span>تقارير Word وPDF</span><span>أرشفة سحابية</span></div>
       </div>
       <div class="login-card">
-        <div class="login-card-head"><span>دخول المنصة</span><h2>سجّل الدخول أو أنشئ حسابًا</h2><p>الحساب التجريبي يتيح التحليل والعرض. الحفظ والطباعة والتصدير للمشتركين Premium.</p></div>
+        <div class="login-card-head"><span>دخول المنصة</span><h2>سجّل الدخول أو أنشئ حسابًا</h2><p>جميع أدوات التحليل والحفظ والطباعة والتصدير متاحة لمستخدمي المدرسة.</p></div>
         <div class="auth-grid login-auth-grid">
           <label><span>البريد الإلكتروني</span><input id="authEmail" type="email" autocomplete="email" placeholder="name@school.edu.sa"></label>
           <label><span>كلمة المرور</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="6 أحرف على الأقل"></label>
           <label class="full-width"><span>الاسم الكامل — عند إنشاء حساب جديد</span><input id="authFullName" type="text" autocomplete="name" placeholder="اسم المستخدم"></label>
           <div class="actions full-width auth-actions">
             <button id="signInButton" class="primary-button" type="button">تسجيل الدخول</button>
-            <button id="signUpButton" class="secondary-button" type="button">إنشاء حساب تجريبي</button>
+            <button id="signUpButton" class="secondary-button" type="button">إنشاء حساب المدرسة</button>
           </div>
         </div>
-        <div class="price-strip"><strong>الباقات</strong><span>التحاليل: 10 شهريًا أو 50 سنويًا</span><small>الشاملة: 50 شهريًا أو 300 سنويًا — تفتح جميع المنصات</small></div>
+        <div class="price-strip"><strong>خدمات المدرسة</strong><span>التحاليل: 10 شهريًا أو 50 سنويًا</span><small>الشاملة: 50 شهريًا أو 300 سنويًا — تفتح جميع المنصات</small></div>
         <div id="loginStatus" class="status-box" hidden></div>
       </div>
     </div>
@@ -103,7 +104,7 @@
         <div class="hero-eyebrow"><span class="eyebrow-dot"></span> منصة رقمية ذكية لتحليل النتائج</div>
         <h1>منصة التحليل الذكي<br><span>للنتائج التعليمية</span></h1>
         <p>منصة عامة للمدارس لتحليل نتائج الطلاب، إعداد التقارير، ومتابعة مؤشرات التحصيل من الصف الأول الابتدائي حتى الثالث الثانوي.</p>
-        <div class="hero-features"><span><b>✓</b> تحليل تجريبي مجاني</span><span><b>✓</b> اشتراك شهري أو سنوي</span><span><b>✓</b> أرشفة سحابية آمنة</span></div>
+        <div class="hero-features"><span><b>✓</b> جميع أدوات التحليل متاحة</span><span><b>✓</b> حفظ وطباعة وتصدير</span><span><b>✓</b> أرشفة مدرسية آمنة</span></div>
       </div>
       <div class="brand-stage">
         <div class="brand-stage-glow" aria-hidden="true"></div>
@@ -173,11 +174,11 @@
 
     <section class="panel account-panel" aria-labelledby="accountHeading">
       <div class="panel-accent" aria-hidden="true"></div>
-      <div class="section-title premium-title"><span class="step">AC</span><div><span class="section-kicker">الحساب والاشتراك</span><h2 id="accountHeading">إعدادات المدرسة وحالة الاشتراك</h2><p>أضف اسم المدرسة وشعارها ليظهرا في المنصة والتقارير.</p></div></div>
+      <div class="section-title premium-title"><span class="step">AC</span><div><span class="section-kicker">حساب المدرسة</span><h2 id="accountHeading">إعدادات المدرسة</h2><p>أضف اسم المدرسة وشعارها ليظهرا في المنصة والتقارير.</p></div></div>
       <div class="account-dashboard">
         <div class="account-summary">
           <div><span>المستخدم</span><strong id="currentUserName"></strong><small id="currentUserEmail"></small></div>
-          <div class="plan-card"><span>الخطة الحالية</span><strong id="currentUserPlan">تجريبي</strong><small id="subscriptionExpiry">التحليل والعرض فقط</small></div>
+          <div class="plan-card"><span>حالة الخدمة</span><strong id="currentUserPlan">منصة المدرسة</strong><small id="subscriptionExpiry">جميع الأدوات متاحة</small></div>
         </div>
         <div class="school-profile-form">
           <label><span>اسم المدرسة — تلقائي من توزيع المستخدم</span><input id="schoolProfileName" type="text" readonly></label>
@@ -186,8 +187,8 @@
           <button id="saveSchoolProfileButton" class="secondary-button" type="button">حفظ بيانات المدرسة</button>
         </div>
         <div class="subscription-box">
-          <div><span class="premium-pill">الباقات</span><h3>باقة التحاليل أو الباقة الشاملة</h3><p>باقة التحاليل: 10 ريالات شهريًا أو 50 سنويًا. الباقة الشاملة: 50 ريالًا شهريًا أو 300 سنويًا وتفتح جميع المنصات الحالية والقادمة.</p></div>
-          <button id="requestPremiumButton" class="primary-button" type="button">طلب تفعيل Premium</button>
+          <div><span class="premium-pill">خدمات المدرسة</span><h3>جميع أدوات التحليل متاحة</h3><p>لا توجد باقات أو رسوم في نسخة المدرسة.</p></div>
+          <button id="requestنسخة المدرسةButton" class="primary-button" type="button">متاحة بالكامل</button>
         </div>
         <div class="actions inline-actions account-actions">
           <button id="openArchiveButton" class="primary-button" type="button">التحليلات المحفوظة</button>
@@ -213,7 +214,7 @@
     </section>
 
     <section id="adminPanel" class="panel admin-panel" hidden>
-      <div class="section-title premium-title compact"><span class="step">AD</span><div><span class="section-kicker">إدارة المنصة</span><h2>الاشتراكات والمديرون والدعم</h2><p>متاح لمديري النظام فقط. يمكنك تفعيل الاشتراكات وتعيين مدير من أي حساب مسجل والرد على رسائل الدعم.</p></div></div>
+      <div class="section-title premium-title compact"><span class="step">AD</span><div><span class="section-kicker">إدارة المنصة</span><h2>الحسابات والدعم</h2><p>أدوات الإدارة والدعم الفني لحسابات المدرسة.</p></div></div>
       <div class="admin-grid">
         <div><h3>طلبات التفعيل من جميع المنصات</h3><div id="subscriptionRequestsList" class="admin-list"></div></div>
         <div><h3>حسابات المستخدمين وصلاحيات الإدارة</h3><div id="premiumUsersList" class="admin-list"></div></div>
@@ -417,7 +418,7 @@
     <span>تحليل النتائج التعليمية</span>
   </div>
 
-  <footer class="app-footer"><div class="footer-shell"><div class="footer-brand"><img src="assets/expressive-education-logo.png" alt="رمز التحليل التعليمي"><div><strong>منصة تحليل النتائج التعليمية</strong><span>حل رقمي عام للمدارس</span></div></div><p>الحساب التجريبي للتحليل والعرض، والاشتراك Premium للحفظ والطباعة والتصدير.</p><img class="footer-guidance" src="assets/expressive-insight-logo.png" alt="رمز التميز والإنجاز"></div></footer>
+  <footer class="app-footer"><div class="footer-shell"><div class="footer-brand"><img src="assets/expressive-education-logo.png" alt="رمز التحليل التعليمي"><div><strong>منصة تحليل النتائج التعليمية</strong><span>حل رقمي عام للمدارس</span></div></div><p>جميع أدوات التحليل والحفظ والطباعة والتصدير متاحة ضمن منصة المدرسة.</p><img class="footer-guidance" src="assets/expressive-insight-logo.png" alt="رمز التميز والإنجاز"></div></footer>
   </div>
 
 
@@ -445,37 +446,37 @@
     <section class="payment-modal-card">
       <button id="closePaymentModalButton" class="payment-modal-close" type="button" aria-label="إغلاق">×</button>
       <div class="payment-modal-head">
-        <span class="payment-badge">Premium</span>
-        <h2 id="paymentModalTitle">اختر خطة الاشتراك</h2>
-        <p id="paymentModalDescription">اختر باقة التحاليل أو الباقة الشاملة، ثم تواصل عبر واتساب وأرسل طلب التفعيل.</p>
+        <span class="payment-badge">نسخة المدرسة</span>
+        <h2 id="paymentModalTitle">خدمات المدرسة</h2>
+        <p id="paymentModalDescription">اختر جميع أدوات التحليل متاحة، ثم تواصل عبر واتساب وأرسل طلب التفعيل.</p>
       </div>
-      <div class="subscription-plan-selector package-plan-selector" role="radiogroup" aria-label="اختيار الباقة ومدة الاشتراك">
+      <div class="subscription-plan-selector package-plan-selector" role="radiogroup" aria-label="إعداد قديم مخفي">
         <label class="subscription-plan-option">
-          <span class="plan-choice-badge package-badge">باقة التحاليل</span>
+          <span class="plan-choice-badge package-badge">تحليل النتائج</span>
           <input type="radio" name="premiumBillingPeriod" value="results_analysis_monthly">
           <span class="plan-choice-title">شهري</span>
-          <strong>10 ريالات</strong>
+          <strong>متاحة</strong>
           <small>منصة تحليل النتائج فقط — شهر واحد</small>
         </label>
         <label class="subscription-plan-option selected">
-          <span class="plan-choice-badge package-badge">باقة التحاليل</span>
+          <span class="plan-choice-badge package-badge">تحليل النتائج</span>
           <input type="radio" name="premiumBillingPeriod" value="results_analysis_yearly" checked>
           <span class="plan-choice-title">سنوي</span>
-          <strong>50 ريالًا</strong>
+          <strong>متاحة</strong>
           <small>منصة تحليل النتائج فقط — 12 شهرًا</small>
         </label>
         <label class="subscription-plan-option comprehensive-option">
-          <span class="plan-choice-badge comprehensive-badge">الباقة الشاملة</span>
+          <span class="plan-choice-badge comprehensive-badge">جميع الخدمات</span>
           <input type="radio" name="premiumBillingPeriod" value="all_access_monthly">
           <span class="plan-choice-title">شهري شامل</span>
-          <strong>50 ريالًا</strong>
+          <strong>متاحة</strong>
           <small>جميع المنصات — شهر واحد</small>
         </label>
         <label class="subscription-plan-option comprehensive-option">
-          <span class="plan-choice-badge comprehensive-badge">الباقة الشاملة</span>
+          <span class="plan-choice-badge comprehensive-badge">جميع الخدمات</span>
           <input type="radio" name="premiumBillingPeriod" value="all_access_yearly">
           <span class="plan-choice-title">سنوي شامل</span>
-          <strong>300 ريال</strong>
+          <strong>متاحة</strong>
           <small>جميع المنصات — 12 شهرًا</small>
         </label>
       </div>
@@ -485,33 +486,34 @@
         </div>
         <div class="whatsapp-activation-copy">
           <span class="whatsapp-kicker">خطوة إلزامية قبل التفعيل</span>
-          <h3>تواصل معنا عبر واتساب للحصول على بيانات الاشتراك</h3>
-          <p>أرسل رسالة واتساب أولًا للحصول على بيانات السداد واستكمال إجراءات التفعيل، ثم ارجع إلى المنصة واضغط <strong>إرسال طلب التفعيل</strong>.</p>
+          <h3>جميع الأدوات متاحة مباشرة</h3>
+          <p>أرسل رسالة واتساب أولًا للحصول على بيانات السداد واستكمال إجراءات التفعيل، ثم ارجع إلى المنصة واضغط <strong>متاحة</strong>.</p>
           <div class="whatsapp-number"><span>رقم واتساب</span><strong dir="ltr">00966 58 271 2620</strong></div>
         </div>
       </section>
       <a id="whatsappContactButton" class="whatsapp-contact-button" href="https://wa.me/966582712620" target="_blank" rel="noopener noreferrer">
         <span aria-hidden="true">💬</span>
-        <span>مراسلة واتساب لبيانات الاشتراك</span>
+        <span>الدعم الفني</span>
       </a>
-      <label class="payment-confirm-row"><input id="paymentConfirmCheckbox" type="checkbox"><span id="paymentConfirmText">أؤكد أنني تواصلت عبر واتساب بخصوص الاشتراك السنوي، وأرغب في إرسال طلب التفعيل.</span></label>
+      <label class="payment-confirm-row"><input id="paymentConfirmCheckbox" type="checkbox"><span id="paymentConfirmText">نسخة المدرسة مفعلة بالكامل.</span></label>
       <div class="payment-actions">
-        <button id="confirmPremiumRequestButton" class="primary-button" type="button" disabled>إرسال طلب التفعيل</button>
+        <button id="confirmنسخة المدرسةRequestButton" class="primary-button" type="button" disabled>متاحة</button>
         <button class="secondary-button" type="button" data-close-payment-modal>إلغاء</button>
       </div>
-      <p id="paymentSecurityNote" class="payment-security-note"><strong>تنبيه:</strong> لن يتم تفعيل الاشتراك إلا بعد التواصل عبر واتساب واستكمال إجراءات الاشتراك.</p>
+      <p id="paymentSecurityNote" class="payment-security-note"><strong>تنبيه:</strong> نسخة المدرسة متاحة بالكامل.</p>
     </section>
   </div>
   <div id="securityWatermark" class="security-watermark" aria-hidden="true"></div>
   <div id="screenShield" class="screen-shield" hidden aria-hidden="true"><div><img src="assets/expressive-education-logo.png" alt=""><strong>المحتوى محمي</strong><span>تم إخفاء الشاشة مؤقتًا لحماية بيانات الطلاب.</span></div></div>
 
-  <script src="../bubble-schema.js?v=school-1.0.49"></script>
-  <script src="../bubble-config.js?v=school-1.0.49"></script>
-  <script src="../school-context.js?v=school-1.0.49"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="../school-directory.js?v=school-1.0.49"></script>
+  <script src="../bubble-schema.js?v=school-1.0.86"></script>
+  <script src="../bubble-config.js?v=school-1.0.86"></script>
+  <script src="../school-context.js?v=school-1.0.86"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="../school-directory.js?v=school-1.0.86"></script>
   <script src="app-v12.js"></script>
-  <script src="../smart-reminders.js?v=19.0.9"></script>
-  <script src="../global-shell.js?v=school-1.0.49"></script>
+  <script src="../smart-reminders.js?v=19.0.10"></script>
+  <script src="../global-shell.js?v=school-1.0.86"></script>
+  <script src="../school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>

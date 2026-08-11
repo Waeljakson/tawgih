@@ -9,7 +9,7 @@
     students: [], employees: [],
     academicYears: [{id:"1448", name:"1448", isCurrent:true, active:true}],
     terms: [], campuses: [], stages: [], grades: [], classes: [],
-    guidanceActions:[], guidanceWays:[], guidanceReasons:[], guidanceSitu:[], guidanceFailTypes:[], guidanceProblemBehav:[], guidanceProblemEdu:[], guidanceSkills:[], guidanceStudentNotices:[], guidanceObserv:[]
+    guidanceActions:[], guidanceWays:[], guidanceReasons:[], guidanceSitu:[], guidanceFailTypes:[], guidanceProblemBehav:[], guidanceProblemEdu:[], guidanceSkills:[], guidanceStudentNotices:[], guidanceObserv:[], guidanceTimes:[]
   };
   const schema = global.MISHKAT_BUBBLE_SCHEMA || {};
 
@@ -82,7 +82,8 @@
       ["guidanceProblemEdu",["guidanceProblemEdu","Guidance_ProblemEdu"]],
       ["guidanceSkills",["guidanceSkills","Guidance_Skills"]],
       ["guidanceStudentNotices",["guidanceStudentNotices","guidance_Studentnotice"]],
-      ["guidanceObserv",["guidanceObserv","Guidance_observ"]]
+      ["guidanceObserv",["guidanceObserv","Guidance_observ"]],
+      ["guidanceTimes",["guidanceTimes","guidance_times","guidanceTime","Guidance_Time","Guidance Time"]]
     ];
     for(const [canonical,keys] of supplementalGroups){
       const p=listFrom(primary,keys),e=listFrom(extra,keys);out[canonical]=p.length?p:e;
@@ -178,9 +179,15 @@
     };
   }
   function normalizeSimple(raw, index, prefix){
-    return {id:idOf(raw,`${prefix}-${index+1}`),name:labelOf(raw),isCurrent:boolOf(pick(raw,["Active","isCurrent","is_current","current","active_current","default"],false)),active:activeOf(raw,true),raw};
+    // Active means the option/row is enabled; it does NOT mean the academic term is current.
+    // Treat only explicit current/default flags as the current-term marker.
+    return {id:idOf(raw,`${prefix}-${index+1}`),name:labelOf(raw),isCurrent:boolOf(pick(raw,["isCurrent","is_current","current","Current","active_current","default","Default"],false)),active:activeOf(raw,true),raw};
   }
   function normalizeLookup(raw,index,prefix,labelKeys){
+    if(typeof raw === "string" || typeof raw === "number"){
+      const name=String(raw).trim();
+      return {id:name||`${prefix}-${index+1}`,name,active:true,raw};
+    }
     return {id:idOf(raw,`${prefix}-${index+1}`),name:String(pick(raw,labelKeys,"")),active:activeOf(raw,true),raw};
   }
 
@@ -210,6 +217,7 @@
       guidanceSkills:listFrom(src,["guidanceSkills","Guidance_Skills"]).map((x,i)=>normalizeLookup(x,i,"skill",["Title","title","name","Name"])).filter(x=>x.name&&x.active),
       guidanceStudentNotices:listFrom(src,["guidanceStudentNotices","guidance_Studentnotice"]).map((x,i)=>normalizeLookup(x,i,"notice",["Notice_description","Title","title","name","Name"])).filter(x=>x.name&&x.active),
       guidanceObserv:listFrom(src,["guidanceObserv","Guidance_observ"]).map((x,i)=>normalizeLookup(x,i,"observ",["Title","title","name","Name"])).filter(x=>x.name&&x.active),
+      guidanceTimes:listFrom(src,["guidanceTimes","guidance_times","guidanceTime","Guidance_Time","Guidance Time"]).map((x,i)=>normalizeLookup(x,i,"guidancetime",["Display","display","Title","title","Name","name","Time","time","Duration","duration","Minutes","minutes","Guidance Time","Guidance_Time"])).filter(x=>x.name&&x.active),
       raw:src
     };
   }
@@ -275,7 +283,29 @@
     const titleScore=x=>{const m=String(x.name||"").match(/\d+/);return m?Number(m[0]):0};
     return [...pool].sort((a,b)=>(dateScore(b)-dateScore(a))||(titleScore(b)-titleScore(a)))[0]||null;
   }
-  function currentTerm(){return snapshot.terms.find(x=>x.isCurrent)||snapshot.terms[0]||null;}
+  function termOrder(name){
+    const s=norm(name);
+    if(/الفصل\s*(الدراسي\s*)?(الاول|1)|الترم\s*(الاول|1)|semester\s*1|term\s*1|first\s*(semester|term)/.test(s))return 1;
+    if(/الفصل\s*(الدراسي\s*)?(الثاني|2)|الترم\s*(الثاني|2)|semester\s*2|term\s*2|second\s*(semester|term)/.test(s))return 2;
+    if(/الفصل\s*(الدراسي\s*)?(الثالث|3)|الترم\s*(الثالث|3)|semester\s*3|term\s*3|third\s*(semester|term)/.test(s))return 3;
+    return 99;
+  }
+  function termContainsToday(term){
+    const raw=term?.raw||term||{};
+    const start=Date.parse(pick(raw,["start","Start","start_date","Start Date","from","From"],""));
+    const end=Date.parse(pick(raw,["end","End","end_date","End Date","to","To"],""));
+    if(!Number.isFinite(start)||!Number.isFinite(end))return false;
+    const now=Date.now();return now>=start&&now<=end;
+  }
+  function currentTerm(){
+    const explicit=snapshot.terms.find(x=>x.isCurrent);
+    if(explicit)return explicit;
+    const dated=snapshot.terms.find(termContainsToday);
+    if(dated)return dated;
+    // If Bubble has no current-term marker/dates, default by semantic order, not API row order.
+    // This prevents an enabled "الفصل الثاني" row returned first from becoming current by accident.
+    return [...snapshot.terms].sort((a,b)=>termOrder(a.name)-termOrder(b.name))[0]||null;
+  }
   function findStudent(idOrName){const v=String(idOrName);return snapshot.students.find(x=>x.id===v)||snapshot.students.find(x=>x.name===v)||null;}
   function findEmployee(idOrName){const v=String(idOrName);return snapshot.employees.find(x=>x.id===v)||snapshot.employees.find(x=>x.name===v)||null;}
   function findLookup(source,idOrName){

@@ -111,7 +111,7 @@ const RECORDS = {
     description: "يوثّق جلسة إرشاد جمعي من تحديد المستهدفين وعنوان الجلسة إلى الأهداف والإجراءات وسير الجلسة والمهام والتقييم والموعد القادم.",
     studentKey: "", classKey: "stage", sections: [
       section("بيانات الجلسة", [
-        f("session_title","عنوان الجلسة","text",{span:8,required:true}), f("day","اليوم","text",{span:4}), f("stage","المرحلة","text",{span:4}), f("complex","المجمع / المبنى","text",{span:4}), f("session_number","رقم الجلسة","text",{span:4})
+        f("session_title","عنوان الجلسة","text",{span:8,required:true}), f("day","اليوم","text",{span:4}), f("stage","المرحلة","text",{span:4}), f("complex","المجمع / المبنى","text",{span:4})
       ]),
       section("المستهدفون", [
         f("participants","أسماء الطلاب المستهدفين","repeater",{columns:[{key:"student_name",label:"اسم الطالب",type:"text"},{key:"class_name",label:"الفصل",type:"text"},{key:"signature",label:"التوقيع",type:"text"}],minRows:4})

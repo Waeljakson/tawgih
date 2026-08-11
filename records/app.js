@@ -37,7 +37,7 @@ const UNIFIED_PLATFORM_ICONS={
   messages_library:'<svg viewBox="0 0 24 24"><path d="M4 5h16v12H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg>'
 };
 function unifiedPlanMeta(){
-  if(state.user?.id==="mishkat-school-local")return {label:'مدارس المشكاة الأهلية',detail:'جميع الخدمات متاحة',trial:false};
+  if(SCHOOL_EDITION||state.user?.id==="mishkat-school-local")return {label:'منصة المدرسة',detail:'جميع الخدمات متاحة',trial:false};
   const active=activeUnifiedEntitlements();
   if(state.account?.is_system_admin)return {label:'مدير النظام',detail:'صلاحية كاملة لجميع المنصات',trial:false};
   if(active.some(e=>e.product_code==='all_access'))return {label:'الباقة الشاملة',detail:'جميع المنصات مفعّلة',trial:false};
@@ -62,7 +62,7 @@ function renderUnifiedPlatformSwitcher(){
     const current=code===CURRENT_PACKAGE_CODE;
     return `<a href="${item.href}?from=portal" data-unified-platform="${code}" class="platform-tab${current?' current':''}"${current?' aria-current="page"':''}><span class="platform-tab-icon">${icon}</span><span class="platform-tab-copy"><strong>${item.label}</strong><small>${current?'المنصة الحالية':'انتقال إلى المنصة'}</small></span></a>`;
   }).join('');
-  badge.innerHTML=`<span class="platform-plan-status${plan.trial?' trial':''}"></span><span class="platform-plan-copy"><span>الباقة الحالية</span><strong>${plan.label}</strong><small>${plan.detail}</small></span>`;
+  badge.innerHTML=`<span class="platform-plan-status${plan.trial?' trial':''}"></span><span class="platform-plan-copy"><span>الإتاحة</span><strong>${plan.label}</strong><small>${plan.detail}</small></span>`;
   bar.hidden=false;
   box.querySelectorAll('[data-unified-platform]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goToUnifiedPlatform(a.dataset.unifiedPlatform);}));
 }
@@ -116,13 +116,33 @@ const RECORDS = {
     description: "يوثّق جلسة إرشاد جمعي من تحديد المستهدفين وعنوان الجلسة إلى الأهداف والإجراءات وسير الجلسة والمهام والتقييم والموعد القادم.",
     studentKey: "", classKey: "stage", sections: [
       section("بيانات الجلسة", [
-        f("session_title","عنوان الجلسة","text",{span:8,required:true}), f("day","اليوم","text",{span:4}), f("stage","المرحلة","text",{span:4}), f("complex","المجمع / المبنى","text",{span:4}), f("session_number","رقم الجلسة","text",{span:4})
+        f("session_title","عنوان الجلسة","text",{span:8,required:true}), f("day","اليوم","derived-day",{span:4,help:"يُحدد تلقائيًا من تاريخ السجل"}), f("stage","المرحلة","text",{span:4}), f("complex","المجمع / المبنى","text",{span:4})
       ]),
       section("المستهدفون", [
         f("participants","أسماء الطلاب المستهدفين","repeater",{columns:[{key:"student_name",label:"اسم الطالب",type:"text"},{key:"class_name",label:"الفصل",type:"text"},{key:"signature",label:"التوقيع",type:"text"}],minRows:4})
       ],"يمكن إضافة أي عدد من الطلاب."),
       section("التخطيط والتنفيذ", [
-        f("objectives","أهداف الجلسة","textarea",{span:12,rows:5}), f("procedures","الإجراءات","textarea",{span:12,rows:4}), f("tools","الأدوات","text",{span:8}), f("duration","الزمن بالدقائق","number",{span:4}), f("session_flow","سير الجلسة","textarea",{span:12,rows:7})
+        f("objectives","أهداف الجلسة","textarea",{span:12,rows:5,required:true}), f("procedures","الإجراءات","textarea",{span:12,rows:4}), f("tools","الأدوات","text",{span:8}), f("duration","الزمن","select",{span:4,source:"guidanceTimes",help:"اختر الزمن من Option Set: Guidance_Time"}), f("session_flow","سير الجلسة","textarea",{span:12,rows:7})
+      ]),
+      section("المتابعة والتقييم", [
+        f("student_tasks","المهام المطلوب تنفيذها من الطلاب","textarea",{span:12,rows:5}), f("evaluation","تقييم الجلسة","textarea",{span:12,rows:7}), f("next_session_date","موعد الجلسة القادمة","date",{span:4}), f("counselor_name","الموجه الطلابي","text",{span:4}), f("signature","التوقيع","text",{span:4})
+      ])
+    ]
+  },
+  group_guidance_followup: {
+    title: "جلسة متابعة للإرشاد الجمعي", category: "الجلسات الإرشادية", icon: "↳", confidential: false, hiddenCatalog: true,
+    description: "جلسة تابعة لنفس موضوع الإرشاد الجمعي ونفس المشاركين. يتم تحديد عنوانها وموعدها تلقائيًا من الجلسة السابقة.",
+    studentKey: "", classKey: "stage", sections: [
+      section("ارتباط الجلسة", [
+        f("session_title","عنوان الجلسة","text",{span:8,required:true,linkedReadonly:true,help:"نفس عنوان الجلسة الرئيسية"}),
+        f("day","اليوم","derived-day",{span:4,help:"يُحدد تلقائيًا من موعد الجلسة"}),
+        f("followup_label","تسلسل الجلسة","text",{span:4,linkedReadonly:true}),
+        f("stage","المرحلة","text",{span:4,linkedReadonly:true}),
+        f("complex","المجمع / المبنى","text",{span:4,linkedReadonly:true}),
+        f("root_session_date","","hidden"), f("followup_number","","hidden"), f("parent_grade","","hidden")
+      ],"المشاركون هم نفس المشاركين المسجلين في الجلسة الرئيسية، لذلك لا تُعاد كتابة أسمائهم."),
+      section("التخطيط والتنفيذ", [
+        f("objectives","أهداف الجلسة","textarea",{span:12,rows:5,required:true}), f("procedures","الإجراءات","textarea",{span:12,rows:4}), f("tools","الأدوات","text",{span:8}), f("duration","الزمن","select",{span:4,source:"guidanceTimes",help:"اختر الزمن من Guidance_Time"}), f("session_flow","سير الجلسة","textarea",{span:12,rows:7})
       ]),
       section("المتابعة والتقييم", [
         f("student_tasks","المهام المطلوب تنفيذها من الطلاب","textarea",{span:12,rows:5}), f("evaluation","تقييم الجلسة","textarea",{span:12,rows:7}), f("next_session_date","موعد الجلسة القادمة","date",{span:4}), f("counselor_name","الموجه الطلابي","text",{span:4}), f("signature","التوقيع","text",{span:4})
@@ -515,8 +535,8 @@ function currentAcademicYearName(){return window.MishkatBubbleDirectory?.current
 function currentAcademicTermName(){return window.MishkatBubbleDirectory?.currentTerm()?.name||"";}
 function sourceOptions(source,selected=""){
   const items=directoryItems(source);const person=source==="students"||source==="employees";const selectedText=String(selected||"");
-  const label=source==="students"?`اختر الطالب — ${items.length} متاح`:source==="employees"?`اختر الموظف — ${items.length} متاح`:"اختر";
-  const emptyLabel=source==="students"?"لم يتم تحميل أسماء الطلاب":source==="employees"?"لم يتم تحميل أسماء الموظفين":"لم يتم تحميل البيانات";
+  const label=source==="students"?`اختر الطالب — ${items.length} متاح`:source==="employees"?`اختر الموظف — ${items.length} متاح`:source==="guidanceTimes"?"اختر الزمن":"اختر";
+  const emptyLabel=source==="students"?"لم يتم تحميل أسماء الطلاب":source==="employees"?"لم يتم تحميل أسماء الموظفين":source==="guidanceTimes"?"لم يتم تحميل خيارات Guidance_Time":"لم يتم تحميل البيانات";
   return `<option value="">${items.length?label:emptyLabel}</option>`+items.map(item=>{
     const value=person?item.id:item.name;
     const chosen=String(value)===selectedText || item.name===selectedText;
@@ -774,7 +794,7 @@ const CATEGORY_ORDER = ["الكل","الجلسات الإرشادية","المو
 
 const state = {
   user: null, account: null, packageAccess: false, entitlements: [], currentView: "dashboard", currentType: null, currentRecordId: null,
-  pendingSchoolLogo: null, records: [], archiveLoaded: false, catalogCategory: "الكل", directory: null,
+  pendingSchoolLogo: null, records: [], archiveLoaded: false, collectiveReportRemoteError: "", catalogCategory: "الكل", directory: null,
   studentReportStudents: [], studentReportRecords: [], studentReportsReady: false, studentReportsLoading: null,
   supportThread: null, supportMessages: [], supportPoll: null, adminUsers: [], adminRequests: [], adminEntitlements: [],
   adminSupportThreads: [], adminSelectedThread: null
@@ -869,6 +889,7 @@ function setView(view){
 function renderCatalog(){
   const query=cleanText(el.catalogSearch?.value).toLowerCase();
   const items=Object.entries(RECORDS).filter(([,r])=>{
+    if(r.hiddenCatalog)return false;
     const categoryOk=state.catalogCategory==="الكل"||r.category===state.catalogCategory;
     const searchOk=!query||`${r.title} ${r.description} ${r.category}`.toLowerCase().includes(query);
     return categoryOk&&searchOk;
@@ -884,7 +905,9 @@ function renderCatalog(){
 
 const RECORD_REPORT_COLUMNS = {
   group_guidance:[
-    {label:"عنوان الجلسة",keys:["session_title"]},{label:"الطلاب المشاركون",keys:["participants"],kind:"students"},{label:"المرحلة",keys:["stage"]},{label:"الزمن",keys:["duration"]},{label:"موعد المتابعة",keys:["next_session_date"],kind:"date"},{label:"التقييم",keys:["evaluation"]}
+    {label:"اسم الجلسة",keys:["session_title"],cell:"title"},
+    {label:"المشاركون",keys:["participants"],kind:"students",cell:"students"},
+    {label:"الزمن",keys:["duration"],cell:"compact"}
   ],
   academic_weakness_guidance:[
     {label:"الطالب",keys:["student_name","student_name"]},{label:"الفصل",keys:["class_name"]},{label:"مواد الضعف",keys:["weak_subjects"]},{label:"النسبة",keys:["score_percent"],suffix:"%"},{label:"تاريخ الجلسة",keys:["session_date"],kind:"date"},{label:"الملاحظات",keys:["problem_description","session_content"]}
@@ -979,37 +1002,164 @@ function fillRecordReportFilters(reset=false){
   if(priorYear&&years.includes(priorYear))el.recordReportYear.value=priorYear;
   if(priorTerm&&terms.includes(priorTerm))el.recordReportTerm.value=priorTerm;
 }
+function collectiveSequence(record){
+  if(record?.record_type!=="group_guidance_followup")return 1;
+  const n=Number(record?.form_data?.followup_number||0);
+  return Number.isFinite(n)&&n>=2?n:2;
+}
+function collectiveSequenceLabel(record){
+  const n=collectiveSequence(record);
+  return n===1?"الجلسة الرئيسية":({2:"الجلسة الثانية",3:"الجلسة الثالثة",4:"الجلسة الرابعة"}[n]||`الجلسة ${n}`);
+}
+function collectiveParentGrade(record){
+  const data=record?.form_data||{};
+  if(cleanText(data.parent_grade||data.grade_label))return cleanText(data.parent_grade||data.grade_label);
+  const first=(data.participants||[]).find(r=>cleanText(r?.student_name_id||r?.student_name));
+  const student=first?selectedStudent(first.student_name_id||first.student_name):null;
+  return cleanText(student?.grade||student?.gradeName||"");
+}
+function collectiveRootDate(record){
+  return String(record?.record_type==="group_guidance_followup"?(record?.form_data?.root_session_date||""):(record?.record_date||"")).slice(0,10);
+}
+function collectiveRootIdentity(record){
+  const data=record?.form_data||{};
+  return [cleanText(record?.academic_year),cleanText(record?.academic_term),cleanText(record?.campus),cleanText(record?.stage),collectiveParentGrade(record),cleanText(data.session_title),collectiveRootDate(record)]
+    .map(v=>String(v||"").toLowerCase()).join("|");
+}
+function groupedCollectiveRows(rows=[]){
+  const mains=rows.filter(r=>r.record_type==="group_guidance").sort((a,b)=>String(b.record_date||b.created_at||"").localeCompare(String(a.record_date||a.created_at||"")));
+  const follows=rows.filter(r=>r.record_type==="group_guidance_followup");
+  const used=new Set(),out=[];
+  for(const main of mains){
+    out.push(main);
+    const key=collectiveRootIdentity(main);
+    const related=follows.filter(r=>collectiveRootIdentity(r)===key).sort((a,b)=>collectiveSequence(a)-collectiveSequence(b)||String(a.record_date||"").localeCompare(String(b.record_date||"")));
+    related.forEach(r=>{used.add(r.id);out.push(r);});
+  }
+  follows.filter(r=>!used.has(r.id)).sort((a,b)=>String(b.record_date||b.created_at||"").localeCompare(String(a.record_date||a.created_at||""))).forEach(r=>out.push(r));
+  return out;
+}
 function currentRecordReportRows(){
   const type=state.currentType;if(!type)return[];
   const q=cleanText(el.recordReportSearch?.value).toLowerCase();
   const year=cleanText(el.recordReportYear?.value);const term=cleanText(el.recordReportTerm?.value);
-  return (state.records||[]).filter(r=>{
-    if(r.record_type!==type)return false;
+  const accepted=type==="group_guidance"?new Set(["group_guidance","group_guidance_followup"]):new Set([type]);
+  const rows=(state.records||[]).filter(r=>{
+    if(!accepted.has(r.record_type))return false;
     if(year&&cleanText(r.academic_year)!==year)return false;
     if(term&&cleanText(r.academic_term)!==term)return false;
     if(!q)return true;
     const hay=`${r.student_name||""} ${r.class_name||""} ${r.title||""} ${r.academic_year||""} ${r.academic_term||""} ${JSON.stringify(r.form_data||{})}`.toLowerCase();
     return hay.includes(q);
-  }).sort((a,b)=>String(b.record_date||b.created_at||"").localeCompare(String(a.record_date||a.created_at||"")));
+  });
+  return type==="group_guidance"?groupedCollectiveRows(rows):rows.sort((a,b)=>String(b.record_date||b.created_at||"").localeCompare(String(a.record_date||a.created_at||"")));
+}
+function collectiveCanAddFollowup(record,rows=[]){
+  const seq=collectiveSequence(record);if(seq>=4)return false;
+  if(!cleanText(record?.form_data?.next_session_date))return false;
+  const key=collectiveRootIdentity(record);
+  const family=rows.filter(r=>["group_guidance","group_guidance_followup"].includes(r.record_type)&&collectiveRootIdentity(r)===key);
+  const max=Math.max(1,...family.map(collectiveSequence));
+  return seq===max;
+}
+function renderCollectiveReportCell(record,col,index){
+  let value=firstReportValue(record,col.keys);
+  if(col.kind==="students"&&record.record_type==="group_guidance_followup")value="نفس المشاركين في الجلسة الرئيسية";
+  if(col.keys?.includes("record_date")&&!value)value=record.record_date;
+  let text=reportPlainValue(value,col.kind);if(col.suffix&&text!=="—")text+=col.suffix;
+  const cls=[index===0?'report-cell-main':'',`report-col-${col.cell||"default"}`].filter(Boolean).join(' ');
+  if(index===0){
+    const follow=record.record_type==="group_guidance_followup";
+    return `<td class="${cls}" title="${escapeHtml(text)}"><div class="collective-session-title${follow?" followup":""}"><span class="collective-sequence-badge${follow?" followup":""}">${escapeHtml(collectiveSequenceLabel(record))}</span><span class="report-cell-value">${escapeHtml(text)}</span></div></td>`;
+  }
+  return `<td class="${cls}" title="${escapeHtml(text)}"><span class="report-cell-value">${escapeHtml(text)}</span></td>`;
 }
 function renderCurrentRecordReport(){
   if(!state.currentType||!el.recordReportHead||!el.recordReportBody)return;
   const def=RECORDS[state.currentType];if(!def)return;
   const columns=recordReportColumns(state.currentType);const rows=currentRecordReportRows();
-  el.recordReportTitle.textContent=`تقرير ${def.title}`;el.recordReportCategory.textContent=def.category;el.recordReportDescription.textContent=`عرض ${def.title} المحفوظة، البحث فيها، ثم إضافة أو تعديل سجل عند الحاجة.`;
+  el.recordReportTitle.textContent=`تقرير ${def.title}`;el.recordReportCategory.textContent=def.category;
+  el.recordReportDescription.textContent=state.currentType==="group_guidance"
+    ?(state.collectiveReportRemoteError?`تعذر تحديث التقرير من Bubble: ${state.collectiveReportRemoteError}`:`الجلسة الرئيسية وجلسات المتابعة التابعة لها تظهر كسلسلة واحدة مرتبة وواضحة.`)
+    :`عرض ${def.title} المحفوظة، البحث فيها، ثم إضافة أو تعديل سجل عند الحاجة.`;
+  if(el.recordReportSearch){
+    const searchLabel=el.recordReportSearch.closest("label")?.querySelector("span");
+    if(state.currentType==="group_guidance"){
+      if(searchLabel)searchLabel.textContent="بحث في الجلسات";
+      el.recordReportSearch.placeholder="ابحث باسم الجلسة أو أحد المشاركين";
+    }else{
+      if(searchLabel)searchLabel.textContent="بحث عن طالب / اسم";
+      el.recordReportSearch.placeholder="ابحث بالاسم أو أي بيانات داخل السجل";
+    }
+  }
   el.recordReportCount.textContent=String(rows.length);
-  el.recordReportHead.innerHTML=`<tr>${columns.map(c=>`<th>${escapeHtml(c.label)}</th>`).join("")}<th>الإجراءات</th></tr>`;
-  el.recordReportBody.innerHTML=rows.map(record=>`<tr>${columns.map((col,index)=>{let value=firstReportValue(record,col.keys);if(col.keys?.includes("record_date")&&!value)value=record.record_date;let text=reportPlainValue(value,col.kind);if(col.suffix&&text!=="—")text+=col.suffix;return `<td class="${index===0?'report-cell-main':''}">${escapeHtml(text)}</td>`;}).join("")}<td><div class="report-row-actions"><button class="secondary-button" data-report-edit="${escapeHtml(record.id)}" type="button">تعديل</button><button class="ghost-button" data-report-print="${escapeHtml(record.id)}" type="button">طباعة</button><button class="ghost-button" data-report-delete="${escapeHtml(record.id)}" type="button">حذف</button></div></td></tr>`).join("");
+  const collective=state.currentType==="group_guidance";
+  const panel=el.recordReportTableShell?.closest?.(".record-report-panel");
+  if(panel)panel.classList.toggle("collective-report-panel",collective);
+  el.recordReportHead.innerHTML=`<tr>${columns.map(c=>`<th class="report-col-${escapeHtml(c.cell||"default")}">${escapeHtml(c.label)}</th>`).join("")}<th class="report-actions-head">الإجراءات</th></tr>`;
+  el.recordReportBody.innerHTML=rows.map(record=>{
+    const follow=collective&&record.record_type==="group_guidance_followup";
+    const add=collective&&collectiveCanAddFollowup(record,rows)?`<button class="primary-button report-add-session" data-report-add-followup="${escapeHtml(record.id)}" type="button">+ إضافة جلسة</button>`:"";
+    const cells=collective?columns.map((col,index)=>renderCollectiveReportCell(record,col,index)).join(""):columns.map((col,index)=>{let value=firstReportValue(record,col.keys);if(col.keys?.includes("record_date")&&!value)value=record.record_date;let text=reportPlainValue(value,col.kind);if(col.suffix&&text!=="—")text+=col.suffix;const cls=[index===0?'report-cell-main':'',`report-col-${col.cell||"default"}`].filter(Boolean).join(' ');return `<td class="${cls}" title="${escapeHtml(text)}"><span class="report-cell-value">${escapeHtml(text)}</span></td>`;}).join("");
+    return `<tr class="${follow?"collective-followup-row":"collective-main-row"}">${cells}<td class="report-actions-cell"><div class="report-row-actions"><button class="secondary-button" data-report-edit="${escapeHtml(record.id)}" type="button">تعديل</button>${add}<button class="ghost-button" data-report-print="${escapeHtml(record.id)}" type="button">طباعة</button><button class="ghost-button report-delete-action" data-report-delete="${escapeHtml(record.id)}" type="button">حذف</button></div></td></tr>`;
+  }).join("");
   el.recordReportEmpty.hidden=rows.length>0;el.recordReportTableShell&&(el.recordReportTableShell.hidden=rows.length===0);
 }
 async function openRecordReport(type,preserveFilters=false){
   const def=RECORDS[type];if(!def)return;
   const changing=state.currentType!==type;state.currentType=type;state.currentRecordId=null;
-  if(!state.archiveLoaded)await loadArchive(true);
+  if(!state.archiveLoaded||(SCHOOL_EDITION&&type==="group_guidance"))await loadArchive(true);
   if(el.recordReportSearch&&(!preserveFilters||changing))el.recordReportSearch.value="";
   fillRecordReportFilters(!preserveFilters||changing);renderCurrentRecordReport();setView("recordReport");
 }
-function returnToCurrentRecordReport(){if(state.currentType)openRecordReport(state.currentType,true);else setView("dashboard");}
+async function goToRecordReportAfterSave(type){
+  if(!type)return;
+  state.currentType=type;
+  state.currentRecordId=null;
+  setView("recordReport");
+  renderCurrentRecordReport();
+  try{
+    await openRecordReport(type,false);
+  }catch(error){
+    console.warn("Mishkat: record saved but report refresh failed.",error);
+    renderCurrentRecordReport();
+    setView("recordReport");
+    showToast("تم حفظ السجل، وتعذر تحديث التقرير من Bubble الآن.",true);
+  }
+}
+function openCollectiveFollowupFromRecord(id){
+  const source=(state.records||[]).find(r=>r.id===id);if(!source)return;
+  if(!["group_guidance","group_guidance_followup"].includes(source.record_type))return;
+  const currentSeq=collectiveSequence(source);
+  if(currentSeq>=4){showToast("تم استكمال الجلسة الرئيسية وثلاث جلسات المتابعة.",true);return;}
+  const nextDate=String(source?.form_data?.next_session_date||"").slice(0,10);
+  if(!nextDate){showToast("حدد موعد الجلسة القادمة في الجلسة الحالية أولًا ثم احفظ التعديل.",true);return;}
+  const rootDate=collectiveRootDate(source)||String(source.record_date||"").slice(0,10);
+  const nextSeq=currentSeq+1;
+  const data={
+    session_title:cleanText(source?.form_data?.session_title),
+    day:arabicWeekdayFromISO(nextDate),
+    followup_label:({2:"الجلسة الثانية",3:"الجلسة الثالثة",4:"الجلسة الرابعة"}[nextSeq]||`الجلسة ${nextSeq}`),
+    stage:cleanText(source.stage||source?.form_data?.stage),
+    complex:cleanText(source.campus||source?.form_data?.complex),
+    root_session_date:rootDate,
+    followup_number:String(nextSeq),
+    parent_grade:collectiveParentGrade(source),
+    objectives:"",procedures:"",tools:"",duration:"",session_flow:"",student_tasks:"",evaluation:"",next_session_date:"",
+    counselor_name:(window.MishkatSchoolContext?.getContext?.()||{}).counselorName||state.account?.full_name||"",signature:""
+  };
+  openRecord("group_guidance_followup",{
+    record_date:nextDate,
+    academic_year:source.academic_year||"",
+    academic_term:source.academic_term||"",
+    campus:source.campus||"",
+    stage:source.stage||"",
+    status:"draft",
+    form_data:data
+  });
+  showToast(`${data.followup_label} مرتبطة تلقائيًا بالجلسة الرئيسية.`);
+}
+function returnToCurrentRecordReport(){if(state.currentType==="group_guidance_followup")openRecordReport("group_guidance",true);else if(state.currentType)openRecordReport(state.currentType,true);else setView("dashboard");}
 
 function inputAttrs(field){
   const attrs=[`data-field="${escapeHtml(field.key)}"`];
@@ -1057,6 +1207,22 @@ function renderMatrixControl(col,row){
   if(col.type==="yesno")return `<div class="yes-no"><label><input type="radio" name="mx_${row.index}_${col.key}" value="نفذ" data-matrix-col="${col.key}"> نفذ</label><label><input type="radio" name="mx_${row.index}_${col.key}" value="لم ينفذ" data-matrix-col="${col.key}"> لم ينفذ</label></div>`;
   return `<input type="${escapeHtml(col.type||"text")}" data-matrix-col="${escapeHtml(col.key)}" value="">`;
 }
+function arabicWeekdayFromISO(value){
+  const iso=String(value||"").slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return "";
+  const parts=iso.split("-").map(Number);
+  const d=new Date(parts[0],parts[1]-1,parts[2],12,0,0);
+  if(Number.isNaN(d.getTime()))return "";
+  return ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"][d.getDay()]||"";
+}
+function syncGroupGuidanceDay(){
+  if(!["group_guidance","group_guidance_followup"].includes(state.currentType)||!el.dynamicRecordForm)return;
+  const day=arabicWeekdayFromISO(el.metaDate?.value||"");
+  const hidden=el.dynamicRecordForm.querySelector('[data-field="day"]');
+  const output=el.dynamicRecordForm.querySelector('[data-derived-day-output]');
+  if(hidden)hidden.value=day;
+  if(output)output.textContent=day||"—";
+}
 function renderField(field){
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
   if(["counselor_name","counselor5"].includes(field.key))field={...field,value:ctx.counselorName||state.account?.full_name||field.value||"",linkedReadonly:true,help:"يظهر تلقائيًا من حساب المستخدم"};
@@ -1068,6 +1234,8 @@ function renderField(field){
   if(field.type==="note")return `<div class="static-note">${escapeHtml(field.text||field.label)}</div>`;
   const value=field.value??"";
   const cls=`${spanClass(field)}${field.linkedReadonly?" linked-school-field":""}`;
+  if(field.type==="hidden")return `<input type="hidden" data-field="${escapeHtml(field.key)}" value="${escapeHtml(value)}">`;
+  if(field.type==="derived-day")return `<div class="${cls} derived-day-field"><span>${escapeHtml(field.label)}</span><div class="derived-day-value" data-derived-day-output aria-live="polite">—</div><input type="hidden" data-field="${escapeHtml(field.key)}" value="${escapeHtml(value)}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</div>`;
   if(field.type==="textarea")return `<details class="${cls} collapsible-textarea"><summary><span>${escapeHtml(field.label)}</span><small>${cleanText(value)?"تم إدخال بيانات — اضغط للعرض":"اضغط للكتابة"}</small></summary><div class="collapsible-textarea-body"><textarea ${inputAttrs(field)} rows="${field.rows||4}">${escapeHtml(value)}</textarea>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</div></details>`;
   if(field.type==="student-search")return `<label class="${cls} student-search-field"><span>${escapeHtml(field.label)}</span><input type="search" list="studentDirectoryList" autocomplete="off" ${inputAttrs(field)} value="${escapeHtml(studentDisplayValue(value))}">${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;
   if(field.type==="select"){const options=field.source?sourceOptions(field.source,value):(field.options||[]).map(opt=>`<option value="${escapeHtml(opt)}"${opt===value?" selected":""}>${escapeHtml(opt)}</option>`).join("");return `<label class="${cls}"><span>${escapeHtml(field.label)}</span><select ${inputAttrs(field)}>${options}</select>${field.help?`<small>${escapeHtml(field.help)}</small>`:""}</label>`;}
@@ -1219,21 +1387,32 @@ async function openNewRecordWithFreshData(type){
   }finally{hideNewRecordDataLoader();}
 }
 
+function syncSaveRecordButtonLabel(){
+  if(!el.saveRecordButton)return;
+  const followup=state.currentType==="group_guidance_followup";
+  el.saveRecordButton.textContent=state.currentRecordId?"حفظ التعديل":(followup?"حفظ الجلسة":"حفظ السجل");
+  el.saveRecordButton.dataset.mode=state.currentRecordId?"update":"create";
+}
+
 function openRecord(type,record=null){
   const def=RECORDS[type];if(!def)return;
   state.currentType=type;state.currentRecordId=record?.id||null;
   el.recordTitle.textContent=def.title;el.recordDescription.textContent=def.description;el.recordCategoryBadge.textContent=def.category;el.confidentialBadge.hidden=!def.confidential;
   el.metaTitle.value=def.title;el.metaTitle.readOnly=true;el.metaTitle.setAttribute("aria-readonly","true");
   el.metaDate.value=(record?.record_date||todayISO()).slice(0,10);
+  const isCollectiveFollowup=type==="group_guidance_followup";
+  el.metaDate.readOnly=isCollectiveFollowup;el.metaDate.title=isCollectiveFollowup?"يتحدد تلقائيًا من موعد الجلسة القادمة في الجلسة السابقة":"";
   fillAcademicMeta(record?.academic_year||"",record?.academic_term||record?.form_data?.academic_term||"");
+  if(el.metaAcademicYear)el.metaAcademicYear.disabled=isCollectiveFollowup;
+  if(el.metaAcademicTerm)el.metaAcademicTerm.disabled=isCollectiveFollowup;
   fillSchoolContextMeta(record?.campus||record?.form_data?.campus||record?.form_data?.complex||"",record?.stage||record?.form_data?.stage||"");
   el.metaStatus.value=record?.status||"draft";
-  renderRecordForm(def);populateForm(record?.form_data||getDefaultFormData(def));
+  renderRecordForm(def);populateForm(record?.form_data||getDefaultFormData(def));syncGroupGuidanceDay();
   el.recordPrintId.textContent=record?.id?record.id.slice(0,8).toUpperCase():"مسودة غير محفوظة";
-  updateRecordIdentity();setView("editor");
+  updateRecordIdentity();syncSaveRecordButtonLabel();setView("editor");
 }
 
-function clearCurrentRecord(){if(state.currentType)openNewRecordWithFreshData(state.currentType);}
+function clearCurrentRecord(){if(state.currentType==="group_guidance_followup")return openRecordReport("group_guidance",true);if(state.currentType)openNewRecordWithFreshData(state.currentType);}
 
 const SCHOOL_RECORDS_KEY="mishkat_school_records_local_v3";
 function readLocalSchoolRecords(){try{return JSON.parse(localStorage.getItem(SCHOOL_RECORDS_KEY)||"[]")||[]}catch(_e){return[]}}
@@ -1248,25 +1427,48 @@ async function saveCurrentRecord(){
   const invalidStudent=Array.from(el.dynamicRecordForm.querySelectorAll('input[data-source="students"],input[data-student-select]')).find(i=>cleanText(i.value)&&!selectedStudent(i.value));
   if(invalidStudent){invalidStudent.focus();showToast("اكتب اسم الطالب ثم اختره من نتائج البحث.",true);return;}
   const ctx=window.MishkatSchoolContext?.getContext?.()||{};
-  const payload={user_id:state.user.id,record_type:state.currentType,title:def.title,student_name:def.studentKey?cleanText(formData[def.studentKey]):null,class_name:def.classKey?cleanText(formData[def.classKey]):null,record_date:el.metaDate.value||null,academic_year:cleanText(el.metaAcademicYear.value)||ctx.academicYear||null,academic_term:cleanText(el.metaAcademicTerm?.value)||ctx.term||null,campus:ctx.campus||null,stage:ctx.stage||null,status:el.metaStatus.value,is_confidential:!!def.confidential,form_data:formData,schema_version:SCHOOL_SCHEMA_VERSION};
-  el.saveRecordButton.disabled=true;el.saveRecordButton.textContent="جارٍ الحفظ...";
+  const payload={user_id:state.user.id,record_type:state.currentType,title:def.title,student_name:def.studentKey?cleanText(formData[def.studentKey]):null,class_name:def.classKey?cleanText(formData[def.classKey]):null,record_date:el.metaDate.value||null,academic_year:cleanText(el.metaAcademicYear.value)||ctx.academicYear||null,academic_term:cleanText(el.metaAcademicTerm?.value)||ctx.term||null,campus:cleanText(el.metaCampus?.value)||ctx.campus||null,stage:cleanText(el.metaStage?.value)||ctx.stage||null,status:el.metaStatus.value,is_confidential:!!def.confidential,form_data:formData,schema_version:SCHOOL_SCHEMA_VERSION};
+  const isEditing=Boolean(state.currentRecordId);
+  el.saveRecordButton.disabled=true;el.saveRecordButton.textContent=isEditing?"جارٍ حفظ التعديل...":"جارٍ الحفظ...";
   try{
     if(SCHOOL_EDITION){
-      const items=readLocalSchoolRecords();const now=new Date().toISOString();const prior=state.currentRecordId?items.find(x=>x.id===state.currentRecordId):null;
+      const items=readLocalSchoolRecords();const now=new Date().toISOString();const prior=state.currentRecordId?(items.find(x=>x.id===state.currentRecordId)||(state.records||[]).find(x=>x.id===state.currentRecordId)||null):null;
       let bubbleResult={supported:false};
-      try{bubbleResult=await window.MishkatRecordsBubbleAdapter?.saveRecord?.(state.currentType,formData,{recordDate:payload.record_date,title:payload.title,status:payload.status},{type:prior?.bubble_type||"",id:prior?.bubble_id||""})||bubbleResult;}catch(error){console.warn("Bubble record save failed; local mirror will still be saved.",error);}
+      try{
+        bubbleResult=await window.MishkatRecordsBubbleAdapter?.saveRecord?.(
+          state.currentType,formData,
+          {recordDate:payload.record_date,title:payload.title,status:payload.status,academicYear:payload.academic_year,academicTerm:payload.academic_term,campus:payload.campus,stage:payload.stage},
+          {type:prior?.bubble_type||"",id:prior?.bubble_id||"",record:prior||null}
+        )||bubbleResult;
+      }catch(error){
+        if(["group_guidance","group_guidance_followup"].includes(state.currentType))throw error;
+        console.warn("Bubble record save failed; local mirror will still be saved.",error);
+      }
       let row;
-      const bubbleMeta=bubbleResult.supported?{bubble_type:bubbleResult.type,bubble_id:bubbleResult.id,bubble_remote:Boolean(bubbleResult.remote),bubble_synced_at:now}:{};
+      const bubbleMeta=bubbleResult.supported?{
+        bubble_type:bubbleResult.type,
+        bubble_id:bubbleResult.id||prior?.bubble_id||"",
+        bubble_remote:Boolean(bubbleResult.remote),
+        bubble_workflow:bubbleResult.workflow||"",
+        bubble_workflow_mode:bubbleResult.workflowMode||"",
+        bubble_workflow_saved:Boolean(bubbleResult.workflow),
+        bubble_synced_at:now
+      }:{};
       if(state.currentRecordId){const idx=items.findIndex(x=>x.id===state.currentRecordId);row={...(idx>=0?items[idx]:{}),...payload,...bubbleMeta,id:state.currentRecordId,updated_at:now,created_at:(idx>=0?items[idx].created_at:now)};if(idx>=0)items[idx]=row;else items.unshift(row)}
       else{row={...payload,...bubbleMeta,id:(crypto.randomUUID?crypto.randomUUID():`local-${Date.now()}`),created_at:now,updated_at:now};items.unshift(row);state.currentRecordId=row.id}
       writeLocalSchoolRecords(items);state.records=items;state.archiveLoaded=true;el.recordPrintId.textContent=String(state.currentRecordId).slice(0,8).toUpperCase();
-      if(bubbleResult.supported)showToast(bubbleResult.remote?"تم حفظ السجل بنجاح.":"تم حفظ السجل بنجاح.");
-      else showToast("تم حفظ السجل محليًا.");
-      const savedType=state.currentType;setTimeout(()=>openRecordReport(savedType,true),80);
+      if(cleanText(formData.next_session_date)||cleanText(prior?.form_data?.next_session_date)){
+        try{window.dispatchEvent(new CustomEvent('guidance-calendar-updated',{detail:{source:'records',recordType:state.currentType,nextDate:cleanText(formData.next_session_date)}}))}catch(_e){}
+      }
+      if(bubbleResult.supported)showToast(isEditing?"تم حفظ التعديل بنجاح.":"تم حفظ السجل بنجاح.");
+      else showToast(isEditing?"تم حفظ التعديل محليًا.":"تم حفظ السجل محليًا.");
+      const savedType=state.currentType==="group_guidance_followup"?"group_guidance":state.currentType;
+      state.archiveLoaded=false;
+      await goToRecordReportAfterSave(savedType);
       return;
     }
-    let result;if(state.currentRecordId)result=await db.from("guidance_digital_records").update(payload).eq("id",state.currentRecordId).select().single();else result=await db.from("guidance_digital_records").insert(payload).select().single();if(result.error)throw result.error;state.currentRecordId=result.data.id;el.recordPrintId.textContent=result.data.id.slice(0,8).toUpperCase();state.archiveLoaded=false;showToast("تم حفظ السجل بنجاح.");const savedType=state.currentType;await loadArchive(true);setTimeout(()=>openRecordReport(savedType,true),80);
-  }catch(error){showToast(error.message||"تعذر حفظ السجل.",true);}finally{el.saveRecordButton.disabled=false;el.saveRecordButton.textContent="حفظ السجل";}
+    let result;if(state.currentRecordId)result=await db.from("guidance_digital_records").update(payload).eq("id",state.currentRecordId).select().single();else result=await db.from("guidance_digital_records").insert(payload).select().single();if(result.error)throw result.error;state.currentRecordId=result.data.id;el.recordPrintId.textContent=result.data.id.slice(0,8).toUpperCase();state.archiveLoaded=false;showToast(isEditing?"تم حفظ التعديل بنجاح.":"تم حفظ السجل بنجاح.");const savedType=state.currentType==="group_guidance_followup"?"group_guidance":state.currentType;await goToRecordReportAfterSave(savedType);
+  }catch(error){showToast(error.message||"تعذر حفظ السجل.",true);}finally{el.saveRecordButton.disabled=false;syncSaveRecordButtonLabel();}
 }
 
 function printCurrentRecord(){updateRecordIdentity();window.print();}
@@ -1274,9 +1476,49 @@ function showToast(message,isError=false){
   let toast=document.getElementById("globalToast");if(!toast){toast=document.createElement("div");toast.id="globalToast";toast.style.cssText="position:fixed;right:22px;bottom:22px;z-index:150;padding:12px 16px;border-radius:12px;color:#fff;font-weight:800;box-shadow:0 16px 40px rgba(0,0,0,.2);transition:.25s";document.body.appendChild(toast);}toast.style.background=isError?"#b6383f":"#14775b";toast.textContent=message;toast.hidden=false;clearTimeout(toast._timer);toast._timer=setTimeout(()=>toast.hidden=true,3200);
 }
 
+function recordIdentityKey(record){
+  const data=record?.form_data||{};
+  if(record?.record_type==="group_guidance")return ["group_guidance",cleanText(record?.academic_year),cleanText(record?.academic_term),cleanText(record?.campus),cleanText(record?.stage),String(record?.record_date||"").slice(0,10),cleanText(data.session_title)].map(v=>String(v||"").toLowerCase()).join("|");
+  if(record?.record_type==="group_guidance_followup")return ["group_guidance_followup",cleanText(record?.academic_year),cleanText(record?.academic_term),cleanText(record?.campus),cleanText(record?.stage),cleanText(data.parent_grade),cleanText(data.root_session_date),cleanText(data.followup_number),String(record?.record_date||"").slice(0,10),cleanText(data.session_title)].map(v=>String(v||"").toLowerCase()).join("|");
+  return String(record?.id||"");
+}
+function mergeCollectiveParticipants(priorRows=[],remoteRows=[]){
+  const prior=Array.isArray(priorRows)?priorRows:[];const remote=Array.isArray(remoteRows)?remoteRows:[];
+  return remote.map(row=>{
+    const key=cleanText(row?.student_name_id||row?.student_name).toLowerCase();
+    const old=prior.find(x=>cleanText(x?.student_name_id||x?.student_name).toLowerCase()===key)||{};
+    return {...old,...row,signature:old?.signature||row?.signature||""};
+  });
+}
+function mergeSchoolArchiveRecords(localRows=[],remoteRows=[]){
+  const local=[...(localRows||[])],byKey=new Map(local.map((row,index)=>[recordIdentityKey(row),index]));
+  for(const remote of remoteRows||[]){
+    const key=recordIdentityKey(remote),idx=byKey.get(key);
+    if(idx===undefined){byKey.set(key,local.length);local.push(remote);continue;}
+    const prior=local[idx]||{};const priorForm=prior.form_data||{};const remoteForm=remote.form_data||{};
+    local[idx]={...prior,...remote,
+      id:prior.id||remote.id,
+      bubble_type:remote.bubble_type||prior.bubble_type,bubble_id:remote.bubble_id||prior.bubble_id,
+      bubble_remote:true,bubble_workflow:remote.bubble_workflow||prior.bubble_workflow,
+      bubble_workflow_saved:true,
+      form_data:{...priorForm,...remoteForm,
+        ...(remote.record_type==="group_guidance"?{participants:mergeCollectiveParticipants(priorForm.participants,remoteForm.participants)}:{}),
+        counselor_name:priorForm.counselor_name||remoteForm.counselor_name||"",
+        signature:priorForm.signature||remoteForm.signature||""
+      },
+      __bubble_row:remote.__bubble_row||prior.__bubble_row
+    };
+  }
+  return local.sort((a,b)=>String(b.record_date||b.created_at||"").localeCompare(String(a.record_date||a.created_at||"")));
+}
 async function loadArchive(force=false){
   if(!state.user)return;
-  if(SCHOOL_EDITION){state.records=readLocalSchoolRecords();state.archiveLoaded=true;hideBox(el.archiveStatus);renderArchive();updateStats();refreshStudentReportIndex();return;}
+  if(SCHOOL_EDITION){
+    const localRows=readLocalSchoolRecords();let remoteRows=[];
+    try{remoteRows=await window.MishkatRecordsBubbleAdapter?.listRemoteRecords?.("group_guidance")||[];state.collectiveReportRemoteError="";}
+    catch(error){state.collectiveReportRemoteError=error?.message||"تعذر تحميل سجلات الإرشاد الجمعي من Bubble.";console.warn("Bubble collective report load failed; using local mirror.",error);}
+    state.records=mergeSchoolArchiveRecords(localRows,remoteRows);state.archiveLoaded=true;hideBox(el.archiveStatus);renderArchive();updateStats();refreshStudentReportIndex();return;
+  }
   if(!isPremiumAccess()){state.records=[];state.archiveLoaded=false;showBox(el.archiveStatus,"الأرشيف والحفظ متاحان فقط لمشتركي باقة السجلات الرقمية أو الباقة الشاملة.");renderArchive();updateStats();refreshStudentReportIndex();return;}
   if(state.archiveLoaded&&!force){renderArchive();refreshStudentReportIndex();return;}
   showBox(el.archiveStatus,"جارٍ تحميل السجلات...");
@@ -1295,7 +1537,20 @@ function updateStats(){
   const records=state.records||[];const now=new Date();
   el.statTotalRecords.textContent=records.length;el.statCompletedRecords.textContent=records.filter(r=>r.status==="completed").length;el.statDraftRecords.textContent=records.filter(r=>r.status==="draft").length;el.statMonthRecords.textContent=records.filter(r=>{const d=new Date(r.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
 }
-async function deleteRecord(id){if(!confirm("سيتم حذف السجل نهائيًا. هل تريد المتابعة؟"))return;const row=state.records.find(r=>r.id===id);if(row?.bubble_type&&row?.bubble_id){try{await window.MishkatRecordsBubbleAdapter?.deleteRecord?.(row.bubble_type,row.bubble_id);}catch(error){console.warn("Bubble delete failed; removing local mirror only.",error);}}state.records=state.records.filter(r=>r.id!==id);writeLocalSchoolRecords(state.records);renderArchive();if(state.currentView==="recordReport")renderCurrentRecordReport();updateStats();showToast("تم حذف السجل.");}
+async function deleteRecord(id){
+  if(!confirm("سيتم حذف السجل نهائيًا. هل تريد المتابعة؟"))return;
+  const row=state.records.find(r=>r.id===id);if(!row)return;
+  const collectiveRemote=row.record_type==="group_guidance"&&Boolean(row.bubble_workflow_saved||row.bubble_workflow||row.bubble_remote);
+  const followupRemote=row.record_type==="group_guidance_followup"&&Boolean(row.bubble_id||row.bubble_remote);
+  if(collectiveRemote||followupRemote){
+    try{await window.MishkatRecordsBubbleAdapter?.deleteRecord?.(row.bubble_type||(followupRemote?"Guidance_SubCollective":"Guidance_Collective"),row.bubble_id||"",row);}
+    catch(error){showToast(error?.message||"تعذر حذف جلسة الإرشاد من Bubble.",true);return;}
+  }else if(row?.bubble_type&&row?.bubble_id){
+    try{await window.MishkatRecordsBubbleAdapter?.deleteRecord?.(row.bubble_type,row.bubble_id,row);}
+    catch(error){console.warn("Bubble delete failed; removing local mirror only.",error);}
+  }
+  state.records=state.records.filter(r=>r.id!==id);writeLocalSchoolRecords(state.records);renderArchive();if(state.currentView==="recordReport")renderCurrentRecordReport();updateStats();showToast("تم حذف السجل بنجاح.");
+}
 
 function openSavedRecord(id,printAfter=false){const record=state.records.find(r=>r.id===id);if(!record)return;openRecord(record.record_type,record);if(printAfter)setTimeout(()=>printCurrentRecord(),350);}
 
@@ -1885,10 +2140,11 @@ function bindEvents(){
   if(el.recordReportSearch)el.recordReportSearch.addEventListener("input",debounce(renderCurrentRecordReport,120));
   if(el.recordReportYear)el.recordReportYear.addEventListener("change",renderCurrentRecordReport);
   if(el.recordReportTerm)el.recordReportTerm.addEventListener("change",renderCurrentRecordReport);
-  if(el.recordReportBody)el.recordReportBody.addEventListener("click",e=>{const edit=e.target.closest("[data-report-edit]");if(edit)return openSavedRecord(edit.dataset.reportEdit);const print=e.target.closest("[data-report-print]");if(print)return openSavedRecord(print.dataset.reportPrint,true);const del=e.target.closest("[data-report-delete]");if(del)return deleteRecord(del.dataset.reportDelete);});
+  if(el.recordReportBody)el.recordReportBody.addEventListener("click",e=>{const add=e.target.closest("[data-report-add-followup]");if(add)return openCollectiveFollowupFromRecord(add.dataset.reportAddFollowup);const edit=e.target.closest("[data-report-edit]");if(edit)return openSavedRecord(edit.dataset.reportEdit);const print=e.target.closest("[data-report-print]");if(print)return openSavedRecord(print.dataset.reportPrint,true);const del=e.target.closest("[data-report-delete]");if(del)return deleteRecord(del.dataset.reportDelete);});
   el.dynamicRecordForm.addEventListener("click",e=>{const add=e.target.closest("[data-add-row]");if(add){const wrapper=el.dynamicRecordForm.querySelector(`[data-repeat-key="${CSS.escape(add.dataset.addRow)}"]`);const columns=JSON.parse(wrapper.dataset.repeatColumns||"[]");wrapper.querySelector("tbody").insertAdjacentHTML("beforeend",renderRepeatRow(columns,{}));refreshUniqueStudents(wrapper);return;}const del=e.target.closest("[data-delete-row]");if(del){const wrapper=del.closest("[data-repeat-key]");const tbody=del.closest("tbody");if(tbody.children.length>1)del.closest("tr").remove();else Array.from(del.closest("tr").querySelectorAll("input,textarea,select")).forEach(i=>i.value="");refreshUniqueStudents(wrapper);}});
   el.dynamicRecordForm.addEventListener("input",handleSchoolBubbleInput);
   el.dynamicRecordForm.addEventListener("change",handleSchoolBubbleChange);
+  if(el.metaDate){el.metaDate.addEventListener("input",syncGroupGuidanceDay);el.metaDate.addEventListener("change",syncGroupGuidanceDay);}
   el.archiveSearch.addEventListener("input",debounce(renderArchive));el.archiveTypeFilter.addEventListener("change",renderArchive);el.archiveStatusFilter.addEventListener("change",renderArchive);el.refreshArchiveButton.addEventListener("click",()=>loadArchive(true));
   el.archiveList.addEventListener("click",e=>{const edit=e.target.closest("[data-edit-record]");if(edit)return openSavedRecord(edit.dataset.editRecord);const print=e.target.closest("[data-print-saved]");if(print)return openSavedRecord(print.dataset.printSaved,true);const report=e.target.closest("[data-student-report]");if(report)return openStudentReportForName(report.dataset.studentReport);const del=e.target.closest("[data-delete-record]");if(del)return deleteRecord(del.dataset.deleteRecord);});
   if(el.studentReportName){

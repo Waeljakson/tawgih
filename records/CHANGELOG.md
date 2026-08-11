@@ -1,3 +1,17 @@
+## V1.0.76 — SubCollective Workflow API CRUD
+- ربط حفظ جلسات المتابعة بـ `guidance_save_subcollective`.
+- ربط تعديل جلسات المتابعة بـ `guidance_update_subcollective` باستخدام بيانات الجلسة الأصلية، بدون أي ID يدوي.
+- ربط حذف جلسات المتابعة بـ `guidance_delete_subcollective`.
+- الإبقاء على قراءة التقرير من Bubble وتجميع الجلسات التابعة تحت الجلسة الرئيسية.
+- بعد الحفظ أو التعديل يعود المستخدم مباشرة إلى تقرير الإرشاد الجمعي.
+
+## V1.0.75 — Collective follow-up chain
+- Added up to three linked follow-up sessions using the existing `Guidance_SubCollective` table.
+- Added `+ إضافة جلسة` beside Edit on the latest session in the chain.
+- Follow-up title/date inherit from the previous session; participants are not re-entered.
+- Grouped main and follow-up sessions visually in the collective report.
+- No Bubble schema changes.
+
 # V11 — تقرير الطالب الموحد
 
 - إضافة شاشة تقارير الطلاب داخل منصة السجلات.

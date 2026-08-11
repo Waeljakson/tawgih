@@ -109,6 +109,7 @@ const UNIFIED_PLATFORM_ICONS={
   messages_library:'<svg viewBox="0 0 24 24"><path d="M4 5h16v12H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg>'
 };
 function unifiedPlanMeta(){
+  if(SCHOOL_EDITION)return {label:'منصة المدرسة',detail:'جميع الخدمات متاحة',trial:false};
   const active=activeUnifiedEntitlements();
   if(state.account?.is_system_admin)return {label:'مدير النظام',detail:'صلاحية كاملة لجميع المنصات',trial:false};
   if(active.some(e=>e.product_code==='all_access'))return {label:'الباقة الشاملة',detail:'جميع المنصات مفعّلة',trial:false};
@@ -133,7 +134,7 @@ function renderUnifiedPlatformSwitcher(){
     const current=code===CURRENT_PACKAGE_CODE;
     return `<a href="${item.href}?from=portal" data-unified-platform="${code}" class="platform-tab${current?' current':''}"${current?' aria-current="page"':''}><span class="platform-tab-icon">${icon}</span><span class="platform-tab-copy"><strong>${item.label}</strong><small>${current?'المنصة الحالية':'انتقال إلى المنصة'}</small></span></a>`;
   }).join('');
-  badge.innerHTML=`<span class="platform-plan-status${plan.trial?' trial':''}"></span><span class="platform-plan-copy"><span>الباقة الحالية</span><strong>${plan.label}</strong><small>${plan.detail}</small></span>`;
+  badge.innerHTML=`<span class="platform-plan-status${plan.trial?' trial':''}"></span><span class="platform-plan-copy"><span>الإتاحة</span><strong>${plan.label}</strong><small>${plan.detail}</small></span>`;
   bar.hidden=false;
   box.querySelectorAll('[data-unified-platform]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();goToUnifiedPlatform(a.dataset.unifiedPlatform)}));
 }
@@ -2383,6 +2384,7 @@ function isPremiumAccess(){
   return Boolean(state.account.is_system_admin||state.packageAccess);
 }
 function premiumExpiryLabel(){
+  if(SCHOOL_EDITION)return "نسخة المدرسة — جميع الأدوات متاحة";
   if(state.account?.is_system_admin)return "مدير النظام — جميع المنصات متاحة";
   const entitlement=activeEntitlement();
   if(!entitlement)return "الحفظ والطباعة والتصدير غير متاحة في باقة التحاليل";
@@ -2412,11 +2414,11 @@ function updatePremiumUi() {
   }
   if(el.currentUserPlan){
     const packageName=entitlement?PACKAGE_LABELS[entitlement.product_code]:"";
-    el.currentUserPlan.textContent=state.account?.is_system_admin?"مدير النظام":access?packageName:"تجريبي";
+    el.currentUserPlan.textContent=SCHOOL_EDITION?"منصة المدرسة":state.account?.is_system_admin?"مدير النظام":access?packageName:"تجريبي";
   }
   if(el.subscriptionExpiry) el.subscriptionExpiry.textContent=premiumExpiryLabel();
   if(el.requestPremiumButton){
-    el.requestPremiumButton.hidden=Boolean(state.account?.is_system_admin);
+    el.requestPremiumButton.hidden=SCHOOL_EDITION||Boolean(state.account?.is_system_admin);
     el.requestPremiumButton.disabled=false;
     el.requestPremiumButton.textContent=entitlement?.product_code==="all_access"?"إدارة أو ترقية الباقة الشاملة":access?"ترقية للباقة الشاملة أو السنوية":"طلب تفعيل Premium";
   }
@@ -2440,7 +2442,7 @@ function showDatabaseStatus(message, isError = false) {
   el.databaseStatus.classList.toggle("error", isError);
 }
 function hideDatabaseStatus() { el.databaseStatus.hidden = true; }
-function roleLabel() { const e=activeEntitlement(); return isPremiumAccess() ? `${state.account?.is_system_admin?"مدير النظام":PACKAGE_LABELS[e?.product_code]||"Premium"} — الحفظ والتصدير متاحان` : "تجريبي — التحليل والعرض فقط"; }
+function roleLabel() { if(SCHOOL_EDITION)return "نسخة المدرسة — جميع الأدوات متاحة"; const e=activeEntitlement(); return isPremiumAccess() ? `${state.account?.is_system_admin?"مدير النظام":PACKAGE_LABELS[e?.product_code]||"Premium"} — الحفظ والتصدير متاحان` : "تجريبي — التحليل والعرض فقط"; }
 function modeDbName(mode) { return MODES[mode]?.name || mode; }
 async function loadProfile(user) {
   if (!db || !user) return null;

@@ -11,15 +11,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v10.1.0-20260806">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../support-widget.css?v10.1.0-20260806">
   <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+  <link rel="stylesheet" href="../school-free-mode.css?v=school-1.0.86">
 </head>
-<body>
+<body data-school-free="true">
   <div id="accessGate" class="access-gate">
     <div class="gate-spinner"></div>
-    <strong>جارٍ التحقق من باقة العروض التقديمية…</strong>
-    <p>سيتم إعادتك إلى بوابة المنصات إذا لم تكن الباقة مفعّلة.</p>
+    <strong>جارٍ تحميل منصة العروض التقديمية…</strong>
+    <p>يتم تحميل بيانات المدرسة ومكتبة العروض.</p>
   </div>
 
   <div id="appShell" hidden>
@@ -132,9 +132,9 @@
         <label class="span-2"><span>الهدف من البرنامج</span><textarea id="customObjective" rows="4" placeholder="اشرح المشكلة أو الهدف الذي تريد أن يعالجه العرض…"></textarea></label>
         <label class="span-2"><span>ملاحظات التصميم والمحتوى</span><textarea id="customNotes" rows="3" placeholder="ألوان، مدة العرض، نشاط مطلوب، موعد التنفيذ…"></textarea></label>
       </div>
-      <div class="cost-note"><strong>التسعير حسب التكلفة</strong><p>يتم تحديد السعر بعد مراجعة عدد الشرائح، عمق المحتوى، مستوى التصميم، الصور، والموعد المطلوب.</p></div>
-      <a id="customWhatsAppLink" class="whatsapp-button" target="_blank" rel="noopener">التواصل عبر واتساب ببيانات الطلب</a>
-      <label class="confirmation"><input id="customWhatsappConfirmed" type="checkbox"><span>أؤكد أنني تواصلت عبر واتساب بخصوص هذا الطلب.</span></label>
+      <div class="cost-note"><strong>طلب داخلي للمدرسة</strong><p>يتم تسجيل الطلب ومراجعته ضمن أعمال المدرسة مجانًا ضمن أعمال المدرسة.</p></div>
+      <a id="customWhatsAppLink" class="whatsapp-button" target="_blank" rel="noopener" hidden>التواصل</a>
+      <label class="confirmation" hidden><input id="customWhatsappConfirmed" type="checkbox" checked><span>طلب داخلي</span></label>
       <button id="submitCustomRequestButton" class="primary-button wide" type="button" disabled>إرسال طلب التصميم</button>
       <div id="customRequestStatus" class="status-box" hidden></div>
     </div>
@@ -142,14 +142,15 @@
 
   <div id="toast" class="toast" hidden></div>
   <script src="data.js?v10.1.0-20260806"></script>
-  <script src="../bubble-schema.js?v=school-1.0.49"></script>
-  <script src="../bubble-config.js?v=school-1.0.49"></script>
-  <script src="../school-context.js?v=school-1.0.49"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="../school-directory.js?v=school-1.0.49"></script>
-  <script src="app-v12.js"></script>
+  <script src="../bubble-schema.js?v=school-1.0.86"></script>
+  <script src="../bubble-config.js?v=school-1.0.86"></script>
+  <script src="../school-context.js?v=school-1.0.86"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="../school-directory.js?v=school-1.0.86"></script>
+  <script src="app-v12.js?v=school-1.0.86"></script>
   <script src="../support-widget.js?v10.1.0-20260806"></script>
-  <script src="../smart-reminders.js?v=19.0.9"></script>
-  <script src="../global-shell.js?v=school-1.0.49"></script>
+  <script src="../smart-reminders.js?v=19.0.10"></script>
+  <script src="../global-shell.js?v=school-1.0.86"></script>
+  <script src="../school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>

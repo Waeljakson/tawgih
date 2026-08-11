@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#4f46e5">
   <meta name="app-version" content="19.0.9">
-  <meta name="description" content="تقويم ذكي وتنبيهات مرتبطة بخطة الموجه الطلابي — حصري للباقة الشاملة.">
+  <meta name="description" content="تقويم ذكي وتنبيهات مرتبطة بخطة الموجه الطلابي ضمن منصة المدرسة.">
   <title>التقويم الذكي والتنبيهات</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,8 +13,9 @@
   <link rel="stylesheet" href="styles.css?v=19.0.8">
   <link rel="stylesheet" href="../support-widget.css?v=17.3.1">
   <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+  <link rel="stylesheet" href="../school-free-mode.css?v=school-1.0.86">
 </head>
-<body>
+<body data-school-free="true">
   <section id="gate" class="gate">
     <div class="gate-card">
       <div id="gateSpinner" class="spinner"></div>
@@ -30,7 +31,7 @@
       <div class="hero-orb one"></div><div class="hero-orb two"></div>
       <div class="hero-inner">
         <div>
-          <span class="eyebrow">ميزة حصرية للباقة الشاملة</span>
+          <span class="eyebrow">متاحة ضمن منصة المدرسة</span>
           <h1>التقويم الذكي <b>والتنبيهات</b></h1>
           <p>يقرأ آخر خطة محفوظة للمستخدم ويحوّل أسابيعها وبرامجها وإجازاتها إلى مواعيد وتنبيهات عملية تلقائيًا.</p>
         </div>
@@ -331,13 +332,14 @@
 })();
 
   </script>
-  <script src="../smart-reminders.js?v=19.0.9"></script>
+  <script src="../smart-reminders.js?v=19.0.10"></script>
   <script src="../support-widget-rest.js?v=17.3.0"></script>
-  <script src="../bubble-schema.js?v=school-1.0.49"></script>
-  <script src="../bubble-config.js?v=school-1.0.49"></script>
-  <script src="../school-context.js?v=school-1.0.49"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="../school-directory.js?v=school-1.0.49"></script>
-  <script src="../global-shell.js?v=school-1.0.49"></script>
+  <script src="../bubble-schema.js?v=school-1.0.86"></script>
+  <script src="../bubble-config.js?v=school-1.0.86"></script>
+  <script src="../school-context.js?v=school-1.0.86"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="../school-directory.js?v=school-1.0.86"></script>
+  <script src="../global-shell.js?v=school-1.0.86"></script>
+  <script src="../school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>

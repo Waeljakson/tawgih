@@ -37,7 +37,6 @@
       await Promise.race([API.loadContext(true),new Promise((_,reject)=>setTimeout(()=>reject(new Error('calendar_boot_timeout')),18000))]);
       state.ctx=API.state;
       if(!state.ctx.user)return gateError('يلزم تسجيل الدخول','ارجع إلى البوابة وسجّل الدخول ثم افتح التقويم من داخلها.');
-      if(!state.ctx.access)return gateError('ميزة الباقة الشاملة فقط','التقويم الذكي والتنبيهات متاحان حصريًا للباقة الشاملة الشهرية أو السنوية، وكذلك كود هدية الباقة الشاملة.');
       $('gate').hidden=true;$('app').hidden=false;$('customDate').value=API.isoToday();
       if('Notification'in window&&Notification.permission==='granted')$('browserNotifyButton').textContent='🔔 الإشعارات مفعّلة';
       renderAll();

@@ -392,3 +392,331 @@
 .student-report-occurrence time{color:#315b6e;font-size:.75rem;font-weight:800;white-space:nowrap}.student-report-occurrence div strong{display:block;color:#1c4356;font-size:.82rem;line-height:1.65}.student-report-occurrence div small{display:block;margin-top:3px;color:#788c95;font-size:.66rem}.student-report-occurrence>span{color:#0b628f;font-size:.7rem;font-weight:800;white-space:nowrap}
 @media(max-width:760px){.student-report-occurrence{grid-template-columns:1fr;gap:5px}.student-report-occurrence>span{justify-self:start}}
 @media print{body.printing-student-report .no-print{display:none!important}body.printing-student-report .print-only{display:flex!important}body.printing-student-report .student-report-type-group{break-inside:avoid-page;border-radius:8px;margin-bottom:5px}body.printing-student-report .student-report-type-group>summary{padding:6px 8px;grid-template-columns:28px 1fr}body.printing-student-report .student-report-type-group>summary>b{display:none}body.printing-student-report .student-report-type-group>summary .student-report-type-group-icon{width:26px;height:26px;border-radius:7px}body.printing-student-report .student-report-occurrence{grid-template-columns:80px 1fr;padding:5px 8px;gap:7px}body.printing-student-report .student-report-occurrence div strong{font-size:7.5pt}body.printing-student-report .student-report-occurrence div small,body.printing-student-report .student-report-occurrence time{font-size:6.5pt}}
+
+/* V1.0.65 — يوم جلسة الإرشاد الجمعي مشتق تلقائيًا من تاريخ السجل */
+.derived-day-field{display:flex;flex-direction:column;gap:7px}.derived-day-value{min-height:46px;border:1px solid #cfe0e9;border-radius:12px;background:linear-gradient(135deg,#f4fbfb,#f7fafc);padding:12px 13px;display:flex;align-items:center;color:#17465d;font-weight:900}.derived-day-field small{color:var(--muted);font-size:.72rem}
+@media print{.derived-day-value{min-height:25px;border:0;border-bottom:1px solid #aab9c2;border-radius:0;background:transparent;padding:4px;font-size:8pt}}
+
+
+/* V1.0.71 - polished collective guidance report */
+.collective-report-panel{border-color:#d4e6ed;box-shadow:0 16px 42px rgba(7,61,88,.10)}
+.collective-report-panel .record-report-filters{background:linear-gradient(135deg,#f4fbfd 0%,#f8fcfb 58%,#fff9f1 100%);padding:14px;gap:10px}
+.collective-report-panel .record-report-count{border-color:#aadbd6;background:linear-gradient(145deg,#ffffff,#edf9f7);box-shadow:inset 0 0 0 1px rgba(8,168,156,.04)}
+.collective-report-panel .record-report-count strong{color:#087f79;font-size:1.28rem}
+.collective-report-panel .record-report-table-shell{padding:12px;min-height:250px;max-height:66vh;scrollbar-color:#9fc6d2 #edf5f8;scrollbar-width:thin}
+.collective-report-panel .record-report-table{min-width:1860px;font-size:.75rem;border:1px solid #dbe8ed;border-radius:14px;overflow:hidden;background:#fff}
+.collective-report-panel .record-report-table th{background:linear-gradient(135deg,#0b628f,#078f87);padding:12px 10px;border-left-color:rgba(255,255,255,.13);font-size:.72rem;letter-spacing:0;top:0}
+.collective-report-panel .record-report-table td{padding:10px 10px;line-height:1.7;border-bottom-color:#e5eef2;border-left:1px solid #eef4f6;max-width:180px}
+.collective-report-panel .record-report-table tbody tr:nth-child(even) td{background:#fbfdfe}
+.collective-report-panel .record-report-table tbody tr:hover td{background:#f0faf9}
+.collective-report-panel .record-report-table .report-cell-value{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;white-space:normal;word-break:break-word}
+.collective-report-panel .record-report-table .report-col-compact{min-width:88px;max-width:120px;white-space:nowrap}
+.collective-report-panel .record-report-table .report-col-title{min-width:155px;max-width:190px;font-weight:900;color:#123f55}
+.collective-report-panel .record-report-table .report-col-medium{min-width:130px;max-width:170px}
+.collective-report-panel .record-report-table .report-col-long{min-width:165px;max-width:205px}
+.collective-report-panel .record-report-table .report-col-students{min-width:180px;max-width:230px;color:#255164;font-weight:700}
+.collective-report-panel .record-report-table .report-actions-head,.collective-report-panel .record-report-table .report-actions-cell{position:sticky;left:0;z-index:3;min-width:150px;max-width:150px}
+.collective-report-panel .record-report-table .report-actions-head{z-index:5;background:linear-gradient(135deg,#084b70,#087c75)}
+.collective-report-panel .record-report-table .report-actions-cell{background:#fff;border-right:1px solid #dce9ee;box-shadow:8px 0 18px rgba(9,62,88,.06)}
+.collective-report-panel .record-report-table tbody tr:nth-child(even) .report-actions-cell{background:#fbfdfe}
+.collective-report-panel .record-report-table tbody tr:hover .report-actions-cell{background:#f0faf9}
+.collective-report-panel .report-row-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;white-space:normal}
+.collective-report-panel .report-row-actions button{padding:7px 7px;font-size:.67rem;border-radius:9px;min-width:0}
+.collective-report-panel .report-delete-action{grid-column:1/-1;color:#a33b42;background:#fff5f5;border-color:#efd1d4}
+@media(max-width:900px){.collective-report-panel .record-report-table-shell{max-height:none}.collective-report-panel .record-report-table{min-width:1700px}}
+@media print{.collective-report-panel .record-report-table-shell{max-height:none;overflow:visible;padding:0}.collective-report-panel .record-report-table{min-width:0;width:100%;font-size:6.5pt}.collective-report-panel .record-report-table th,.collective-report-panel .record-report-table td{padding:4px 3px;max-width:none;min-width:0!important}.collective-report-panel .record-report-table .report-cell-value{-webkit-line-clamp:unset;display:block}.collective-report-panel .report-actions-head,.collective-report-panel .report-actions-cell{display:none}}
+
+
+/* V1.0.72 — luxury compact collective guidance report */
+.collective-report-panel{
+  overflow:hidden;
+  border:1px solid rgba(9,96,127,.14);
+  border-radius:24px;
+  background:linear-gradient(160deg,#ffffff 0%,#fbfdfe 55%,#f3faf9 100%);
+  box-shadow:0 24px 65px rgba(5,64,91,.12),0 3px 12px rgba(5,64,91,.05);
+}
+.collective-report-panel .record-report-filters{
+  position:relative;
+  background:linear-gradient(135deg,#f5fbfd 0%,#f8fcfb 60%,#fffaf3 100%);
+  border-bottom:1px solid #dcebef;
+  padding:18px;
+  gap:12px;
+}
+.collective-report-panel .record-report-filters label{
+  border-radius:14px;
+}
+.collective-report-panel .record-report-filters input,
+.collective-report-panel .record-report-filters select{
+  min-height:44px;
+  border-color:#cfe2e9;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 5px 14px rgba(13,89,116,.04);
+}
+.collective-report-panel .record-report-count{
+  min-height:64px;
+  border:1px solid #b9dedb;
+  border-radius:16px;
+  background:linear-gradient(145deg,#ffffff,#ecf9f7);
+  box-shadow:0 8px 20px rgba(7,125,116,.08),inset 0 0 0 1px rgba(8,168,156,.04);
+}
+.collective-report-panel .record-report-count strong{color:#087f79;font-size:1.35rem;font-weight:900}
+.collective-report-panel .record-report-table-shell{
+  padding:18px;
+  min-height:240px;
+  max-height:68vh;
+  overflow:auto;
+  background:linear-gradient(180deg,#fbfdfe 0%,#f7fbfc 100%);
+  scrollbar-color:#9fc6d2 #edf5f8;
+  scrollbar-width:thin;
+}
+.collective-report-panel .record-report-table{
+  width:100%;
+  min-width:760px;
+  border-collapse:separate;
+  border-spacing:0 10px;
+  table-layout:fixed;
+  font-size:.82rem;
+  background:transparent;
+  border:0;
+}
+.collective-report-panel .record-report-table thead th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  padding:14px 16px;
+  background:linear-gradient(135deg,#075a80 0%,#087f79 100%);
+  color:#fff;
+  border:0;
+  font-size:.76rem;
+  font-weight:900;
+  white-space:nowrap;
+  box-shadow:0 10px 24px rgba(6,92,117,.12);
+}
+.collective-report-panel .record-report-table thead th:first-child{border-radius:0 14px 14px 0}
+.collective-report-panel .record-report-table thead th:last-child{border-radius:14px 0 0 14px}
+.collective-report-panel .record-report-table tbody td{
+  padding:16px 16px;
+  vertical-align:middle;
+  line-height:1.8;
+  color:#294d5e;
+  background:#fff;
+  border-top:1px solid #e2edf1;
+  border-bottom:1px solid #e2edf1;
+  border-left:0;
+  box-shadow:0 8px 22px rgba(20,75,96,.045);
+}
+.collective-report-panel .record-report-table tbody td:first-child{
+  border-right:1px solid #e2edf1;
+  border-radius:0 15px 15px 0;
+}
+.collective-report-panel .record-report-table tbody td:last-child{
+  border-left:1px solid #e2edf1;
+  border-radius:15px 0 0 15px;
+}
+.collective-report-panel .record-report-table tbody tr:hover td{
+  background:#f8fdfc;
+  border-color:#cbe6e2;
+}
+.collective-report-panel .record-report-table .report-cell-value{
+  display:block;
+  overflow:visible;
+  white-space:normal;
+  word-break:break-word;
+  -webkit-line-clamp:unset;
+}
+.collective-report-panel .record-report-table .report-col-title{
+  width:28%;
+  min-width:190px;
+  max-width:none;
+  color:#123f55;
+  font-weight:900;
+  font-size:.86rem;
+}
+.collective-report-panel .record-report-table .report-col-students{
+  width:42%;
+  min-width:280px;
+  max-width:none;
+  color:#255164;
+  font-weight:750;
+}
+.collective-report-panel .record-report-table .report-col-compact{
+  width:13%;
+  min-width:105px;
+  max-width:none;
+  white-space:nowrap;
+  text-align:center;
+  color:#087f79;
+  font-weight:900;
+}
+.collective-report-panel .record-report-table .report-actions-head,
+.collective-report-panel .record-report-table .report-actions-cell{
+  position:static;
+  width:17%;
+  min-width:155px;
+  max-width:none;
+}
+.collective-report-panel .record-report-table .report-actions-head{
+  background:linear-gradient(135deg,#064c70,#076d68);
+}
+.collective-report-panel .record-report-table .report-actions-cell{
+  background:#fff;
+  border-right:0;
+  box-shadow:0 8px 22px rgba(20,75,96,.045);
+}
+.collective-report-panel .report-row-actions{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  white-space:nowrap;
+}
+.collective-report-panel .report-row-actions button{
+  min-width:0;
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:.68rem;
+  font-weight:850;
+}
+.collective-report-panel .report-delete-action{
+  grid-column:auto;
+  color:#a33b42;
+  background:#fff7f7;
+  border-color:#efd7d9;
+}
+@media(max-width:900px){
+  .collective-report-panel{border-radius:18px}
+  .collective-report-panel .record-report-table-shell{padding:10px;max-height:none}
+  .collective-report-panel .record-report-table{min-width:720px;font-size:.78rem}
+  .collective-report-panel .record-report-table .report-col-students{min-width:250px}
+}
+@media(max-width:620px){
+  .collective-report-panel .record-report-filters{padding:12px}
+  .collective-report-panel .record-report-table{min-width:680px}
+  .collective-report-panel .record-report-table tbody td{padding:12px 10px}
+}
+@media print{
+  .collective-report-panel{border:0;box-shadow:none;background:#fff}
+  .collective-report-panel .record-report-filters{display:none!important}
+  .collective-report-panel .record-report-table-shell{max-height:none;overflow:visible;padding:0;background:#fff}
+  .collective-report-panel .record-report-table{min-width:0;width:100%;table-layout:fixed;border-spacing:0 5px;font-size:8pt}
+  .collective-report-panel .record-report-table th,.collective-report-panel .record-report-table td{padding:6px 7px!important;min-width:0!important;max-width:none!important}
+  .collective-report-panel .record-report-table .report-col-title{width:35%}
+  .collective-report-panel .record-report-table .report-col-students{width:50%}
+  .collective-report-panel .record-report-table .report-col-compact{width:15%}
+  .collective-report-panel .report-actions-head,.collective-report-panel .report-actions-cell{display:none!important}
+}
+
+/* V1.0.74 — force collective report header labels to high-contrast white */
+.collective-report-panel .record-report-table thead th,
+.collective-report-panel .record-report-table .report-actions-head{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  text-shadow:0 1px 1px rgba(0,0,0,.12);
+}
+
+/* V1.0.75 — linked collective follow-up sessions */
+.collective-report-panel .record-report-table{min-width:860px}
+.collective-report-panel .record-report-table .report-col-title{width:29%}
+.collective-report-panel .record-report-table .report-col-students{width:34%}
+.collective-report-panel .record-report-table .report-col-compact{width:12%}
+.collective-report-panel .record-report-table .report-actions-head,
+.collective-report-panel .record-report-table .report-actions-cell{width:25%;min-width:220px}
+.collective-report-panel .report-row-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;white-space:normal}
+.collective-report-panel .report-row-actions button{width:100%;padding:8px 9px}
+.collective-report-panel .report-add-session{background:linear-gradient(135deg,#0a876f,#10a78b);color:#fff;border:0;box-shadow:0 7px 16px rgba(8,135,111,.17)}
+.collective-report-panel .report-delete-action{grid-column:auto}
+.collective-session-title{display:flex;align-items:center;gap:9px;min-width:0}
+.collective-session-title.followup{padding-right:22px;position:relative}
+.collective-session-title.followup:before{content:"";position:absolute;right:5px;top:-18px;bottom:-18px;width:2px;background:linear-gradient(180deg,#8bd7cb,#d9efeb);border-radius:999px}
+.collective-sequence-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;padding:5px 9px;border-radius:999px;background:linear-gradient(135deg,#0a648d,#078b83);color:#fff;font-size:.64rem;font-weight:900;box-shadow:0 5px 12px rgba(8,103,133,.14)}
+.collective-sequence-badge.followup{background:#e8f7f4;color:#087a6f;border:1px solid #bfe5de;box-shadow:none}
+.collective-followup-row td{background:linear-gradient(90deg,#f9fdfc,#f5fbfa)!important;border-color:#d8ece7!important}
+.collective-followup-row .report-col-students{color:#4f6f79!important;font-style:italic;font-weight:700!important}
+.collective-followup-row:hover td{background:#eef9f6!important}
+.collective-main-row td{border-color:#dbe9ef!important}
+.collective-main-row .report-cell-main{font-size:.9rem}
+@media(max-width:900px){
+  .collective-report-panel .record-report-table{min-width:820px}
+  .collective-report-panel .record-report-table .report-actions-head,
+  .collective-report-panel .record-report-table .report-actions-cell{min-width:205px}
+}
+@media print{
+  .collective-session-title.followup{padding-right:14px}
+  .collective-session-title.followup:before{right:2px}
+  .collective-sequence-badge{font-size:6pt;padding:2px 5px}
+  .collective-followup-row td{background:#f6fbf9!important}
+}
+
+/* V1.0.78 — report grows with the page; no nested scrolling */
+.collective-report-panel .record-report-table-shell{
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+  scrollbar-width:none;
+}
+.collective-report-panel .record-report-table-shell::-webkit-scrollbar{display:none}
+.collective-report-panel .record-report-table{
+  width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed;
+}
+.collective-report-panel .record-report-table .report-col-title{width:30% !important;min-width:0 !important;max-width:none !important}
+.collective-report-panel .record-report-table .report-col-students{width:35% !important;min-width:0 !important;max-width:none !important}
+.collective-report-panel .record-report-table .report-col-compact{width:12% !important;min-width:0 !important;max-width:none !important;white-space:normal}
+.collective-report-panel .record-report-table .report-actions-head,
+.collective-report-panel .record-report-table .report-actions-cell{width:23% !important;min-width:0 !important;max-width:none !important;position:static !important}
+.collective-report-panel .record-report-table td,
+.collective-report-panel .record-report-table th{word-break:break-word;overflow-wrap:anywhere}
+.collective-report-panel .report-row-actions{white-space:normal}
+
+@media(max-width:760px){
+  .collective-report-panel .record-report-table-shell{padding:10px !important;overflow:visible !important}
+  .collective-report-panel .record-report-table{display:block;width:100% !important;min-width:0 !important;border-spacing:0}
+  .collective-report-panel .record-report-table thead{display:none}
+  .collective-report-panel .record-report-table tbody{display:block;width:100%}
+  .collective-report-panel .record-report-table tbody tr{
+    display:block;
+    width:100%;
+    margin:0 0 14px;
+    padding:5px 12px;
+    border:1px solid #d9e9ee;
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 9px 24px rgba(10,70,96,.06);
+  }
+  .collective-report-panel .record-report-table tbody td{
+    display:grid !important;
+    grid-template-columns:minmax(92px,32%) 1fr;
+    align-items:start;
+    gap:10px;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    padding:10px 4px !important;
+    border:0 !important;
+    border-bottom:1px solid #edf3f5 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .collective-report-panel .record-report-table tbody td:last-child{border-bottom:0 !important}
+  .collective-report-panel .record-report-table tbody td::before{
+    color:#56717e;
+    font-size:.7rem;
+    font-weight:900;
+    line-height:1.7;
+  }
+  .collective-report-panel .record-report-table tbody td:nth-child(1)::before{content:"اسم الجلسة"}
+  .collective-report-panel .record-report-table tbody td:nth-child(2)::before{content:"المشاركون"}
+  .collective-report-panel .record-report-table tbody td:nth-child(3)::before{content:"الزمن"}
+  .collective-report-panel .record-report-table tbody td:nth-child(4)::before{content:"الإجراءات"}
+  .collective-report-panel .collective-session-title{min-width:0;flex-wrap:wrap}
+  .collective-report-panel .report-row-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
+  .collective-report-panel .report-row-actions button{width:100%}
+}
+
+/* V1.0.79 — centered collective report column headings */
+.collective-report-panel .record-report-table thead th,
+.collective-report-panel .record-report-table .report-actions-head{
+  text-align:center !important;
+  vertical-align:middle;
+}

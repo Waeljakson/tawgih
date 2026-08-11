@@ -15,12 +15,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../support-widget.css?v12">
   <link rel="stylesheet" href="../smart-reminders.css?v=19.0.9">
+  <link rel="stylesheet" href="../school-free-mode.css?v=school-1.0.86">
 </head>
-<body>
+<body data-school-free="true">
   <div id="accessGate" class="access-gate">
     <div class="gate-spinner"></div>
     <strong>جارٍ تجهيز منصة خطة الموجه الطلابي…</strong>
-    <p>يتم التحقق من الحساب والباقة وبيانات المدرسة.</p>
+    <p>يتم تحميل بيانات المدرسة وتجهيز خطة الموجه الطلابي.</p>
   </div>
 
   <div id="appShell" hidden>
@@ -36,7 +37,7 @@
       <div class="header-pattern"></div>
       <div class="plan-header-inner">
         <div class="school-brand"><div class="school-logo-box"><img id="schoolLogo" hidden alt="شعار المدرسة"><span id="schoolLogoPlaceholder">م</span></div><div><span>منصة خطة الموجه الطلابي</span><h1 id="schoolName">اسم المدرسة</h1><p id="userName">الموجه الطلابي</p></div></div>
-        <div class="header-copy"><span class="eyebrow">خطة أسبوعية مبنية على التقويم الفعلي</span><h2>من التقويم الدراسي إلى <b>خطة تنفيذ أسبوعية جاهزة</b></h2><p>حدد المرحلة وبداية الدراسة ونهايتها والإجازات، ثم تُنشئ المنصة الأسابيع تلقائيًا وتوزع عناصر الخطة والبرامج المناسبة للمرحلة.</p></div>
+        <div class="header-copy"><span class="eyebrow">خطة أسبوعية مبنية على التقويم الفعلي</span><h2>من التقويم الدراسي إلى <b>خطة تنفيذ أسبوعية جاهزة</b></h2><p>حدد المرحلة وبداية الفصل الدراسي ونهاية الفصل الدراسي والإجازات، ثم تُنشئ المنصة الأسابيع تلقائيًا وتوزع عناصر الخطة والبرامج المناسبة للمرحلة.</p></div>
         <div class="header-stat"><span>المراحل المدعومة</span><strong>4</strong><small>ابتدائية دنيا وعليا ومتوسطة وثانوية</small></div>
       </div>
     </header>
@@ -56,15 +57,15 @@
             <label><span>العام الدراسي</span><input id="academicYear" type="text" placeholder="مثال: 1448 هـ / 2026-2027"></label>
             <label><span>اسم الموجه الطلابي — تلقائي</span><input id="counselorName" type="text" readonly></label>
             <label><span>اسم مدير المدرسة — تلقائي من بيانات المدرسة</span><input id="principalName" type="text" readonly></label>
-            <label><span>عنوان الخطة</span><input id="planTitle" type="text" value="خطة الأعمال الأسبوعية للموجه الطلابي"></label>
+            <label><span>عنوان الخطة — تلقائي حسب الفصل</span><input id="planTitle" type="text" value="خطة الموجه الطلابي للفصل الدراسي الأول" readonly aria-readonly="true"></label>
           </div>
         </article>
 
         <article class="setup-card calendar-card">
           <div class="card-heading"><span>2</span><div><h3>مدة الدراسة</h3><p>تُحسب الأسابيع من الأحد إلى الخميس تلقائيًا.</p></div></div>
           <div class="form-grid calendar-fields">
-            <label><span>تاريخ بداية الدراسة</span><input id="studyStart" type="date"></label>
-            <label><span>تاريخ نهاية الدراسة</span><input id="studyEnd" type="date"></label>
+            <label><span>بداية الفصل الدراسي</span><input id="studyStart" type="date"></label>
+            <label><span>نهاية الفصل الدراسي</span><input id="studyEnd" type="date"></label>
           </div>
           <div class="calendar-note"><b>آلية التوزيع:</b> الأسبوع الذي تكون جميع أيامه إجازة يظهر كفاصل إجازة ولا يُحتسب ضمن ترقيم أسابيع الدراسة. أما الإجازة الجزئية فتظهر ملاحظة داخل الأسبوع وتُضبط بدايته ونهايته على أيام الدراسة الفعلية.</div>
         </article>
@@ -162,14 +163,15 @@
   </div>
 
   <div id="toast" class="toast" hidden></div>
-  <script src="../bubble-schema.js?v=school-1.0.49"></script>
-  <script src="../bubble-config.js?v=school-1.0.49"></script>
-  <script src="../school-context.js?v=school-1.0.49"></script>
-  <script src="../bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="../school-directory.js?v=school-1.0.49"></script>
-  <script src="app-v13.js?v=19.0.8"></script>
+  <script src="../bubble-schema.js?v=school-1.0.86"></script>
+  <script src="../bubble-config.js?v=school-1.0.86"></script>
+  <script src="../school-context.js?v=school-1.0.86"></script>
+  <script src="../bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="../school-directory.js?v=school-1.0.86"></script>
+  <script src="app-v13.js?v=school-1.0.86"></script>
   <script src="../support-widget.js?v13"></script>
-  <script src="../smart-reminders.js?v=19.0.9"></script>
-  <script src="../global-shell.js?v=school-1.0.49"></script>
+  <script src="../smart-reminders.js?v=19.0.10"></script>
+  <script src="../global-shell.js?v=school-1.0.86"></script>
+  <script src="../school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>
