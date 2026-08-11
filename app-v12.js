@@ -122,7 +122,7 @@ async function loadAccount(){
  if(entsResult.error)throw entsResult.error;if(promoResult.error)throw promoResult.error;state.entitlements=entsResult.data||[];state.promoAccesses=promoResult.data||[];
 }
 function planSummary(){
- if(SCHOOL_EDITION)return{title:"منصة المدارس",details:"مدارس المشكاة الأهلية — جميع الخدمات متاحة بدون اشتراكات",chips:["جميع الخدمات متاحة","نسخة المدرسة"]};
+ if(SCHOOL_EDITION)return{title:"منصة المدرسة",details:"مدارس المشكاة الأهلية — جميع الخدمات متاحة",chips:["جميع الخدمات متاحة","نسخة المدرسة"]};
  const gifts=activePromoAccesses();const giftProducts=new Set(gifts.map(g=>g.product_code));
  const giftChips=gifts.map(g=>`هدية: ${LABELS[g.product_code]||g.product_code} حتى ${formatDate(g.access_ends_at)}`);
  if(isAdmin())return{title:'مدير النظام',details:'صلاحية كاملة لجميع المنصات والباقات.',chips:['جميع المنصات','هدية: شهادات التقدير',...giftChips]};

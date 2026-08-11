@@ -2,7 +2,7 @@
 /* Role-scoped statistics — homepage insight zone V1.0.17 */
 (function(global){
   if(global.MishkatGuidanceAccess)return;
-  const SUPERVISOR_PREVIEW=true;
+  const SUPERVISOR_PREVIEW=false;
   const $=s=>document.querySelector(s);
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   function context(){return global.MishkatSchoolContext?.getContext?.()||{};}
@@ -17,7 +17,7 @@
     main.querySelector('#guidanceInsightZone')?.remove();
     const c=context();const items=[];
     if(c.canViewSupervisionStats||SUPERVISOR_PREVIEW){
-      items.push(insight({kind:'supervision',title:'لوحة الإشراف والمتابعة للتوجيه الطلابي',desc:'نظرة تنفيذية على أداء المدارس: النشاط الإرشادي، الحالات والمواقف، البرامج الجماعية، التواصل، المواظبة، الخطط، التقويم والشهادات — مع مقارنة المدارس داخل نطاق الإشراف.',href:'guidance-stats/index.html?scope=supervision&from=home&preview=general_supervisor',scope:c.canViewSupervisionStats?(c.roleKey==='complex_supervisor'?'نطاق المجمع الموزع عليك':'نطاق الإشراف المصرح به'):'معاينة حالية بصلاحية المشرف العام',pills:['مقارنة المدارس','مؤشرات الطلاب','المواقف والحالات','البرامج والخطط']}));
+      items.push(insight({kind:'supervision',title:'لوحة الإشراف والمتابعة للتوجيه الطلابي',desc:'لوحة إشرافية شاملة لجميع المجمعات والمراحل، مع مقارنة إنجاز الخطط ومستوى تنفيذ البرامج والجلسات ومؤشرات السجلات والتواصل والمواظبة.',href:'guidance-stats/index.html?scope=supervision&from=home',scope:'جميع المجمعات والمراحل',pills:['إنجاز الخطة','مقارنة المجمعات','تفصيل المراحل','مؤشرات الطلاب']}));
     } else if(c.canViewSchoolStats){
       items.push(insight({kind:'school',title:'إحصائيات التوجيه الطلابي للمدرسة',desc:'متابعة مؤشرات المدرسة والسجلات والطلاب المستفيدين والبرامج والمراسلات والخطط حسب العام الأكاديمي والفصل الدراسي.',href:'guidance-stats/index.html?scope=school&from=home',scope:c.roleKey==='counselor'?'مدرستك ومرحلتك':'نطاق المدرسة بالكامل',pills:['مؤشرات السجلات','الطلاب المستفيدون','التواصل','الخطط والتنفيذ']}));
     }

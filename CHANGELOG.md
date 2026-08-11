@@ -1,3 +1,125 @@
+## V1.0.86 — Counselor statistics assignment scope
+- Hardened counselor statistics to the assigned campus + stage intersection.
+- Counselor scope now uses the authoritative assigned school/stage lists from Bubble.
+- Fail-closed stage filtering prevents accidental cross-stage statistics when assignment is missing.
+- Scope header explicitly shows campus and stage.
+
+## 1.0.80
+- إصلاح عرض اسم المدرسة في صفحة الإحصائيات بدل مرجع Bubble الرقمي.
+- تحسين Hydration لأسماء المدارس من Directory/Current Context.
+- تحديث cache لصفحة الإحصائيات.
+
+## 1.0.79
+- Centered collective report headings and connected upcoming session dates to Smart Calendar and reminders.
+
+## V1.0.76 — SubCollective Workflow API CRUD
+- ربط حفظ جلسات المتابعة بـ `guidance_save_subcollective`.
+- ربط تعديل جلسات المتابعة بـ `guidance_update_subcollective` باستخدام بيانات الجلسة الأصلية، بدون أي ID يدوي.
+- ربط حذف جلسات المتابعة بـ `guidance_delete_subcollective`.
+- الإبقاء على قراءة التقرير من Bubble وتجميع الجلسات التابعة تحت الجلسة الرئيسية.
+- بعد الحفظ أو التعديل يعود المستخدم مباشرة إلى تقرير الإرشاد الجمعي.
+
+## V1.0.75 — Collective follow-up chain
+- Added up to three linked follow-up sessions using the existing `Guidance_SubCollective` table.
+- Added `+ إضافة جلسة` beside Edit on the latest session in the chain.
+- Follow-up title/date inherit from the previous session; participants are not re-entered.
+- Grouped main and follow-up sessions visually in the collective report.
+- No Bubble schema changes.
+
+## V1.0.72 — Compact luxury collective guidance report
+- تقرير الإرشاد الجمعي يعرض فقط: اسم الجلسة، المشاركون، الزمن.
+- إعادة تصميم الجدول بحجم متزن وألوان أزرق/تركواز متوافقة مع هوية المنصة.
+- الانتقال إلى صفحة التقرير فور نجاح الحفظ أو حفظ التعديل.
+- فصل نجاح الحفظ عن تحديث التقرير حتى لا يظهر الحفظ كفشل بسبب تأخر تحميل التقرير.
+- الحفاظ على أزرار التعديل والطباعة والحذف كإجراءات مستقلة عن بيانات التقرير.
+
+## V1.0.71 — Collective guidance save/update/report UX
+- Successful save/update now moves immediately to the collective guidance report view.
+- Existing records show **حفظ التعديل** instead of **حفظ السجل** while editing.
+- Collective report colors and sizing were aligned with the Mishkat blue/teal design system.
+- Wide report usability improved with wrapped text, compact widths, sticky action controls, and print-safe sizing.
+
+# V1.0.71
+- تحويل زمن جلسة الإرشاد الجمعي إلى قائمة منسدلة من Option Set `Guidance_Time`.
+- إرسال Display الخاص بالخيار مباشرة إلى Bubble في الحفظ والتعديل.
+- لا يوجد أي تعديل على قاعدة البيانات أو السجلات القديمة.
+
+## V1.0.68
+- Complete Guidance_Collective save/report synchronization and deterministic post-save report redirect.
+
+## V1.0.67 — 2026-08-11
+- ربط تقرير الإرشاد الجمعي مباشرة ببيانات Guidance_Collective في Bubble.
+- دمج السجلات البعيدة والمحلية بدون ازدواجية، مع فتح/تعديل/طباعة/حذف السجل البعيد.
+- إضافة تاريخ الجلسة واليوم للتقرير، وتحميل Guidance_Time لعرض المدة.
+
+# V1.0.64 — Collective guidance automatic weekday
+
+- Replaced the editable **اليوم** textbox in the collective guidance session with a non-editable derived display.
+- The Arabic weekday is calculated automatically from **تاريخ السجل** and refreshes instantly when the date changes.
+- The derived day is still stored in the form data for printing/report continuity, with no manual user entry.
+- Bubble collective Save/Update/Delete workflow integration from V1.0.63 is unchanged.
+
+## V1.0.63 — Collective guidance workflow API
+- Connected `group_guidance` to `guidance_save_collective`, `guidance_update_collective`, and `guidance_delete_collective`.
+- New records are created in Bubble before the local archive mirror is updated.
+- Edits send the original collective date/title to Bubble so the existing row is changed instead of creating a duplicate.
+- Delete removes the local archive row only after Bubble confirms the backend workflow succeeded.
+- Grade (school), School (complex), Department, academic year, term, and selected Students are resolved automatically from the authenticated Bubble context; there is no user-facing manual ID entry.
+- Optional collective fields are omitted from the request when blank.
+- Cache-busting updated to `school-1.0.63`.
+
+## V1.0.61 — Plan create/update workflows
+- Added `guidance_update_plan` endpoint integration.
+- Prevented duplicate plan creation on repeated saves.
+- Added workflow identity markers for plans whose create response has no Bubble ID.
+- Existing Bubble plan rows seed the update marker automatically.
+
+# V1.0.60 — Guidance Plan Workflow API
+- نقل حفظ `Guidance_Plan` من الكتابة المباشرة عبر Data API إلى Backend Workflow موثّق باسم `guidance_save_plan`.
+- تمرير `Grade` (المدرسة) و`School` (المجمع) و`Department` و`academic year` و`terms` تلقائيًا كمراجع Bubble Things من سياق المستخدم.
+- استخدام User Bearer Token الحالي؛ لا يوجد Admin API Token في الواجهة.
+- حفظ النموذج الكامل للخطة والأسابيع والبرامج والجلسات داخل `Notes`.
+- إضافة `Grade` إلى خريطة `Guidance_Plan` بعد إضافته فعليًا في Bubble.
+- عدم إعلان نجاح الحفظ إلا بعد رد `success=yes/true` من الـBackend Workflow.
+
+# V1.0.59
+- حفظ رأس الخطة في Guidance_Plan أصبح مستقلًا عن مزامنة Guidance_Plan_Item.
+- تحسين تشخيص أخطاء Bubble وصلاحيات Data API.
+- إعادة محاولة الحفظ بالحقول الأساسية عند رفض حقل اختياري.
+
+# V1.0.59 — Verified Bubble Plan Persistence
+
+- خطة الموجه لا تُعتبر محفوظة إلا بعد إنشاء/تحديث سجل حقيقي في Bubble والتحقق منه بقراءة السجل مرة أخرى.
+- إلغاء LocalStorage fallback نهائيًا لنوعي `Guidance_Plan` و`Guidance_Plan_Item`.
+- عند فشل Bubble تظهر رسالة خطأ واضحة بدل رسالة نجاح وهمية.
+- ترحيل الخطط المحلية القديمة تلقائيًا إلى Bubble عند فتح منصة الخطة إذا أمكن.
+- أرشيف الخطط يعرض فقط السجلات القادمة من Bubble ويظهر عليها «محفوظ في قاعدة المدرسة ✓».
+- تحسين سلامة تحديث بنود الخطة: تُحفظ البنود الجديدة أولًا، ثم تُحذف النسخة القديمة بعد نجاح الكتابة.
+- تسريع كتابة بنود الخطة بتوازي محدود لا يتجاوز 5 طلبات.
+- الاتصال الحالي ما زال ببيئة Bubble Development عبر `version-test`؛ لم يتم التحويل إلى Live بدون طلب صريح.
+
+## V1.0.57 — 2026-08-11
+- Automatic term-based plan naming.
+- Messages top hint header-overlap fix.
+- Plan completion and programs/sessions school comparison analytics with role-scoped access.
+- Removed supervisor preview bypass.
+
+## V1.0.56 — Term date labels
+- استبدال «بداية الدراسة / نهاية الدراسة» داخل الخطة بـ «بداية الفصل الدراسي / نهاية الفصل الدراسي».
+- تحديث رسائل التحقق وملخص الطباعة والتنبيه المرتبط بالتواريخ.
+- الحفاظ على توافق البيانات القديمة عبر الإبقاء على startDate/endDate داخليًا.
+
+
+## V1.0.53 — Free School Edition
+- إزالة الباقات والاشتراكات والهدايا من واجهة نسخة المدرسة.
+- جميع الخدمات متاحة مباشرة للمستخدم المدرسي.
+- إصلاح شاشة شهادات التقدير وإزالة «هدية الباقة».
+- إزالة شروط التسعير/واتساب من الطلب الداخلي للعروض.
+## V1.0.52 — Direct school-manager lookup
+- Fixed the root manager-resolution dependency on the general employee directory.
+- Added direct `job_titels -> Users Data` lookup constrained by `Current Job` and current School.
+- Added session-scoped manager cache and automatic UI refresh after async resolution.
+
 # V1.0.22 — Bubble Records Directory Fix
 
 - Fixed blank student dropdowns in Digital Records.
@@ -373,3 +495,34 @@
 - `User Student` is used by its exact Bubble field name.
 - Records catalog renders before Bubble/archive network calls so all 16 digital records remain visible.
 - All 16 record definitions now have a Bubble persistence mapping using confirmed existing types/fields; aggregate lateness/absence tracking is preserved in `Guidance_Log` details.
+
+## V1.0.78 — Full-page collective report scrolling
+- تقرير الإرشاد الجمعي يتمدد مع عدد السجلات بدون Scroll رأسي داخل البلوك.
+- السكرول أصبح للصفحة بالكامل عند كبر التقرير.
+- الأعمدة الأربعة تتكيف مع عرض الصفحة، وعلى الشاشات الضيقة تتحول الصفوف إلى بطاقات مقروءة بدون Nested Scroll.
+- لا تغيير في قاعدة البيانات أو Workflows أو منطق الحفظ والتعديل والحذف.
+
+
+# V1.0.81 — Statistics campus/stage terminology fix
+
+- توحيد المصطلحات في صفحة الإحصائيات: `School` في Bubble يُعرض كمجمع، و`Department` يُعرض كمرحلة.
+- جدول آخر النشاطات يعرض الآن: النوع، المجمع، المرحلة، التاريخ.
+- حل أسماء المرحلة من دليل `Department` بدل إظهار أي مرجع Bubble.
+- تغيير عناوين المقارنات والفلاتر من المدرسة إلى المجمع حتى لا تختلط المرحلة بالمجمع.
+
+# V1.0.83 — النشاط حسب المجمع والمرحلة
+
+- تطوير لوحة الإحصائيات من إجمالي النشاط حسب المجمع فقط إلى عرض هرمي حسب `School` (المجمع) ثم `Department` (المرحلة).
+- كل مجمع يعرض إجمالي النشاط، عدد الطلاب المستفيدين، ونسبة إنجاز الخطة.
+- تحت كل مجمع تظهر المراحل المسجل عليها نشاط، مع إنجاز الخطة والبرامج والجلسات وإجمالي النشاط والطلاب لكل مرحلة.
+- ترتيب المراحل دراسيًا قدر الإمكان: ابتدائية أولية، ابتدائية عليا، متوسطة، ثانوية.
+- إتاحة التفصيل في نطاق المدرسة والإشراف، مع احترام فلاتر العام والفصل والمجمع والصلاحيات الحالية.
+- لا تغيير في Bubble schema أو Workflows.
+
+# V1.0.84 — صلاحيات الإحصائيات حسب الدور
+
+- تقييد الموجه الطلابي على المجمع والمرحلة الموزع عليهما فقط.
+- فتح جميع المجمعات والمراحل للمشرف، المشرف العام، مشرف المجمع، مدير المجمعات ومدير النظام.
+- إضافة دعم صريح لمسمى مدير النظام في تحديد الدور.
+- توحيد بطاقة الإحصائيات الإشرافية على عبارة جميع المجمعات والمراحل.
+- لا تغيير في Bubble schema أو Workflows.

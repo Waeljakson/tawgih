@@ -1,0 +1,3 @@
+/* Mishkat School Edition V1.0.54 — permanently free school workspace */
+#subscriptionModal,#promoModal,#paymentModal,.subscription-box,.subscription-card,.plans-overview,.price-note,#openPromoButton,#requestPremiumButton,[data-quick-plan],.payment-modal{display:none!important}
+body[data-school-free="true"] .locked-platform-group{display:none!important}

@@ -10,7 +10,7 @@
   const ROOT_URL=new URL('./',SCRIPT_URL);
   const CALENDAR_URL=new URL('calendar/index.html?from=portal',ROOT_URL).href;
   const PLAN_URL=new URL('plans/index.html?from=portal',ROOT_URL).href;
-  const state={session:null,user:null,access:false,account:{},plans:[],latestPlan:null,customEvents:[],reminderStates:[],events:[],reminders:[],loading:false};
+  const state={session:null,user:null,access:false,account:{},plans:[],latestPlan:null,customEvents:[],recordSessionEvents:[],reminderStates:[],events:[],reminders:[],loading:false};
   const LATEST_PLAN_CACHE_PREFIX='guidance_latest_plan_v1:';
   let loadPromise=null;
   let refreshTimer=null;
@@ -70,6 +70,39 @@
   }
 
   function normalizePlanData(plan){let pd=plan?.plan_data;if(typeof pd==='string')pd=safeParse(pd);return pd&&typeof pd==='object'?pd:{}}
+  const cleanText=value=>String(value??'').trim();
+  function sessionEventKey(kind,title,currentDate,nextDate){
+    return ['guidance-session',kind,cleanText(title).toLowerCase(),String(currentDate||'').slice(0,10),String(nextDate||'').slice(0,10)].join('|');
+  }
+  function sessionEventModel({kind='collective',title='',currentDate='',nextDate='',details=''}){
+    const date=String(nextDate||'').slice(0,10);if(!date)return null;
+    const label=cleanText(title)||'الإرشاد الجمعي';
+    const kindLabel=kind==='subcollective'?'جلسة متابعة':(kind==='collective'?'جلسة إرشاد جمعي':'جلسة قادمة');
+    const key=sessionEventKey(kind,label,currentDate,date);
+    return {id:key,dedupe_key:key,title:`موعد ${kindLabel}: ${label}`,details:details||`موعد الجلسة القادمة المسجل في ${kindLabel}.`,event_date:date,category:'followup',priority:'normal',source:'record'};
+  }
+  function localRecordSessionEvents(){
+    let rows=[];try{const parsed=safeParse(localStorage.getItem('mishkat_school_records_local_v3'));if(Array.isArray(parsed))rows=parsed}catch(_e){}
+    return rows.map(row=>{
+      const data=row?.form_data||{},next=data.next_session_date;if(!next)return null;
+      const kind=row?.record_type==='group_guidance_followup'?'subcollective':(row?.record_type==='group_guidance'?'collective':'session');
+      const title=data.session_title||row?.title||'سجل التوجيه الطلابي';
+      const seq=data.followup_number?`الجلسة ${data.followup_number}`:'الجلسة الرئيسية';
+      return sessionEventModel({kind,title,currentDate:row?.record_date,nextDate:next,details:`${seq} — موعد الجلسة القادمة.`});
+    }).filter(Boolean);
+  }
+  function bubbleRecordSessionEvents(mainRows=[],subRows=[]){
+    const schema=window.MishkatBubbleStore?.schema||window.MISHKAT_BUBBLE_SCHEMA||{};
+    const mainF=schema?.fields?.guidanceCollective||{},subF=schema?.fields?.guidanceSubCollective||{};
+    const make=(row,f,kind)=>sessionEventModel({
+      kind,
+      title:row?.[f.collectiveName||'Collective name']||'الإرشاد الجمعي',
+      currentDate:row?.[f.collectiveDate||'Collective Date'],
+      nextDate:row?.[f.nextDate||'next Date'],
+      details:kind==='subcollective'?'جلسة متابعة — موعد الجلسة القادمة.':'الجلسة الرئيسية — موعد الجلسة القادمة.'
+    });
+    return [...(mainRows||[]).map(row=>make(row,mainF,'collective')),...(subRows||[]).map(row=>make(row,subF,'subcollective'))].filter(Boolean);
+  }
   function reminderStateMap(){return new Map((state.reminderStates||[]).map(x=>[x.reminder_key,x]))}
   function reminderVisible(rem,map){const s=map.get(rem.key);if(!s)return true;if(s.dismissed_at)return false;if(s.snoozed_until&&new Date(s.snoozed_until).getTime()>Date.now())return false;return true}
   function reminderUnread(rem,map){const s=map.get(rem.key);return !(s&&s.read_at)}
@@ -131,13 +164,15 @@
       const raw=safeParse(localStorage.getItem(`guidance_calendar_custom_v1:${state.user?.id||''}`));
       if(Array.isArray(raw))localCustom=raw;
     }catch(_e){}
-    const mergedCustom=[...(state.customEvents||[]),...localCustom];
+    const recordLocal=localRecordSessionEvents();
+    const mergedCustom=[...(state.customEvents||[]),...(state.recordSessionEvents||[]),...recordLocal,...localCustom];
     const seenCustom=new Set();
     for(const e of mergedCustom){
       const date=String(e.event_date||e.date||'').slice(0,10);if(!date)continue;
-      const dedupe=`${e.id||''}|${date}|${e.title||''}`;if(seenCustom.has(dedupe))continue;seenCustom.add(dedupe);
+      const dedupe=e.dedupe_key||`${e.source||'custom'}|${e.id||''}|${date}|${e.title||''}`;if(seenCustom.has(dedupe))continue;seenCustom.add(dedupe);
       const id=e.id||`local_${date}_${seenCustom.size}`;
-      events.push({key:`custom:${id}`,date,title:e.title||'تذكير',category:e.category||'custom',priority:e.priority||'normal',source:'custom',details:e.details||'',id});
+      const source=e.source||'custom';
+      events.push({key:`${source}:${id}`,date,title:e.title||'تذكير',category:e.category||'custom',priority:e.priority||'normal',source,details:e.details||'',id});
     }
 
     // V19.0.8: every event that appears in the calendar is itself a reminder.
@@ -176,11 +211,21 @@
     loadPromise=(async()=>{
       if(window.MishkatBubbleStore&&window.MishkatSchoolContext){
         const c=window.MishkatSchoolContext.getContext();state.user={id:c.id||'school-user'};state.session={schoolEdition:true};state.access=true;state.account={full_name:c.counselorName||'',school_name:c.schoolName||''};
-        const [planRows,eventRows]=await Promise.all([window.MishkatBubbleStore.listPlans().catch(()=>[]),window.MishkatBubbleStore.listEvents().catch(()=>[])]);
-        state.plans=(planRows||[]).map(bubblePlanToLegacy);state.latestPlan=state.plans[0]||null;state.customEvents=(eventRows||[]).map(bubbleEventToLegacy);state.reminderStates=loadLocalReminderStates();derive();return state;
+        const schema=window.MishkatBubbleStore.schema||window.MISHKAT_BUBBLE_SCHEMA||{};
+        const collectiveType=schema?.dataTypes?.guidanceCollective||'Guidance_Collective';
+        const subCollectiveType=schema?.dataTypes?.guidanceSubCollective||'Guidance_SubCollective';
+        const mainF=schema?.fields?.guidanceCollective||{},subF=schema?.fields?.guidanceSubCollective||{};
+        const constraintsFor=f=>{const out=[];if(c.schoolId)out.push({key:f.school||'School',constraint_type:'equals',value:c.schoolId});if(c.stageId)out.push({key:f.dep||'Dep',constraint_type:'equals',value:c.stageId});if(c.academicYearId)out.push({key:f.academicYear||'Academic year',constraint_type:'equals',value:c.academicYearId});if(c.termId)out.push({key:f.term||'Term',constraint_type:'equals',value:c.termId});return out};
+        const [planRows,eventRows,collectiveRows,subCollectiveRows]=await Promise.all([
+          window.MishkatBubbleStore.listPlans().catch(()=>[]),
+          window.MishkatBubbleStore.listEvents().catch(()=>[]),
+          window.MishkatBubbleStore.list(collectiveType,constraintsFor(mainF)).catch(()=>[]),
+          window.MishkatBubbleStore.list(subCollectiveType,constraintsFor(subF)).catch(()=>[])
+        ]);
+        state.plans=(planRows||[]).map(bubblePlanToLegacy);state.latestPlan=state.plans[0]||null;state.customEvents=(eventRows||[]).map(bubbleEventToLegacy);state.recordSessionEvents=bubbleRecordSessionEvents(collectiveRows,subCollectiveRows);state.reminderStates=loadLocalReminderStates();derive();return state;
       }
       const login=state.user&&state.session?{user:state.user,session:state.session}:await resolveLogin();
-      if(!login){state.access=false;state.plans=[];state.latestPlan=null;state.reminders=[];state.events=[];return state}
+      if(!login){state.access=false;state.plans=[];state.latestPlan=null;state.recordSessionEvents=[];state.reminders=[];state.events=[];return state}
       const token=login.session.access_token;
       const access=await request('/rest/v1/rpc/premium_has_all_access',{method:'POST',token,body:{p_user_id:login.user.id}}).catch(()=>null);
       // If the entitlement RPC is temporarily unavailable, keep the reminder center usable
@@ -325,7 +370,7 @@
         <span class="smart-reminder-bell" aria-hidden="true">🔔</span><span class="smart-reminder-label">التنبيهات</span><b id="smartReminderBadge" hidden>0</b>
       </button>
       <aside id="smartReminderPanel" class="smart-reminder-panel" hidden aria-label="التنبيهات الذكية">
-        <header><div><span>الباقة الشاملة</span><strong>التقويم والتنبيهات الذكية</strong><small>متابعة كل مهام الخطة والبرامج والأعمال والمواعيد المهمة</small></div><button id="smartReminderClose" type="button">×</button></header>
+        <header><div><span>منصة المدرسة</span><strong>التقويم والتنبيهات الذكية</strong><small>متابعة كل مهام الخطة والبرامج والأعمال والمواعيد المهمة</small></div><button id="smartReminderClose" type="button">×</button></header>
         <div id="smartReminderSummary" class="smart-reminder-summary"></div>
         <section id="smartReminderNext" class="smart-reminder-next" aria-live="polite"></section>
         <div id="smartReminderList" class="smart-reminder-list"></div>

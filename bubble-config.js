@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Mishkat School Platform — Bubble connection settings V1.0.49 STABLE DIRECTORY LOADING
+ * Mishkat School Platform — Bubble connection settings V1.0.67 COLLECTIVE REPORT SYNC
  * Development only: authenticates a real Bubble user, stores the user-scoped token
  * in sessionStorage, and sends it to guidance_bootstrap/Data API.
  * NEVER place a Bubble admin token or user password in this file.
@@ -13,6 +13,15 @@
   const workflowRoot="https://almeshkat.mgtech.online/version-test/api/1.1/wf";
   const loginEndpoint=`${workflowRoot}/guidance_login_test`;
   const directoryEndpoint=`${workflowRoot}/guidance_bootstrap`;
+  const planSaveEndpoint=`${workflowRoot}/guidance_save_plan`;
+  const planUpdateEndpoint=`${workflowRoot}/guidance_update_plan`;
+  const planDeleteEndpoint=`${workflowRoot}/guidance_delete_plan`;
+  const collectiveSaveEndpoint=`${workflowRoot}/guidance_save_collective`;
+  const collectiveUpdateEndpoint=`${workflowRoot}/guidance_update_collective`;
+  const collectiveDeleteEndpoint=`${workflowRoot}/guidance_delete_collective`;
+  const subCollectiveSaveEndpoint=`${workflowRoot}/guidance_save_subcollective`;
+  const subCollectiveUpdateEndpoint=`${workflowRoot}/guidance_update_subcollective`;
+  const subCollectiveDeleteEndpoint=`${workflowRoot}/guidance_delete_subcollective`;
   const dataApiBase="https://almeshkat.mgtech.online/version-test/api/1.1/obj";
 
   const storage={
@@ -121,6 +130,9 @@
     out.employees=arr("employees","employee","Users Data","usersData","users_data","staff","schoolEmployees","school_employees");
     out.academicYears=arr("academicYears","academic_years","academic year","years");
     out.terms=arr("terms","academicTerms","academic_terms","semesters");
+    // Guidance_Time is a Bubble Option Set returned by guidance_bootstrap.
+    // Keep its Display values as a canonical list for the records dropdown.
+    out.guidanceTimes=arr("guidance_times","guidanceTimes","guidanceTime","Guidance_Time","Guidance Time");
     const currentYear=data.current_academic_year||data.currentAcademicYear||data["current academic year"]||null;
     if(currentYear){
       const currentId=String(currentYear?._id||currentYear?.id||currentYear?.["unique id"]||currentYear?.["Unique ID"]||"");
@@ -196,6 +208,7 @@
       localStorage.removeItem("mishkat_school_user_context_v3");
       localStorage.removeItem("mishkat_school_user_context_v2");
       sessionStorage.removeItem(LAST_DIRECTORY_KEY);
+      sessionStorage.removeItem("mishkat_school_manager_direct_v2");
     }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:true}}));
     return payload;
@@ -209,6 +222,7 @@
       localStorage.removeItem("mishkat_school_user_context_v3");
       localStorage.removeItem("mishkat_school_user_context_v2");
       sessionStorage.removeItem(LAST_DIRECTORY_KEY);
+      sessionStorage.removeItem("mishkat_school_manager_direct_v2");
     }catch(_e){}
     global.dispatchEvent(new CustomEvent("mishkat:bubble-auth-changed",{detail:{authenticated:false}}));
   }
@@ -268,6 +282,16 @@
   global.MISHKAT_BUBBLE_CONFIG=Object.assign({
     loginEndpoint,
     directoryEndpoint,
+    planSaveEndpoint,
+    planUpdateEndpoint,
+    planDeleteEndpoint,
+    collectiveSaveEndpoint,
+    collectiveUpdateEndpoint,
+    collectiveDeleteEndpoint,
+    subCollectiveSaveEndpoint,
+    subCollectiveUpdateEndpoint,
+    subCollectiveDeleteEndpoint,
+    workflowRoot,
     dataApiBase,
     credentials:"omit",
     timeoutMs:12000,
@@ -278,7 +302,7 @@
     typeApiNames:{
       "academic year":"academic year","Users Data":"Users Data","Students":"Students","terms":"terms","School":"School","Department":"Department","Grades":"Grades","Class":"Class","job_titels":"job_titels","Job Titels":"job_titels","job_titles":"job_titels","Job Title":"job_titels",
       "Guidance_Attandance":"Guidance_Attandance","Guidance_Cases":"Guidance_Cases","Guidance_Collective":"Guidance_Collective","Guidance_Contact":"Guidance_Contact","guidance_Fail":"guidance_Fail","Guidance_FailType":"Guidance_FailType","Guidance_Late":"Guidance_Late","Guidance_Log":"Guidance_Log","Guidance_Mettings":"Guidance_Mettings","Guidance_observ":"Guidance_observ","Guidance_Observation":"Guidance_Observation","Guidance_Periodic":"Guidance_Periodic","Guidance_ProblemBehav":"Guidance_ProblemBehav","Guidance_ProblemEdu":"Guidance_ProblemEdu","Guidance_Project":"Guidance_Project","Guidance_Project_Progress":"Guidance_Project_Progress","Guidance_Reason":"Guidance_Reason","Guidance_Situ":"Guidance_Situ","Guidance_Situation":"Guidance_Situation","Guidance_Skills":"Guidance_Skills","Guidance_Statistics":"Guidance_Statistics","guidance_Studentnotice":"guidance_Studentnotice","Guidance_SubCollective":"Guidance_SubCollective","Guidance_Way":"Guidance_Way","Guidance_Action":"Guidance_Action","Guidance_Behav":"Guidance_Behav","Guidance_Edu":"Guidance_Edu",
-      "Guidance_Plan":"Guidance_Plan","Guidance_Plan_Item":"Guidance_Plan_Item","Guidance_Event":"Guidance_Event","Guidance_Message":"Guidance_Message","Guidance_Presentation":"Guidance_Presentation","Guidance_Certificate":"Guidance_Certificate","Guidance_Template":"Guidance_Template"
+      "Guidance_Plan":"Guidance_Plan","Guidance_Plan_Item":"Guidance_Plan_Item","Guidance_Event":"Guidance_Event","Guidance_Message":"Guidance_Message","Guidance_Presentation":"Guidance_Presentation","Guidance_Certificate":"Guidance_Certificate","Guidance_Template":"Guidance_Template","Guidance_Time":"Guidance_Time"
     }
   },global.MISHKAT_BUBBLE_CONFIG||{});
 

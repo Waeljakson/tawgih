@@ -22,7 +22,7 @@
       guidanceBehav:"Guidance_Behav", guidanceEdu:"Guidance_Edu",
       guidancePlan:"Guidance_Plan", guidancePlanItem:"Guidance_Plan_Item", guidanceEvent:"Guidance_Event",
       guidanceMessage:"Guidance_Message", guidancePresentation:"Guidance_Presentation",
-      guidanceCertificate:"Guidance_Certificate", guidanceTemplate:"Guidance_Template"
+      guidanceCertificate:"Guidance_Certificate", guidanceTemplate:"Guidance_Template", guidanceTime:"Guidance_Time"
     },
     fields: {
       academicYear:{active:"Active",end:"End",start:"start",title:"title"},
@@ -54,7 +54,7 @@
       guidanceSubCollective:{academicYear:"Academic year",collectiveDate:"Collective Date",collectiveName:"Collective name",collectiveTarget:"Collective target",dep:"Dep",duration:"Duration",evaluation:"Evaluation",nextDate:"next Date",orders:"orders",procedures:"procedures",process:"Process",school:"School",target:"Target",term:"Term",tools:"Tools"},
       guidanceWay:{title:"Title"}, guidanceAction:{description:"Action_Description"},
 
-      guidancePlan:{title:"Title",academicYear:"AcademicYear",term:"Term",guide:"Guide",school:"School",department:"Department",status:"Status",notes:"Notes",active:"Active",items:"Items"},
+      guidancePlan:{title:"Title",academicYear:"AcademicYear",term:"Term",guide:"Guide",grade:"Grade",school:"School",department:"Department",status:"Status",notes:"Notes",active:"Active",items:"Items"},
       guidancePlanItem:{plan:"Plan",title:"Title",description:"Description",category:"Category",startDate:"StartDate",endDate:"EndDate",targetGroup:"TargetGroup",grade:"Grade",class:"Class",students:"Students",responsible:"Responsible",executionStatus:"ExecutionStatus",executionPercent:"ExecutionPercent",actualExecutionDate:"ActualExecutionDate",evidence:"Evidence",notes:"Notes",completed:"Completed"},
       guidanceEvent:{title:"Title",eventDate:"EventDate",endDate:"EndDate",eventType:"EventType",description:"Description",guide:"Guide",school:"School",department:"Department",academicYear:"AcademicYear",term:"Term",student:"Student",planItem:"PlanItem",reminder:"Reminder",reminderDate:"ReminderDate",completed:"Completed",notes:"Notes"},
       guidanceMessage:{messageType:"MessageType",subject:"Subject",messageText:"MessageText",guide:"Guide",school:"School",department:"Department",academicYear:"AcademicYear",term:"Term",student:"Student",parentPhone:"ParentPhone",recipientEmployee:"RecipientEmployee",recipientType:"RecipientType",createdDateCustom:"CreatedDateCustom",sent:"Sent",sentDate:"SentDate",channel:"Channel",notes:"Notes"},

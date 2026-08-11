@@ -172,11 +172,11 @@
   async function loadServices(){
     ensureCss(A('smart-reminders.css?v=1.0.32'),'mgsReminderCss');ensureCss(A('support-widget.css?v=1.0.32'),'mgsSupportCss');
     await loadScript(A('bubble-schema.js?v=1.0.32'),'MISHKAT_BUBBLE_SCHEMA');
-    await loadScript(A('bubble-config.js?v=1.0.32'),'MISHKAT_BUBBLE_CONFIG');
-    await loadScript(A('school-context.js?v=1.0.32'),'MishkatSchoolContext');
-    await loadScript(A('bubble-persistence.js?v=1.0.32'),'MishkatBubbleStore');
-    await loadScript(A('school-directory.js?v=1.0.32'),'MishkatBubbleDirectory');
-    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.32'),'__guidanceSmartRemindersLoaded');
+    await loadScript(A('bubble-config.js?v=1.0.65'),'MISHKAT_BUBBLE_CONFIG');
+    await loadScript(A('school-context.js?v=1.0.54'),'MishkatSchoolContext');
+    await loadScript(A('bubble-persistence.js?v=1.0.65'),'MishkatBubbleStore');
+    await loadScript(A('school-directory.js?v=1.0.54'),'MishkatBubbleDirectory');
+    if(!global.__guidanceSmartRemindersLoaded)await loadScript(A('smart-reminders.js?v=1.0.80'),'__guidanceSmartRemindersLoaded');
     if(!global.__unifiedSupportWidgetLoaded)await loadScript(A('support-widget-rest.js?v=1.0.32'),'__unifiedSupportWidgetLoaded');
     setTimeout(syncBadge,500);setInterval(syncBadge,1200);
   }

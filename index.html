@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl" data-platform-name="منصة المدارس — مدارس المشكاة الأهلية">
 <head>
-  <meta name="app-version" content="school-1.0.49">
+  <meta name="app-version" content="school-1.0.86">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2f6b3a">
@@ -38,6 +38,7 @@
     .school-brand-mark{background:#fff!important;padding:8px}.school-brand-mark img{object-fit:contain!important}
     @media(max-width:720px){.school-logo-wrap{width:58px!important;height:58px!important}.guidance-logo-wrap{width:54px;height:54px}}
   </style>
+  <link rel="stylesheet" href="school-free-mode.css?v=school-1.0.86">
 </head>
 <body class="mishkat-home">
   <div id="authBoot" aria-live="polite" hidden style="display:none!important"><div class="auth-boot-card"><div class="auth-boot-spinner" aria-hidden="true"></div><strong>جارٍ فتح منصة المدارس</strong><small>يتم تجهيز خدمات مدارس المشكاة الأهلية...</small></div></div>
@@ -48,7 +49,7 @@
         <div class="brand-mark school-brand-mark"><img src="assets/school-logo.png" alt="شعار مدارس المشكاة الأهلية"></div>
         <span class="eyebrow">منصة موحدة لخدمات التوجيه الطلابي</span>
         <h1>كل أدوات الموجه<br><b>في بوابة واحدة</b></h1>
-        <p>سجّل الدخول إلى منصة مدارس المشكاة الأهلية، وجميع خدمات التوجيه الطلابي متاحة بدون باقات أو اشتراكات.</p>
+        <p>سجّل الدخول إلى منصة مدارس المشكاة الأهلية، وجميع خدمات التوجيه الطلابي متاحة مباشرة لمستخدمي المدرسة.</p>
         <div class="intro-points"><span>تحليل النتائج</span><span>السجلات الرقمية</span><span>العروض التقديمية</span><span>خطة الموجه الطلابي</span><span>إدارة موحدة للخدمات</span><span>مراسلات أولياء الأمور</span><span>تقارير الإنجاز</span><span>التقويم الذكي والتنبيهات</span><span>شهادات التقدير</span><span>هوية المدرسة</span></div>
       </div>
       <div class="auth-card">
@@ -57,7 +58,7 @@
         <label><span>كلمة المرور</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="6 أحرف على الأقل"></label>
         <label><span>الاسم الكامل — للحساب الجديد</span><input id="authFullName" type="text" autocomplete="name" placeholder="اسم المستخدم"></label>
         <div class="auth-actions"><button id="signInButton" class="primary-button" type="button">تسجيل الدخول</button><button id="signUpButton" class="secondary-button" type="button">إنشاء حساب</button></div>
-        <div class="price-note" hidden><strong>الباقات الفردية</strong><span>10 ريالات شهريًا أو 50 ريالًا سنويًا</span><strong>الباقة الشاملة</strong><span>50 ريالًا شهريًا أو 300 ريال سنويًا</span></div>
+        <div class="price-note" hidden><strong>خدمات المدرسة</strong><span>متاحة ضمن حساب المدرسة</span><strong>جميع الخدمات</strong><span>متاحة ضمن حساب المدرسة</span></div>
         <div id="loginStatus" class="status-box" hidden></div>
       </div>
     </div>
@@ -99,7 +100,7 @@
           <button id="portalSupportButton" class="toolbar-button" type="button"><span class="toolbar-icon">?</span><span><b>الدعم الفني</b><small>محادثة مباشرة</small></span></button>
           <button id="openProfileButton" class="toolbar-button" type="button"><span class="toolbar-icon">⌂</span><span><b>بيانات التوزيع</b><small>تلقائي</small></span></button>
           
-          <button id="openPromoButton" class="toolbar-button gift" type="button"><span class="toolbar-icon">🎁</span><span><b>كود هدية</b><small>تفعيل برومو كود</small></span></button>
+          <button id="openPromoButton" class="toolbar-button gift" type="button"><span class="toolbar-icon">🎁</span><span><b>كود هدية</b><small>إتاحة الخدمات</small></span></button>
           <button id="openAdminButton" class="toolbar-button admin" type="button" hidden><span class="toolbar-icon">⚙</span><span><b>إدارة النظام</b><small>الطلبات والحسابات</small></span></button>
           <button id="signOutButton" class="toolbar-button logout" type="button"><span class="toolbar-icon">↪</span><span><b>تسجيل الخروج</b><small>إنهاء الجلسة</small></span></button>
         </div>
@@ -123,7 +124,7 @@
       <section class="platforms-section dashboard-platforms">
         <div class="section-heading dashboard-section-heading">
           <div><span class="section-kicker">مساحة العمل</span><h2>المنصات الرقمية</h2><p>ابدأ من الخدمة التي تحتاجها، ويمكنك العودة إلى هذه الصفحة والتنقل بين خدمات المدرسة في أي وقت.</p></div>
-          <div class="platform-legend"><span><i class="legend-dot active-dot"></i> مفعّلة</span><span><i class="legend-dot locked-dot"></i> غير مفعّلة</span><span><i class="legend-dot coming-dot"></i> قريبًا</span></div>
+          <div class="platform-legend"><span><i class="legend-dot active-dot"></i> متاحة</span><span><i class="legend-dot coming-dot"></i> خدمات قيد التطوير</span></div>
         </div>
 
         <div class="platform-group active-platform-group">
@@ -188,12 +189,12 @@
 
       <section class="plans-overview compact-plans-overview">
         <div class="section-heading dashboard-section-heading">
-          <div><span class="section-kicker">الترقية والاشتراك</span><h2>خطط واضحة بدون تكرار</h2><p>اختر منصة واحدة أو فعّل الباقة الشاملة لكل الخدمات الحالية والمستقبلية.</p></div>
+          <div><span class="section-kicker">إتاحة الخدمات</span><h2>جميع الخدمات متاحة لمستخدمي المدرسة</h2><p>جميع الخدمات الحالية متاحة مباشرة ضمن حساب المدرسة.</p></div>
         </div>
         <div class="compact-plans-grid">
           <article class="compact-plan-card individual-plan">
-            <div class="compact-plan-head"><div><span>منصة واحدة</span><h3>10 <small>ريالات شهريًا</small></h3></div><strong>50 ريالًا سنويًا</strong></div>
-            <p>اختر الخدمة التي تحتاجها فقط، ويمكنك إضافة منصة أخرى لاحقًا كباقة مستقلة.</p>
+            <div class="compact-plan-head"><div><span>منصة واحدة</span><h3>متاحة <small>للمدرسة</small></h3></div><strong>بدون رسوم</strong></div>
+            <p>جميع خدمات المدرسة متاحة من نفس الحساب.</p>
             <div class="individual-plan-actions">
               <button class="plan-choice" data-quick-plan="results_analysis" type="button"><span>▥</span> تحليل النتائج</button>
               <button class="plan-choice" data-quick-plan="guidance_records" type="button"><span>▤</span> السجلات الرقمية</button>
@@ -204,10 +205,10 @@
           </article>
           <article class="compact-plan-card comprehensive-plan">
             <div class="comprehensive-badge">الأوفر للمدرسة</div>
-            <div class="compact-plan-head"><div><span>الباقة الشاملة</span><h3>50 <small>ريالًا شهريًا</small></h3></div><strong>300 ريال سنويًا</strong></div>
-            <p>تفتح كل المنصات المتاحة، وتضم أي منصة جديدة عند إطلاقها ضمن مدة الاشتراك.</p>
+            <div class="compact-plan-head"><div><span>جميع الخدمات</span><h3>متاحة <small>للمدرسة</small></h3></div><strong>بدون رسوم</strong></div>
+            <p>جميع المنصات المتاحة تعمل مباشرة ضمن حساب المدرسة.</p>
             <ul><li>تحليل النتائج التعليمية</li><li>السجلات الرقمية</li><li>العروض التقديمية</li><li>خطة الموجه الطلابي</li><li>تقارير الإنجاز</li><li>التقويم الذكي والتنبيهات — حصري الشاملة</li><li>شهادات التقدير</li><li>المنصات القادمة</li></ul>
-            <button class="primary-button comprehensive-button" data-quick-plan="all_access" type="button">طلب الباقة الشاملة</button>
+            <button class="primary-button comprehensive-button" data-quick-plan="all_access" type="button">جميع الخدمات متاحة</button>
           </article>
         </div>
       </section>
@@ -231,29 +232,29 @@
   </div>
 
   <div id="subscriptionModal" class="modal" hidden style="display:none!important">
-    <div class="modal-card subscription-modal"><div class="modal-head"><div><span>طلب التفعيل</span><h2>اختر الباقة والمدة</h2></div><button class="icon-button" data-close-modal="subscriptionModal">×</button></div>
+    <div class="modal-card subscription-modal"><div class="modal-head"><div><span>خدمات المدرسة</span><h2>جميع الخدمات متاحة</h2></div><button class="icon-button" data-close-modal="subscriptionModal">×</button></div>
       <div class="subscription-options">
         <label class="option-card"><input type="radio" name="productCode" value="results_analysis" checked><span><b>منصة تحليل النتائج</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
         <label class="option-card"><input type="radio" name="productCode" value="guidance_records"><span><b>منصة السجلات الرقمية</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
         <label class="option-card"><input type="radio" name="productCode" value="presentations"><span><b>منصة العروض التقديمية</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
         <label class="option-card"><input type="radio" name="productCode" value="counselor_plan"><span><b>منصة خطة الموجه الطلابي</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
         <label class="option-card"><input type="radio" name="productCode" value="achievement_reports"><span><b>منصة تقارير الإنجاز</b><small>10 شهريًا أو 50 سنويًا</small></span></label>
-        <label class="option-card featured-option"><input type="radio" name="productCode" value="all_access"><span><b>الباقة الشاملة</b><small>50 شهريًا أو 300 سنويًا</small></span></label>
+        <label class="option-card featured-option"><input type="radio" name="productCode" value="all_access"><span><b>جميع الخدمات</b><small>50 شهريًا أو 300 سنويًا</small></span></label>
       </div>
       <div class="period-options"><label><input type="radio" name="billingPeriod" value="monthly" checked><span>شهري</span></label><label><input type="radio" name="billingPeriod" value="yearly"><span>سنوي</span></label></div>
-      <div class="selected-plan"><span>الباقة المطلوبة</span><strong id="selectedPlanName">منصة تحليل النتائج — شهري</strong><b id="selectedPlanPrice">10 ريالات</b></div>
-      <div class="activation-steps"><p><b>1.</b> تواصل عبر واتساب للحصول على بيانات الاشتراك.</p><a id="whatsappActivationLink" class="whatsapp-button" target="_blank" rel="noopener">مراسلة واتساب</a><p><b>2.</b> بعد التواصل، فعّل الإقرار ثم أرسل طلب التفعيل.</p></div>
+      <div class="selected-plan"><span>الخدمة</span><strong id="selectedPlanName">منصة تحليل النتائج</strong><b id="selectedPlanPrice">متاحة</b></div>
+      <div class="activation-steps"><p><b>1.</b> الخدمات المدرسية متاحة مباشرة.</p><a id="whatsappActivationLink" class="whatsapp-button" target="_blank" rel="noopener">مراسلة واتساب</a><p><b>2.</b> الخدمات متاحة مباشرة للمستخدم المدرسي.</p></div>
       <label class="confirmation"><input id="whatsappConfirmed" type="checkbox"><span>أؤكد أنني تواصلت عبر واتساب، وأعلم أن التفعيل لن يتم قبل استكمال التواصل.</span></label>
-      <button id="sendActivationRequestButton" class="primary-button" type="button" disabled>إرسال طلب التفعيل</button><div id="subscriptionStatus" class="status-box" hidden></div>
+      <button id="sendActivationRequestButton" class="primary-button" type="button" disabled>إرسال خدمات المدرسة</button><div id="subscriptionStatus" class="status-box" hidden></div>
     </div>
   </div>
 
   <div id="promoModal" class="modal" hidden>
     <div class="modal-card compact-modal promo-redeem-modal">
-      <div class="modal-head"><div><span>هدية من المنصة</span><h2>تفعيل برومو كود</h2></div><button class="icon-button" data-close-modal="promoModal">×</button></div>
-      <div class="gift-hero"><div class="gift-hero-icon">🎁</div><div><strong>لديك كود هدية؟</strong><p>أدخل الكود لتفعيل باقة شاملة أو منصة محددة لمدة من يوم إلى 10 أيام.</p></div></div>
-      <label><span>البرومو كود</span><input id="promoRedeemCode" class="promo-code-input" type="text" maxlength="32" autocomplete="off" placeholder="GIFT-XXXXXXXX"></label>
-      <button id="redeemPromoButton" class="primary-button" type="button">تفعيل الهدية</button>
+      <div class="modal-head"><div><span>خدمات المدرسة</span><h2>إتاحة الخدمات</h2></div><button class="icon-button" data-close-modal="promoModal">×</button></div>
+      <div class="gift-hero"><div class="gift-hero-icon">🎁</div><div><strong>جميع الخدمات متاحة</strong><p>لا يلزم أي كود؛ جميع الخدمات متاحة لمستخدمي المدرسة.</p></div></div>
+      <label><span>إعداد غير مستخدم</span><input id="promoRedeemCode" class="promo-code-input" type="text" maxlength="32" autocomplete="off" placeholder="غير مستخدم"></label>
+      <button id="redeemPromoButton" class="primary-button" type="button">متاحة</button>
       <div id="promoRedeemStatus" class="status-box" hidden></div>
       <p class="promo-note">يستخدم الكود وفق عدد الاستخدامات الذي حدده مدير النظام، وتبدأ مدة الهدية فور التفعيل.</p>
     </div>
@@ -267,11 +268,11 @@
       <section id="adminPromoPanel" hidden>
         <div class="promo-admin-layout">
           <div class="promo-create-card">
-            <div class="promo-section-head"><div><span>إنشاء كود جديد</span><h3>برومو كود هدية</h3></div><button id="generatePromoCodeButton" class="secondary-button" type="button">توليد كود</button></div>
+            <div class="promo-section-head"><div><span>إنشاء كود جديد</span><h3>إعداد قديم غير مستخدم</h3></div><button id="generatePromoCodeButton" class="secondary-button" type="button">توليد كود</button></div>
             <div class="promo-form-grid">
               <label><span>الكود</span><input id="adminPromoCode" type="text" maxlength="32" placeholder="يُولّد تلقائيًا أو اكتب كودًا"></label>
-              <label><span>الباقة أو المنصة</span><select id="adminPromoProduct">
-                <option value="all_access">الباقة الشاملة</option>
+              <label><span>الخدمة</span><select id="adminPromoProduct">
+                <option value="all_access">جميع الخدمات</option>
                 <option value="results_analysis">تحليل النتائج التعليمية</option>
                 <option value="guidance_records">السجلات الرقمية</option>
                 <option value="presentations">العروض التقديمية</option>
@@ -285,7 +286,7 @@
               <label><span>عدد مرات الاستخدام</span><input id="adminPromoMaxUses" type="number" min="1" max="100" value="1"></label>
               <label class="promo-expiry-field"><span>صلاحية استخدام الكود — اختياري</span><input id="adminPromoExpiresAt" type="datetime-local"></label>
             </div>
-            <button id="createPromoCodeButton" class="primary-button" type="button">إنشاء البرومو كود</button>
+            <button id="createPromoCodeButton" class="primary-button" type="button">إنشاء إعداد غير مستخدم</button>
             <div id="promoAdminStatus" class="status-box" hidden></div>
           </div>
           <div><div class="promo-section-head"><div><span>الأكواد السابقة</span><h3>إدارة أكواد الهدايا</h3></div></div><div id="adminPromoList" class="admin-list promo-code-list"></div></div>
@@ -297,13 +298,14 @@
   </div>
 
   <div id="toast" class="toast" hidden></div>
-  <script src="bubble-schema.js?v=school-1.0.49"></script>
-  <script src="bubble-config.js?v=school-1.0.49"></script>
-  <script src="school-context.js?v=school-1.0.49"></script>
-  <script src="bubble-persistence.js?v=school-1.0.49"></script>
-  <script src="school-directory.js?v=school-1.0.49"></script>
-  <script src="app-v12.js?v=school-1.0.49"></script>
-  <script src="guidance-access.js?v=school-1.0.49"></script>
-  <script src="global-shell.js?v=school-1.0.49"></script>
+  <script src="bubble-schema.js?v=school-1.0.86"></script>
+  <script src="bubble-config.js?v=school-1.0.86"></script>
+  <script src="school-context.js?v=school-1.0.86"></script>
+  <script src="bubble-persistence.js?v=school-1.0.86"></script>
+  <script src="school-directory.js?v=school-1.0.86"></script>
+  <script src="app-v12.js?v=school-1.0.86"></script>
+  <script src="guidance-access.js?v=school-1.0.86"></script>
+  <script src="global-shell.js?v=school-1.0.86"></script>
+  <script src="school-free-mode.js?v=school-1.0.86"></script>
 </body>
 </html>
